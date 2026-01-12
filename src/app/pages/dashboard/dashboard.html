@@ -1,1 +1,83 @@
-<p>dashboard works!</p>
+<div class="dashboard-container">
+
+    <!-- Header -->
+    <header class="page-header">
+        <div>
+            <h2 class="page-title">Dashboard</h2>
+            <p class="text-muted">Welcome to your dashboard</p>
+        </div>
+        <div class="date-display">
+            <span class="material-symbols-rounded">calendar_today</span>
+            <span>Jan 12, 2026</span>
+        </div>
+    </header>
+
+    <!-- Stats Grid -->
+    <section class="stats-grid">
+        @for(stat of stats; track stat.label) {
+        <article class="stat-card">
+            <div class="stat-content">
+                <p class="stat-label">{{ stat.label }}</p>
+                <h3 class="stat-value">{{ stat.value }}</h3>
+                <span class="stat-trend" [class.positive]="stat.trend.startsWith('+')"
+                    [class.negative]="stat.trend.startsWith('-')">
+                    {{ stat.trend }}
+                </span>
+            </div>
+            <div class="stat-icon" [class]="stat.color">
+                <span class="material-symbols-rounded">{{ stat.icon }}</span>
+            </div>
+        </article>
+        }
+    </section>
+
+    <!-- Main Content Grid -->
+    <section class="main-grid">
+
+        <!-- Chart Section (Placeholder) -->
+        <article class="card chart-card">
+            <div class="card-header">
+                <h3 class="card-title">Organization Growth</h3>
+                <button class="icon-btn-small">
+                    <span class="material-symbols-rounded">more_horiz</span>
+                </button>
+            </div>
+            <div class="chart-placeholder">
+                <!-- In a real app, a chart library like Chart.js or ApexCharts would go here -->
+                <div class="bars">
+                    <div class="bar" style="height: 40%"></div>
+                    <div class="bar" style="height: 70%"></div>
+                    <div class="bar" style="height: 50%"></div>
+                    <div class="bar" style="height: 85%"></div>
+                    <div class="bar" style="height: 60%"></div>
+                    <div class="bar" style="height: 90%"></div>
+                    <div class="bar" style="height: 45%"></div>
+                </div>
+                <p class="chart-label">New Organizations (Weekly)</p>
+            </div>
+        </article>
+
+        <!-- Recent Activity -->
+        <article class="card activity-card">
+            <div class="card-header">
+                <h3 class="card-title">System Activity Log</h3>
+                <a href="#" class="link-sm">View All</a>
+            </div>
+            <ul class="activity-list">
+                @for(activity of recentActivities; track activity.id) {
+                <li class="activity-item">
+                    <div class="activity-avatar">{{ activity.user.charAt(0) }}</div>
+                    <div class="activity-details">
+                        <p class="activity-desc">
+                            <span class="fw-medium">{{ activity.user }}</span> - {{ activity.action }}
+                        </p>
+                        <span class="activity-time">{{ activity.time }}</span>
+                    </div>
+                    <span class="status-badge" [class]="activity.statusColor">{{ activity.status }}</span>
+                </li>
+                }
+            </ul>
+        </article>
+
+    </section>
+</div>

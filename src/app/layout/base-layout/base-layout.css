@@ -380,10 +380,6 @@
     transition: opacity 0.4s 0.2s ease, background-color 0.3s ease;
 }
 
-:host-context(body.dark-theme) .theme-toggle-track {
-    background: #695CFE;
-}
-
 .theme-toggle-track .theme-toggle-indicator {
     position: absolute;
     top: 3px;
@@ -394,10 +390,6 @@
     background-color: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
-}
-
-:host-context(body.dark-theme) .theme-toggle-indicator {
-    transform: translateX(24px);
 }
 
 /* Layout */
@@ -798,72 +790,3 @@ footer {
 }
 
 /* Divider spacing */
-.dropdown-menu .dropdown-divider {
-    margin: 6px 0;
-    border-top-color: var(--color-border-hr, rgba(0, 0, 0, .08));
-}
-
-/* Items: make them flex rows so icons align */
-.dropdown-menu .dropdown-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    /* icon ↔ label spacing */
-    padding: 8px 10px;
-    border-radius: 8px;
-    color: var(--color-text-primary, #111);
-    transition: background 0.2s ease, color 0.2s ease;
-}
-
-/* Hover/focus */
-.dropdown-menu .dropdown-item:hover,
-.dropdown-menu .dropdown-item:focus {
-    background: var(--color-hover-secondary, #eef2ff);
-    outline: none;
-}
-
-/* Button items inherit same look */
-.dropdown-menu .dropdown-item.btn,
-.dropdown-menu li>button.dropdown-item {
-    width: 100%;
-    text-align: left;
-    background: transparent;
-    border: 0;
-}
-
-/* Optional destructive style on hover for sign-out */
-.dropdown-menu li>button.dropdown-item:hover[data-variant="danger"],
-.dropdown-menu li>button.dropdown-item[data-variant="danger"]:hover {
-    color: #dc3545;
-    background: color-mix(in srgb, #dc3545 12%, transparent);
-}
-
-/* Material Symbols icon normalization */
-.dropdown-menu .material-symbols-rounded,
-.dropdown-menu .material-symbols-outlined,
-.dropdown-menu .material-icons {
-    font-size: 20px;
-    /* consistent size */
-    line-height: 1;
-    /* no extra vertical space */
-    display: inline-block;
-    vertical-align: middle;
-    /* Optional weight/optical size tuning for Symbols: */
-    font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 20;
-}
-
-/* If you use a specific icon wrapper class */
-.dropdown-menu .ms-icon {
-    font-size: 20px;
-    line-height: 1;
-    display: inline-block;
-    vertical-align: middle;
-    font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 20;
-}
-
-/* Remove Bootstrap's default blue hover background if any cascade leaks */
-.dropdown-menu .dropdown-item.active,
-.dropdown-menu .dropdown-item:active {
-    background: var(--color-hover-secondary, #eef2ff);
-    color: var(--color-text-contrast, #111);
-}
