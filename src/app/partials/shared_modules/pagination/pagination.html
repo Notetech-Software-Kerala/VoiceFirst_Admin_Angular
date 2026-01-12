@@ -1,1 +1,41 @@
-<p>pagination works!</p>
+<nav class="modern-pager" aria-label="Pagination">
+    <div class="pager-left">
+        <select class="form-select page-select" [(ngModel)]="pageSize" (ngModelChange)="changePageSize($event)">
+            @for (s of pageSizes; track s) {
+            <option [ngValue]="s">{{ s }}</option>
+            }
+        </select>
+
+        <span class="muted d-none d-sm-inline">
+            {{ (currentPage - 1) * pageSize + 1 }}–
+            {{ Math.min(currentPage * pageSize, totalItems) }}
+            of {{ totalItems }}
+        </span>
+    </div>
+
+    <ul class="pagination mb-0">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+            <button class="page-link icon" (click)="firstPage()" [attr.aria-disabled]="currentPage===1">«</button>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === 1">
+            <button class="page-link icon" (click)="prevPage()" [attr.aria-disabled]="currentPage===1">‹</button>
+        </li>
+
+        @for (p of pageWindow(); track p) {
+        <li class="page-item" [class.active]="p === currentPage" [class.disabled]="p === '…'">
+            <button class="page-link" [disabled]="p === '…'" (click)="onPageClick(p)">
+                {{ p }}
+            </button>
+        </li>
+        }
+
+        <li class="page-item" [class.disabled]="currentPage === totalPages()">
+            <button class="page-link icon" (click)="nextPage()"
+                [attr.aria-disabled]="currentPage===totalPages()">›</button>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === totalPages()">
+            <button class="page-link icon" (click)="lastPage()"
+                [attr.aria-disabled]="currentPage===totalPages()">»</button>
+        </li>
+    </ul>
+</nav>

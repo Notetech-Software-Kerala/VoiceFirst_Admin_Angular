@@ -87,7 +87,7 @@ export class BaseLayout {
     // adjust filenames to match your assets
     if (collapsed && dark) return '/images/logos/logo.png';
     if (collapsed && !dark) return '/images/logos/logo.png';
-    if (!collapsed && dark) return '/images/logos/voicefirst_logo.png';
+    if (!collapsed && dark) return '/images/logos/voicefirst_logo_light.png';
     return '/images/logos/voicefirst_logo.png';
   }
 

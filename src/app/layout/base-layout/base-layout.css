@@ -574,7 +574,7 @@
 
 /* Sidebar sizing */
 .sidebar {
-    width: 240px;
+    width: 270px;
 }
 
 .sidebar.collapsed {
@@ -791,3 +791,14 @@ footer {
 }
 
 /* Divider spacing */
+
+.dropdown-item {
+    color: var(--color-text-primary) !important;
+    border-radius: 6px;
+}
+
+.dropdown-item:hover {
+    color: var(--color-hover-primary) !important;
+    background: none !important;
+    border-radius: 6px;
+}

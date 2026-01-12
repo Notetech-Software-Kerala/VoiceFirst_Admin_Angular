@@ -1,1 +1,27 @@
-<p>filter-by works!</p>
+<div class="filter-by position-relative">
+    <button class="btn btn-outline-primary dropdown-toggle" type="button" (click)="toggleDropdown()">
+        Filter By
+    </button>
+
+    @if (showDropdown) {
+    <div class="dropdown-menu show shadow p-3 mt-1">
+        @for (f of filters; track f.key) {
+        <div class="filter-group mb-2">
+            <div class="fw-semibold mb-1 filter-label">{{ f.label }}</div>
+            @for (opt of f.options; track opt) {
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" [id]="f.key + '_' + opt"
+                    [checked]="isChecked(f.key, opt)" (change)="toggleValue(f.key, opt, $event.target.checked)" />
+                <label class="form-check-label" [for]="f.key + '_' + opt">
+                    {{ opt }}
+                </label>
+            </div>
+            }
+        </div>
+        @if (f !== filters[filters.length - 1]) {
+        <hr class="my-2" />
+        }
+        }
+    </div>
+    }
+</div>

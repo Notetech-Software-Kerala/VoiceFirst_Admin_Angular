@@ -15,10 +15,10 @@ export const MENU_CONFIG: MenuItem[] = [
   { id: 10, label: 'Issue Type', icon: 'problem', route: '/issue-type' },
   {
     id: 6,
-    label: 'Employees',
+    label: 'User',
     icon: 'group',
     children: [
-      { id: 61, label: 'All Employees', route: '/employees' },
+      { id: 61, label: 'Employees', route: '/employees' },
       { id: 62, label: 'Roles', route: '/roles' },
     ],
   },

@@ -1,0 +1,82 @@
+.filter-by {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-menu {
+    min-width: 240px;
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: var(--color-bg-primary, #fff);
+    border-radius: .5rem;
+    z-index: 1050;
+}
+
+.filter-group {
+    padding: .25rem 0;
+}
+
+.form-check {
+    font-size: 0.9rem;
+}
+
+.filter-label {
+    font-size: .9rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.btn.dropdown-toggle::after {
+    margin-left: .5em;
+}
+
+.dropdown-toggle {
+    margin-top: 10px;
+    padding: 6px 20px;
+    font-size: .9rem;
+    border: 1px solid var(--color-border-hr);
+    color: var(--color-text-placeholder);
+}
+
+.dropdown-toggle:hover {
+    background-color: transparent;
+}
+
+.dropdown-toggle:focus {
+    outline: none;
+    box-shadow: none;
+    color: var(--color-text-placeholder);
+    border-color: var(--color-border-hr);
+}
+
+
+.dropdown-menu::-webkit-scrollbar {
+    width: 3px;
+    /* Make the scrollbar track thinner */
+    height: 6px;
+    /* Optional: for horizontal scrollbar */
+}
+
+.dropdown-menu::-webkit-scrollbar-track {
+    background: var(--color-bg-sidebar);
+    /* Track color */
+    border-radius: 10px;
+    /* Rounded corners for track */
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+    background: var(--color-border-hr);
+    /* Thumb color */
+    border-radius: 0px;
+    /* Rounded corners for the thumb */
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background: var(--color-border-hr);
+    /* Hover color */
+}
+
+.dropdown-menu::-webkit-scrollbar-button {
+    display: none;
+    /* Hide the scrollbar buttons */
+}

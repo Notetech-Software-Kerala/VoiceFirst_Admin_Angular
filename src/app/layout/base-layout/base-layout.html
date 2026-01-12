@@ -39,7 +39,8 @@
 
             @for (child of item.children; track child.id) {
             <li class="submenu-item" role="none">
-              <a class="submenu-link" role="menuitem" [routerLink]="child.route" routerLinkActive="active">
+              <a class="submenu-link" role="menuitem" [routerLink]="child.route" routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: true }">
                 <span class="material-symbols-rounded">{{ child.icon ?? 'arrow_right' }}</span>
                 <span class="submenu-label">{{ child.label }}</span>
               </a>
@@ -49,7 +50,8 @@
 
           } @else {
           <!-- Leaf item navigates via routerLink -->
-          <a class="menu-link" role="menuitem" [routerLink]="item.route" routerLinkActive="active">
+          <a class="menu-link" role="menuitem" [routerLink]="item.route" routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }">
             <span class="material-symbols-rounded">{{ item.icon }}</span>
             <span class="menu-label">{{ item.label }}</span>
           </a>

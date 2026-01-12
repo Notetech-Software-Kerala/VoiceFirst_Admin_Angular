@@ -1,0 +1,110 @@
+.search-bar {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    flex: 1;
+    width: 100%;
+    border: 1px solid var(--color-border-hr);
+    background-color: var(--color-bg-sidebar);
+    color: var(--color-text-primary);
+    border-radius: 8px;
+    padding: 0.45rem 2rem 0.45rem 0.75rem;
+    font-size: 0.9rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-input:focus {
+    border-color: var(--color-hover-primary, #695CFE);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-hover-primary, #695CFE) 25%, transparent);
+    outline: none;
+}
+
+/* Clear (×) button */
+.clear-btn {
+    position: absolute;
+    right: 0.6rem;
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    color: var(--color-text-placeholder);
+    cursor: pointer;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.clear-btn:hover {
+    color: var(--color-hover-primary, #695CFE);
+}
+
+/* Info icon */
+.info-wrapper {
+    position: absolute;
+    right: 0.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.info-icon {
+    font-size: 1.1rem;
+    color: var(--color-text-placeholder);
+    cursor: pointer;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+}
+
+/* Tooltip styling */
+.info-icon::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 130%;
+    right: -100px;
+    transform: translateY(10px);
+    background: var(--color-text-primary);
+    color: var(--color-bg-sidebar);
+    font-size: 0.75rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    white-space: wrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    box-shadow: 0 3px 8px var(--color-shadow);
+    z-index: 999;
+    max-width: 300px;
+    text-align: center;
+}
+
+.info-icon:hover::after,
+.info-icon:focus::after {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .search-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-input {
+        width: 100%;
+        padding-right: 2rem;
+    }
+}

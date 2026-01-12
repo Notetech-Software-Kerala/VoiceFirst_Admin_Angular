@@ -1,0 +1,139 @@
+/* pagination */
+
+/* container */
+.modern-pager {
+    display: flex;
+    gap: .75rem;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    padding-top: .5rem;
+}
+
+/* left side (page size + summary) */
+.pager-left {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+}
+
+.page-select {
+    width: 50px;
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-hr);
+    padding: 6px !important;
+    text-align: center;
+}
+
+.muted {
+    color: var(--color-text-placeholder);
+    margin-top: 0px;
+}
+
+
+/* pagination look */
+.pagination {
+    --bg: var(--color-bg-primary);
+    --fg: var(--color-text-primary);
+    --border: var(--color-border-hr);
+    --hover: var(--color-hover-secondary);
+    --accent: var(--color-hover-primary, #695CFE);
+
+    display: flex;
+    flex-wrap: wrap;
+    /* Allow wrapping on small screens */
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.5rem;
+}
+
+.pagination .page-item {
+    display: inline-flex;
+}
+
+.pagination .page-link {
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--fg);
+    border-radius: 999px;
+    padding: 0.35rem 0.75rem;
+    min-width: 2.25rem;
+    text-align: center;
+    line-height: 1.2;
+    font-size: 0.95rem;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pagination .page-link.icon {
+    padding: 0.35rem 0.6rem;
+    /* narrower for chevrons */
+}
+
+/* Hover and active states */
+.pagination .page-link:hover:not([aria-disabled="true"]):not(:disabled) {
+    background: var(--hover);
+}
+
+.pagination .page-item.active .page-link {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    box-shadow: 0 6px 14px -6px rgba(105, 92, 254, 0.35);
+}
+
+/* Disabled */
+.pagination .page-item.disabled .page-link,
+.pagination .page-link[aria-disabled="true"] {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* Focus ring */
+.pagination .page-link:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+/* --- Responsive Tweaks --- */
+
+/* Small tablets */
+@media (max-width: 768px) {
+    .pagination {
+        gap: 0.25rem;
+        padding: 0.4rem;
+    }
+
+    .pagination .page-link {
+        font-size: 0.85rem;
+        padding: 0.3rem 0.6rem;
+    }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+    .pagination {
+        justify-content: center;
+        gap: 0.25rem;
+    }
+
+    .pagination .page-link {
+        min-width: 2rem;
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    /* Hide long text on very small screens */
+    .pager-left .muted {
+        display: none;
+    }
+}
+
+/* Very small devices (under 360px) */
+@media (max-width: 360px) {
+    .pagination .page-link {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.45rem;
+    }
+}

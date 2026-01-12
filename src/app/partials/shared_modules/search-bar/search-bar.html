@@ -1,1 +1,24 @@
-<p>search-bar works!</p>
+<div class="search-bar position-relative d-flex flex-column flex-sm-row align-items-center gap-2 w-100">
+    @if (label) {
+    <label class="form-label me-2 mb-0">{{ label }}</label>
+    }
+
+    <div class="search-wrapper position-relative flex-grow-1 w-100">
+        <input type="text" class="form-control search-input pe-5" [placeholder]="placeholder" [value]="value"
+            (input)="onInputChange($event)" />
+
+        <!-- Show clear (×) if there's text -->
+        @if (value) {
+        <button type="button" class="clear-btn" (click)="clearInput()" aria-label="Clear search">
+            ×
+        </button>
+        }
+
+        <!-- Show info (ℹ️) with tooltip if empty -->
+        @if (!value) {
+        <div class="info-wrapper" tabindex="0">
+            <span class="info-icon" [attr.data-tooltip]="tooltipText"><i class="fa-solid fa-circle-info"></i></span>
+        </div>
+        }
+    </div>
+</div>
