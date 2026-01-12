@@ -9,10 +9,10 @@ export interface MenuItem {
 }
 
 export const MENU_CONFIG: MenuItem[] = [
-  { id: 1, label: 'Dashboard', icon: 'dashboard', route: '/pages/dashboard' },
-  { id: 8, label: 'Menu', icon: 'menu_book', route: '/pages/menu' },
-  { id: 9, label: 'Business Activity', icon: 'business_center', route: '/pages/business-activity' },
-  { id: 10, label: 'Issue Type', icon: 'problem', route: '/pages/issue-type' },
+  { id: 1, label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
+  { id: 8, label: 'Menu', icon: 'menu_book', route: '/menu' },
+  { id: 9, label: 'Business Activity', icon: 'business_center', route: '/business-activity' },
+  { id: 10, label: 'Issue Type', icon: 'problem', route: '/issue-type' },
   {
     id: 6,
     label: 'Employees',

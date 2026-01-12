@@ -87,7 +87,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-bg-secondary);
+    box-shadow: 0 3px 9px var(--color-shadow);
+    background: var(--color-bg-sidebar);
     color: var(--color-text-primary);
     cursor: pointer;
     transition: background 0.2s ease;
@@ -166,11 +167,11 @@
 }
 
 .sidebar .sidebar-header {
-    padding: 12px 18px;
+    padding: 12px 8px;
     display: flex;
     position: relative;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     border-bottom: 1px solid var(--color-border-hr);
 }
 
@@ -190,18 +191,18 @@
     border: none;
     cursor: pointer;
     display: none;
-    position: absolute;
-    right: 9px;
+    border: none;
+    border-radius: 8px;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
+    background: none;
     color: var(--color-text-primary);
-    background: var(--color-bg-secondary);
+    cursor: pointer;
     transition: 0.4s ease;
 }
 
 .sidebar-header .sidebar-toggle:hover {
-    background: var(--color-hover-secondary);
+    background: none;
 }
 
 .sidebar.collapsed .sidebar-header .sidebar-toggle {
@@ -275,7 +276,7 @@
 /* Menu list */
 .sidebar-content .menu-list {
     display: flex;
-    gap: 4px;
+    gap: 6px;
     list-style: none;
     flex-direction: column;
     padding-left: 0;
@@ -288,16 +289,21 @@
     gap: 12px;
     white-space: nowrap;
     border-radius: 8px;
-    padding: 12px 15px;
+    padding: 10px 16px;
     text-decoration: none;
     color: var(--color-text-primary);
-    transition: 0.3s ease;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
 }
 
 /* when any child is active, <li> gets .active from RouterLinkActive */
-.menu-item.active>.menu-link {
+.menu-item.active>.menu-link,
+.menu-list .menu-link.active {
     color: var(--color-hover-primary);
     background: #e5f3fb;
+    /* Light blue tint */
+    font-weight: 500;
+    border-color: rgba(105, 92, 254, 0.1);
 }
 
 .menu-item.open>.submenu {
@@ -319,12 +325,7 @@
 
 .menu-list .menu-link:hover {
     color: var(--color-hover-primary);
-    background: #e5f3fb;
-}
-
-.menu-list .menu-link.active {
-    color: var(--color-hover-primary);
-    background: #e5f3fb;
+    background: #f1f5f9;
 }
 
 /* Sidebar footer / theme toggle */

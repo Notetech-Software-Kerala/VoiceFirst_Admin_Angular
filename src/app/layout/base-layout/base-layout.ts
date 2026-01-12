@@ -8,7 +8,7 @@ import { MENU_CONFIG, MenuItem } from '../../core/_config/menuConfig';
 
 @Component({
   selector: 'app-base-layout',
-  imports: [RouterOutlet,RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './base-layout.html',
   styleUrl: './base-layout.css',
 })
@@ -87,8 +87,8 @@ export class BaseLayout {
     // adjust filenames to match your assets
     if (collapsed && dark) return '/images/logos/logo.png';
     if (collapsed && !dark) return '/images/logos/logo.png';
-    if (!collapsed && dark) return '/images/logos/logo.png';
-    return '/images/logos/logo.png';
+    if (!collapsed && dark) return '/images/logos/voicefirst_logo.png';
+    return '/images/logos/voicefirst_logo.png';
   }
 
   get logoAlt(): string {
