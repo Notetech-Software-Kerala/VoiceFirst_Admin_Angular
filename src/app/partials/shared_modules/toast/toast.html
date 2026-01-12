@@ -1,0 +1,27 @@
+<div class="toast-wrap" role="region" aria-label="Notifications">
+    <article *ngFor="let t of toasts" class="toast" [class.success]="t.type === 'success'"
+        [class.info]="t.type === 'info'" [class.warning]="t.type === 'warning'" [class.error]="t.type === 'error'"
+        [style.--duration.ms]="t.duration || 0" role="status" aria-live="polite" (mouseenter)="pause(t.id!)"
+        (mouseleave)="resume(t.id!)">
+
+        <div class="icon" [innerHTML]="svg(t.type || 'info')"></div>
+
+        <div class="content">
+            @if(t.title){
+            <div class="title" *ngIf="t.title">{{ t.title }}</div>
+            }
+
+            <div class="message">{{ t.message }}</div>
+        </div>
+
+        <!-- <button
+        *ngIf="t.dismissible !== false"
+        class="close" type="button"
+        aria-label="Dismiss"
+        (click)="close(t.id!)">✕</button> -->
+
+        <div class="progress" *ngIf="(t.duration ?? 0) > 0">
+            <span class="bar" [style.animationPlayState]="paused.has(t.id!) ? 'paused' : 'running'"></span>
+        </div>
+    </article>
+</div>

@@ -1,0 +1,125 @@
+.table-responsive {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+}
+
+.table tbody td {
+  padding: 5px 16px;
+  background-color: var(--color-bg-sidebar);
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-border-hr);
+}
+
+thead.table-light th {
+  padding: 12px 16px;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  text-transform: none;
+  font-weight: 600;
+  border-bottom: 1px solid var(--color-border-hr);
+}
+
+.active-filters {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-hover-secondary);
+  color: var(--color-text-primary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  box-shadow: 0 1px 3px var(--color-shadow);
+}
+
+.filter-chip .btn-clear {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 1rem;
+  margin-left: 0.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.filter-chip .btn-clear:hover {
+  color: var(--color-hover-primary);
+}
+
+.active-filters .btn.btn-outline-secondary {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  color: var(--color-text-placeholder);
+  border-color: var(--color-border-hr);
+}
+
+.active-filters .btn.btn-outline-secondary:hover {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-placeholder);
+  border-color: var(--color-border-hr);
+}
+
+@media (max-width: 576px) {
+  .ms-auto {
+    width: 100%;
+    justify-content: flex-end !important;
+  }
+}
+
+/* ---- Action Cell ------ */
+
+.action-cell {
+  text-align: end;
+  /* align menu to the right edge */
+  width: 1%;
+  white-space: nowrap;
+}
+
+/* Keep overlay above tables/grids */
+.cdk-overlay-container {
+  z-index: 2000;
+  /* higher than any table/toolbar you might have */
+}
+
+/* Ensure the Material menu has a solid background */
+.cdk-overlay-container .mat-mdc-menu-panel.row-menu,
+.cdk-overlay-container .mat-mdc-menu-panel.row-menu .mat-mdc-menu-content,
+.cdk-overlay-container .mat-mdc-menu-panel.row-menu .mdc-menu-surface {
+  background-color: var(--color-bg-primary, #fff) !important;
+  /* light */
+  color: var(--color-text-primary, #111);
+  border-radius: 12px;
+  font-size: .8rem;
+  box-shadow: 0 10px 28px -10px rgba(0, 0, 0, .25);
+  overflow: hidden;
+  /* clip ripples to rounded corners */
+}
+
+/* Dark theme support */
+body.dark-theme .cdk-overlay-container .mat-mdc-menu-panel.row-menu,
+body.dark-theme .cdk-overlay-container .mat-mdc-menu-panel.row-menu .mat-mdc-menu-content,
+body.dark-theme .cdk-overlay-container .mat-mdc-menu-panel.row-menu .mdc-menu-surface {
+  background-color: var(--color-bg-primary, #1f2937) !important;
+  /* dark */
+  color: var(--color-text-primary, #d8dadb);
+}
+
+/* Optional: make trigger tap-friendly & responsive */
+.menu-trigger {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+}
+
+@media (max-width: 576px) {
+  .menu-trigger {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* larger tap target on phones */
+}

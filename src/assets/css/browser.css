@@ -1,0 +1,34 @@
+/* Chrome / Edge / Safari */
+input.form-control:-webkit-autofill,
+input.form-control:-webkit-autofill:hover,
+input.form-control:-webkit-autofill:focus,
+textarea.form-control:-webkit-autofill,
+textarea.form-control:-webkit-autofill:hover,
+textarea.form-control:-webkit-autofill:focus,
+select.form-select:-webkit-autofill,
+select.form-select:-webkit-autofill:hover,
+select.form-select:-webkit-autofill:focus {
+  /* Paint over the autofill background */
+  -webkit-box-shadow: 0 0 0 1000px var(--color-bg-sidebar, transparent) inset !important;
+  box-shadow: 0 0 0 1000px var(--color-bg-sidebar, transparent) inset !important;
+
+  /* Keep your text color */
+  -webkit-text-fill-color: var(--color-text-primary, inherit) !important;
+
+  /* Prevent the yellow flash during transition */
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+/* Firefox */
+input.form-control:-moz-autofill,
+textarea.form-control:-moz-autofill,
+select.form-select:-moz-autofill {
+  box-shadow: 0 0 0 1000px var(--color-bg-sidebar, transparent) inset !important;
+  -moz-text-fill-color: var(--color-text-primary, inherit) !important;
+}
+
+/* Optional: caret color so it’s visible on dark backgrounds */
+input.form-control,
+textarea.form-control {
+  caret-color: var(--color-text-primary, currentColor);
+}

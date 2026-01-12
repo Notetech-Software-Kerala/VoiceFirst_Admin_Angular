@@ -1,0 +1,171 @@
+<div class="wrapper">
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.collapsed]="isSidebarCollapsed" role="complementary" aria-label="Sidebar">
+    <!-- Sidebar header -->
+    <div class="sidebar-header">
+      <img class="header-logo" [src]="logoSrc" [alt]="logoAlt" />
+      <button class="sidebar-toggle" type="button" (click)="toggleSidebar()" aria-label="Collapse sidebar"
+        [attr.aria-expanded]="isSidebarCollapsed">
+        <span class="material-symbols-rounded">chevron_left</span>
+      </button>
+    </div>
+
+    <div class="sidebar-content">
+      <!-- Search Form -->
+      <!-- <form class="search-form" (click)="expandAndFocusSearch()">
+        <span class="material-symbols-rounded">search</span>
+        <input #searchInput type="search" placeholder="Search..." required />
+      </form> -->
+
+      <!-- Sidebar Menu -->
+      <ul class="menu-list" role="menu">
+        @for (item of menu; track item.id) {
+        <li class="menu-item" role="none" [class.active]="isGroupActive(item)" [class.open]="isOpen(item.id)">
+
+          @if (item.children?.length) {
+          <!-- Group header acts as disclosure (no navigation) -->
+          <a href="#" class="menu-link has-children" role="button" [attr.aria-expanded]="isOpen(item.id)"
+            [attr.aria-controls]="'submenu-' + item.id" (click)="$event.preventDefault(); toggleSubmenu(item.id)"
+            (keydown)="onDisclosureKeydown($event, item.id)">
+            <!-- material icon -->
+            <span class="material-symbols-rounded">{{ item.icon }}</span>
+            <span class="menu-label">{{ item.label }}</span>
+            <span class="submenu-caret material-symbols-rounded" aria-hidden="true"
+              [class.open]="isOpen(item.id)">expand_more</span>
+          </a>
+
+          <ul class="submenu mb-0" [class.open]="isOpen(item.id)" role="menu" [attr.id]="'submenu-' + item.id"
+            [attr.aria-label]="item.label">
+
+            @for (child of item.children; track child.id) {
+            <li class="submenu-item" role="none">
+              <a class="submenu-link" role="menuitem" [routerLink]="child.route" routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: true }">
+                <span class="material-symbols-rounded">{{ child.icon ?? 'arrow_right' }}</span>
+                <span class="submenu-label">{{ child.label }}</span>
+              </a>
+            </li>
+            }
+          </ul>
+
+          } @else {
+          <!-- Leaf item navigates via routerLink -->
+          <a class="menu-link" role="menuitem" [routerLink]="item.route" routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }">
+            <span class="material-symbols-rounded">{{ item.icon }}</span>
+            <span class="menu-label">{{ item.label }}</span>
+          </a>
+          }
+        </li>
+        }
+      </ul>
+
+
+
+    </div>
+
+    <!-- Sidebar Footer -->
+    <!-- <div class="sidebar-footer">
+      <button
+        class="theme-toggle"
+        type="button"
+        (click)="toggleTheme()"
+        aria-label="Toggle dark mode"
+        [attr.aria-pressed]="isDarkTheme"
+      >
+        <div class="theme-label">
+          <span class="theme-icon material-symbols-rounded">
+            {{ isSidebarCollapsed ? (isDarkTheme ? 'light_mode' : 'dark_mode') : 'dark_mode' }}
+          </span>
+          <span class="theme-text">Dark Mode</span>
+        </div>
+        <div class="theme-toggle-track">
+          <div class="theme-toggle-indicator"></div>
+        </div>
+      </button>
+    </div> -->
+  </aside>
+
+  <!-- Main content -->
+  <div class="main-wrapper">
+
+
+    <nav class="site-nav" role="navigation" aria-label="Top navigation">
+      <!-- Left: brand / small-screen toggle -->
+      <div class="nav-left">
+        <!-- Sidebar toggle: visible only on small screens via CSS -->
+        <button class="icon-btn" type="button" (click)="toggleSidebar()
+          " aria-label="Toggle sidebar" [attr.aria-expanded]="!isSidebarCollapsed">
+          <span class="material-symbols-rounded">menu</span>
+        </button>
+      </div>
+
+      <!-- Right: actions -->
+      <div class="nav-actions">
+        <!-- Notifications -->
+        <button class="icon-btn" type="button" aria-label="Notifications">
+          <span class="material-symbols-rounded">notifications</span>
+          <span class="badge" aria-hidden="true">3</span>
+        </button>
+
+        <!-- (Optional) Theme quick toggle -->
+        <button class="icon-btn" type="button" aria-label="Toggle theme" (click)="toggleTheme()">
+          <span class="material-symbols-rounded">
+            {{ isDarkTheme ? 'light_mode' : 'dark_mode' }}
+          </span>
+        </button>
+
+        <!-- Profile -->
+        <!-- Make sure Bootstrap CSS is loaded in your app -->
+        <!-- Profile dropdown -->
+        <div class="dropdown">
+          <button class="profile-btn dropdown-toggle" id="profileMenuButton" type="button" data-bs-toggle="dropdown"
+            aria-expanded="false" aria-haspopup="true">
+            <img src="/images/users/user1.jpg" alt="" class="avatar" />
+            <span class="profile-name">You</span>
+            <span class="material-symbols-rounded caret">expand_more</span>
+          </button>
+
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileMenuButton">
+            <li>
+              <a class="dropdown-item d-flex align-items-center gap-2" [routerLink]="'/profile'">
+                <span class="material-symbols-rounded ms-icon" aria-hidden="true">person</span>
+                <span>Profile</span>
+              </a>
+            </li>
+
+            <li>
+              <hr class="dropdown-divider my-2" />
+            </li>
+
+            <li>
+              <button class="dropdown-item d-flex align-items-center gap-2" type="button" (click)="onLogout()"
+                data-variant="danger">
+                <span class="material-symbols-rounded ms-icon" aria-hidden="true">logout</span>
+                <span>Sign out</span>
+              </button>
+            </li>
+          </ul>
+
+        </div>
+
+      </div>
+    </nav>
+
+
+
+    <div class="main-content">
+
+      <router-outlet></router-outlet>
+
+    </div>
+
+    <footer>
+      <div class="footer-container">
+        <p class="footer-text">&copy; 2025 Voice First. All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+
+
+</div>

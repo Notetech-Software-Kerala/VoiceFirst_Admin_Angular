@@ -1,0 +1,134 @@
+/* ==== Modern card: glassy, rounded, animated ==== */
+:host {
+  display: block;
+  color: var(--color-text-primary, #111);
+}
+
+.confirm-card {
+  width: min(92vw, 420px);
+  padding: 20px 18px 14px;
+  border-radius: 16px;
+  background:
+    color-mix(in srgb, var(--color-bg-sidebar, #fff) 82%, transparent);
+  backdrop-filter: saturate(140%) blur(6px);
+  box-shadow: 0 18px 48px -12px rgba(0,0,0,.35);
+  border: 1px solid color-mix(in srgb, var(--color-border-hr, #e5e7eb) 60%, transparent);
+
+}
+
+.icon-wrap {
+  --tone-warn: #e53935;
+  --tone-accent: var(--color-hover-primary, #695CFE);
+  width: 44px; height: 44px;
+  display: grid; place-items: center;
+  border-radius: 12px;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  color: var(--tone-accent);
+  margin-bottom: 10px;
+}
+.tone-warn .icon-wrap { color: var(--tone-warn); }
+
+/* Material symbol */
+.icon-wrap .material-symbols-rounded {
+  font-size: 24px;
+  line-height: 1;
+  font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+}
+
+.title {
+  margin: 0 0 6px 0;
+  font-size: 1.08rem;
+  font-weight: 700;
+}
+
+.message {
+  margin: 0 0 14px 0;
+  font-size: .95rem;
+  color: color-mix(in srgb, var(--color-text-primary, #111) 80%, transparent);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 8px;
+}
+
+/* Buttons: pill style, theme-aware */
+.btn {
+  --accent: var(--color-hover-primary, #695CFE);
+  --fg: var(--color-text-primary, #111);
+  --hover: var(--color-hover-secondary, #eef2ff);
+  border-radius: 999px;
+  padding: .55rem 1rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--fg);
+  cursor: pointer;
+  font-size: .8rem;
+  transition: background .2s, color .2s, border-color .2s, box-shadow .2s;
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.btn.ghost {
+  border-color: color-mix(in srgb, var(--accent) 25%, transparent);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+.btn.ghost:hover {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.btn.solid {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.btn.solid:hover { filter: brightness(1.04); }
+
+/* Warn tone overrides */
+.tone-warn .btn.solid {
+  --accent: #e53935;
+}
+.tone-warn .btn.ghost {
+  border-color: color-mix(in srgb, #e53935 25%, transparent);
+  background: color-mix(in srgb, #e53935 6%, transparent);
+}
+.tone-warn .btn.ghost:hover {
+  background: color-mix(in srgb, #e53935 12%, transparent);
+}
+
+/* Dark mode tweaks */
+:host-context(body.dark-theme) .confirm-card {
+  background: color-mix(in srgb, var(--color-bg-sidebar, #1f2937) 88%, transparent);
+  box-shadow: 0 18px 48px -12px rgba(0,0,0,.6);
+}
+
+@media (max-width: 480px) {
+  .confirm-card { border-radius: 14px; padding: 16px 14px 12px; }
+  .actions { gap: 8px; }
+}
+
+/* small pop-in */
+@keyframes enter {
+  from { transform: translateY(4px) scale(.98); opacity: 0; }
+  to   { transform: translateY(0)   scale(1);    opacity: 1; }
+}
+
+/* Backdrop */
+.cdk-overlay-backdrop.cdk-overlay-backdrop-showing {
+  background: color-mix(in srgb, #000 52%, transparent);
+}
+
+/* Panel shell (spacing around card) */
+.modern-confirm-panel .mat-mdc-dialog-surface {
+  background: transparent;      /* let the inner card control look */
+  box-shadow: none;
+  padding: 0;
+  border-radius: 0;             /* inner card has its own radius */
+}
+

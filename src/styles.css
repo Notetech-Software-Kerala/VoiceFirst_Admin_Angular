@@ -1,1 +1,123 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('./assets/css/form-style.css');
+@import url('./assets/css/browser.css');
+@import url('./assets/css/table-style.css');
+@import url('./assets/css/dialog-style.css');
+@import url('./assets/css/button-style.css');
+
+/* Global theme + reset */
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  /* Light theme colors */
+  --color-text-primary: #444444;
+  --color-text-placeholder: #798EAE;
+  --color-bg-primary: #f9fafb;
+  --color-bg-secondary: #ECECFD;
+  --color-bg-sidebar: #FFFFFF;
+  --color-border-hr: #E2E8F0;
+  --color-hover-primary: #027dcf;
+  --color-hover-secondary: #e2e2fb;
+  --color-shadow: rgba(0, 0, 0, 0.05);
+  --invalid-border-color: #ffaab2;
+  --footer-text-color: #8d8d99;
+}
+
+body.dark-theme {
+  /* Dark theme colors */
+  --color-text-primary: #d8dadb;
+  --color-text-placeholder: #A6B7D2;
+  --color-bg-primary: #111827;
+  --color-bg-secondary: #3D4859;
+  --color-bg-sidebar: #1f2937;
+  --color-border-hr: #3B475C;
+  --color-hover-secondary: #48566a;
+  --color-shadow: rgba(0, 0, 0, 0.3);
+  --invalid-border-color: #dc3545;
+  --footer-text-color: #73868f;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--color-bg-primary);
+  font-family: "Poppins", sans-serif;
+  scrollbar-gutter: stable both-edges;
+}
+
+
+
+/* ======================================================== */
+
+
+.page-title {
+  font-size: 1.25rem;
+}
+
+.card {
+  border-radius: 8px;
+  padding: 20px;
+  background-color: var(--color-bg-sidebar);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: none;
+  color: var(--color-text-primary);
+}
+
+p,
+h1,
+label {
+  color: var(--color-text-primary);
+}
+
+
+/* aNIMATION */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slide-left {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-right {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+::view-transition-old(root) {
+  animation: .7s fade-out;
+}
+ 
+::view-transition-new(root) {
+  animation: .7s fade-in;
+}

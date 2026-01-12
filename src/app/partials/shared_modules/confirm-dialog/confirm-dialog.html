@@ -1,0 +1,20 @@
+<div class="confirm-card" [class.tone-warn]="tone==='warn'" [class.tone-accent]="tone==='accent'">
+    @if(data.icon){
+    <div class="icon-wrap">
+        <span class="material-symbols-rounded">{{ data.icon }}</span>
+    </div>
+    }
+
+
+    <h3 class="title">{{ data.title || 'Are you sure?' }}</h3>
+    <p class="message">{{ data.message || 'This action cannot be undone.' }}</p>
+
+    <div class="actions">
+        <button class="btn ghost" (click)="onCancel()">
+            {{ data.cancelText || 'Cancel' }}
+        </button>
+        <button class="btn solid" (click)="onConfirm()">
+            {{ data.confirmText || (tone==='warn' ? 'Delete' : 'Confirm') }}
+        </button>
+    </div>
+</div>
