@@ -29,7 +29,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     MatPaginatorModule,
     MatSortModule,
     MatMenuModule,
-    DragDropModule
+    DragDropModule,
   ],
   exports: [
     CommonModule,
@@ -49,4 +49,4 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
   ],
   declarations: [],
 })
-export class MaterialModule {}
+export class MaterialModule { }

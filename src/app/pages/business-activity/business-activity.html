@@ -1,1 +1,150 @@
-<p>business-activity works!</p>
+<div class="card">
+    <h2 class="page-title mb-3">Business Activity Management</h2>
+
+    <div class="d-flex flex-wrap align-items-center mb-3 gap-2">
+
+        <!-- Left: search + filters -->
+        <div class="d-flex flex-wrap align-items-center gap-2 flex-grow-1">
+            <app-search-bar [tooltipText]="'Search by name'" [(value)]="searchText" (valueChange)="applyFilter()">
+            </app-search-bar>
+
+            <!-- <app-filter-by
+      [filters]="filterOptions"
+      [activeFilters]="activeFilters"
+      [clearSignal]="clearSignal"
+      (filterChange)="onFilterChange($event)">
+    </app-filter-by> -->
+        </div>
+
+        <!-- Actions -->
+        <div class="actions ms-auto d-flex flex-wrap gap-2">
+
+
+            <input #fileInput type="file" accept=".csv" class="d-none" />
+            <label class="btn-action btn-outline" for="fileInput">
+                <mat-icon class="msr">file_upload</mat-icon>
+                <span class="btn-text">Import</span>
+            </label>
+
+
+            <button type="button" class="btn-action btn-outline">
+                <mat-icon class="msr">file_download</mat-icon>
+                <span class="btn-text">Export</span>
+            </button>
+
+
+            <button type="button" class="btn-action btn-outline">
+                <mat-icon class="msr">insert_chart</mat-icon>
+                <span class="btn-text">Report</span>
+            </button>
+
+
+            <button type="button" class="btn-action btn-primary" (click)="openDialog()">
+                <mat-icon class="msr">add</mat-icon>
+                <span class="btn-text">Add</span>
+            </button>
+
+        </div>
+    </div>
+
+
+    @let entries = activeFilters | keyvalue;
+
+    @if (entries.length) {
+    <div class="active-filters d-flex flex-wrap align-items-center gap-2 mb-3">
+        @for (entry of entries; track entry.key) {
+        @for (val of entry.value; track val) {
+        <span class="filter-chip">
+            {{ val }}
+            <button type="button" class="btn-clear" (click)="removeFilter(entry.key, val)">×</button>
+        </span>
+        }
+        }
+        <button type="button" class="btn btn-sm btn-outline-secondary ms-2" (click)="clearAllFilters()">
+            Clear all
+        </button>
+    </div>
+    }
+
+    <div class="table-responsive position-relative">
+        <mat-progress-bar *ngIf="loading$ | async" mode="indeterminate" class="position-absolute top-0 start-0 w-100"
+            style="z-index: 10; height: 3px;"></mat-progress-bar>
+        <table class="table align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th (click)="sortData('name')" style="cursor:pointer">Name <small>⇅</small></th>
+                    <th class="text-center">Company</th>
+                    <th class="text-center">Branch</th>
+                    <th class="text-center">Section</th>
+                    <th class="text-center">Sub Section</th>
+                    <th>Action</th>
+            </thead>
+
+            <tbody>
+                @for (u of paginatedBuisnessActivity; track u) {
+                <tr>
+                    <td>{{ u.name }}</td>
+                    <td class="text-center">
+                        <mat-icon class="msr" [ngClass]="u.in_company ? 'ok-icon' : 'cancel-icon'">
+                            {{ u.in_company ? 'check_circle' : 'cancel' }}
+                        </mat-icon>
+                    </td>
+
+                    <td class="text-center">
+                        <mat-icon class="msr" [ngClass]="u.in_branch ? 'ok-icon' : 'cancel-icon'">
+                            {{ u.in_branch ? 'check_circle' : 'cancel' }}
+                        </mat-icon>
+                    </td>
+
+                    <td class="text-center">
+                        <mat-icon class="msr" [ngClass]="u.in_section ? 'ok-icon' : 'cancel-icon'">
+                            {{ u.in_section ? 'check_circle' : 'cancel' }}
+                        </mat-icon>
+                    </td>
+
+                    <td class="text-center">
+                        <mat-icon class="msr" [ngClass]="u.in_sub_section ? 'ok-icon' : 'cancel-icon'">
+                            {{ u.in_sub_section ? 'check_circle' : 'cancel' }}
+                        </mat-icon>
+                    </td>
+
+
+                    <td class="action-cell">
+                        <button mat-icon-button class="menu-trigger" [matMenuTriggerFor]="rowMenu"
+                            aria-label="More actions">
+                            <mat-icon class="msr">more_vert</mat-icon>
+                        </button>
+
+                        <mat-menu #rowMenu="matMenu" class="row-menu" xPosition="before" yPosition="below">
+
+                            <button mat-menu-item (click)="openDialog(u)">
+                                <mat-icon class="msr-edit">edit</mat-icon>
+                                <span>Edit</span>
+                            </button>
+
+                            <button mat-menu-item (click)="onDelete(u)">
+                                <mat-icon class="msr-delete">delete</mat-icon>
+                                <span>Delete</span>
+                            </button>
+
+                        </mat-menu>
+                    </td>
+
+
+                </tr>
+                }
+
+                @if (paginatedBuisnessActivity.length === 0) {
+                <tr>
+                    <td colspan="6" class="text-center p-3 text-muted"><small class="text-muted">No data found</small>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <app-pagination [totalItems]="filteredBuisnessActivity.length" [pageSize]="pageSize" [pageSizes]="pageSizes"
+        [currentPage]="currentPage" (pageChange)="changePage($event)" (pageSizeChange)="changePageSize($event)">
+    </app-pagination>
+</div>

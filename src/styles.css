@@ -117,7 +117,7 @@ label {
 ::view-transition-old(root) {
   animation: .7s fade-out;
 }
- 
+
 ::view-transition-new(root) {
   animation: .7s fade-in;
 }
