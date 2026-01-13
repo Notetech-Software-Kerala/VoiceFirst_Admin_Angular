@@ -1,8 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { MaterialModule } from '../../../material.module';
 
 @Component({
   selector: 'app-search-bar',
-  imports: [],
+  imports: [MaterialModule],
   templateUrl: './search-bar.html',
   styleUrl: './search-bar.css',
 })

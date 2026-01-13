@@ -4,7 +4,7 @@
     <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
 
       <div class="logo-container">
-        <img src="/images/logos/voicefirst_logo.png" alt="Voice First Logo" class="logo-image">
+        <img [src]="src" alt="Voice First Logo" class="logo-image">
       </div>
       <h6 class="title mb-4 fw-bold">Login</h6>
 

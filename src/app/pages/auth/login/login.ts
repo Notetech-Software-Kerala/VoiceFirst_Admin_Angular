@@ -16,18 +16,26 @@ export class Login {
   loginForm!: FormGroup;
 
   username = 'athul@notetech.com';
-  password = '123456'
+  password = '123456';
+  theme: any
 
   constructor(private fb: FormBuilder, private router: Router, private toast: ToastService) { }
 
 
 
   ngOnInit() {
+    this.theme = localStorage.getItem('theme');
+
     this.loginForm = this.fb.group({
       email: ['athul@notetech.com', [Validators.required, Validators.email]],
       password: ['123456', [Validators.required, Validators.minLength(6)]],
       remember: [false]
     });
+  }
+
+  get src() {
+    if (this.theme === 'dark') return '/images/logos/voicefirst_logo_light.png';
+    return '/images/logos/voicefirst_logo.png';
   }
 
   get f() {

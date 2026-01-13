@@ -5,7 +5,7 @@
   justify-content: center;
   align-items: center;
   padding: 16px;
-  background-color: var(--bg-body, #f3f4f6);
+  background-color: var(--color-bg-primary, #f3f4f6);
   /* Ensure a background color if not inherited */
 }
 
