@@ -1,1 +1,126 @@
-<p>forgot-paassword works!</p>
+<div class="main-container">
+    <div class="login-card">
+
+        <div class="login-form">
+            <div class="logo-container">
+                <img [src]="src" alt="Voice First Logo" class="logo-image">
+            </div>
+
+            <!-- Step 1: Email/Phone -->
+            @if (step === 1) {
+            <h6 class="title mb-4 fw-bold text-center">Forgot Password</h6>
+            <p class="muted mb-4 small text-center mb-0">Enter your email or phone number to receive an OTP.</p>
+
+            <form [formGroup]="emailForm" (ngSubmit)="onSubmitEmail()">
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email or Phone</label>
+                    <input id="email" type="text" class="form-control" formControlName="email"
+                        placeholder="Enter email or phone"
+                        [attr.aria-invalid]="fEmail['email'].invalid && fEmail['email'].touched">
+                    <div class="text-danger small mt-1"
+                        *ngIf="fEmail['email'].touched && fEmail['email'].errors?.['required']">
+                        This field is required.
+                    </div>
+                </div>
+
+                <button class="button-primary w-100 mb-3" type="submit" [disabled]="emailForm.invalid || submitting">
+                    {{ submitting ? 'Sending...' : 'Send OTP' }}
+                </button>
+            </form>
+            }
+
+            <!-- Step 2: OTP -->
+            @if (step === 2) {
+            <h6 class="title mb-4 fw-bold text-center">Verify OTP</h6>
+            <p class="muted mb-4 small text-center mb-0">Please enter the OTP sent to your device.</p>
+
+            <form [formGroup]="otpForm" (ngSubmit)="onSubmitOtp()">
+                <div class="mb-3">
+                    <label for="otp" class="form-label">OTP</label>
+                    <input id="otp" type="text" class="form-control text-center" formControlName="otp"
+                        placeholder="••••" maxlength="6"
+                        [attr.aria-invalid]="fOtp['otp'].invalid && fOtp['otp'].touched">
+                    <div class="text-danger small mt-1" *ngIf="fOtp['otp'].touched && fOtp['otp'].errors?.['required']">
+                        OTP is required.
+                    </div>
+                    <div class="text-danger small mt-1"
+                        *ngIf="fOtp['otp'].touched && fOtp['otp'].errors?.['minlength']">
+                        OTP must be at least 4 digits.
+                    </div>
+                </div>
+
+                <button class="button-primary w-100 mb-3" type="submit" [disabled]="otpForm.invalid || submitting">
+                    {{ submitting ? 'Verifying...' : 'Verify & Proceed' }}
+                </button>
+
+                <div class="text-center mb-3">
+                    <span class="muted small me-2">Didn't receive code?</span>
+                    <a class="link small" style="cursor: pointer" (click)="resendOtp()">Resend OTP</a>
+                </div>
+            </form>
+            }
+
+            <!-- Step 3: Reset Password -->
+            @if (step === 3) {
+            <h6 class="title mb-4 fw-bold text-center">Reset Password</h6>
+            <p class="muted mb-4 small text-center mb-0">Create a new strong password for your account.</p>
+
+            <form [formGroup]="resetForm" (ngSubmit)="onSubmitReset()">
+                <!-- New Password -->
+                <div class="mb-3">
+                    <label for="newPass" class="form-label">New Password</label>
+                    <div class="position-relative">
+                        <input id="newPass" [type]="hidePassword ? 'password' : 'text'" class="form-control"
+                            formControlName="password" placeholder="••••••••"
+                            [attr.aria-invalid]="fReset['password'].invalid && fReset['password'].touched">
+                        <button type="button"
+                            class="btn btn-link p-0 position-absolute top-50 end-0 translate-middle-y me-2 text-decoration-none"
+                            (click)="togglePassword()">
+                            <i class="fa-solid eye-icon" [ngClass]="hidePassword ? 'fa-eye' : 'fa-eye-slash'"></i>
+                        </button>
+                    </div>
+                    <div class="text-danger small mt-1"
+                        *ngIf="fReset['password'].touched && fReset['password'].errors?.['required']">
+                        Password is required.
+                    </div>
+                    <div class="text-danger small mt-1"
+                        *ngIf="fReset['password'].touched && fReset['password'].errors?.['minlength']">
+                        Must be at least 6 characters.
+                    </div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="mb-3">
+                    <label for="confirmPass" class="form-label">Confirm Password</label>
+                    <div class="position-relative">
+                        <input id="confirmPass" [type]="hideConfirmPassword ? 'password' : 'text'" class="form-control"
+                            formControlName="confirmPassword" placeholder="••••••••"
+                            [attr.aria-invalid]="fReset['confirmPassword'].invalid && fReset['confirmPassword'].touched">
+                        <button type="button"
+                            class="btn btn-link p-0 position-absolute top-50 end-0 translate-middle-y me-2 text-decoration-none"
+                            (click)="toggleConfirmPassword()">
+                            <i class="fa-solid eye-icon"
+                                [ngClass]="hideConfirmPassword ? 'fa-eye' : 'fa-eye-slash'"></i>
+                        </button>
+                    </div>
+                    <div class="text-danger small mt-1"
+                        *ngIf="fReset['confirmPassword'].touched && resetForm.hasError('mismatch')">
+                        Passwords do not match.
+                    </div>
+                </div>
+
+                <button class="button-primary w-100 mb-3" type="submit" [disabled]="resetForm.invalid || submitting">
+                    {{ submitting ? 'Resetting...' : 'Reset Password' }}
+                </button>
+            </form>
+            }
+
+            <div class="text-center mt-3 border-top pt-3">
+                <a class="link small text-decoration-none" routerLink="/login">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Back to Login
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
