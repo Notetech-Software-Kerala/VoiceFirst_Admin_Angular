@@ -67,8 +67,10 @@
     }
 
     <div class="table-responsive position-relative">
-        <mat-progress-bar *ngIf="loading$ | async" mode="indeterminate" class="position-absolute top-0 start-0 w-100"
-            style="z-index: 10; height: 3px;"></mat-progress-bar>
+        <div *ngIf="loading$ | async" class="progress position-absolute top-0 start-0 end-0" role="progressbar"
+            aria-label="Loading" style="z-index: 10; height: 3px; background-color: #ffffff;">
+            <div class="table-premium-loader"></div>
+        </div>
         <table class="table align-middle">
             <thead class="table-light">
                 <tr>
@@ -136,7 +138,13 @@
 
                 @if (paginatedBuisnessActivity.length === 0) {
                 <tr>
-                    <td colspan="6" class="text-center p-3 text-muted"><small class="text-muted">No data found</small>
+                    <td colspan="6" class="text-center p-3 text-muted">
+                        @if (loading$ | async) {
+                        <small class="text-muted">Please wait...</small>
+
+                        } @else {
+                        <small class="text-muted">No data found</small>
+                        }
                     </td>
                 </tr>
                 }

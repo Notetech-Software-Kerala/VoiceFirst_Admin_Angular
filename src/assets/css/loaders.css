@@ -1,0 +1,61 @@
+.table-premium-loader {
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-hover-secondary) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.table-premium-loader::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 60%;
+    /* The sliding bar length */
+    background: var(--color-hover-primary);
+    background: linear-gradient(90deg,
+            transparent,
+            var(--color-hover-primary),
+            transparent);
+    /* Soft gradient edges */
+    opacity: 0.8;
+    animation: slide-indeterminate 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes slide-indeterminate {
+    0% {
+        left: -60%;
+    }
+
+    100% {
+        left: 100%;
+    }
+}
+
+/* Modern Button Spinner */
+.btn-loader {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    /* Transparent track */
+    border-left-color: #ffffff;
+    /* Solid leading edge */
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

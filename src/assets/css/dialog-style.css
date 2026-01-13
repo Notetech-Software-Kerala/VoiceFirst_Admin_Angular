@@ -1,12 +1,12 @@
-
 /* General Dialog Styles */
 
-.mdc-dialog--open .mat-mdc-dialog-surface, .mdc-dialog--closing .mat-mdc-dialog-surface {
-    transform: none;
-    background: transparent;
+.mdc-dialog--open .mat-mdc-dialog-surface,
+.mdc-dialog--closing .mat-mdc-dialog-surface {
+  transform: none;
+  background: transparent;
 }
 
-mat-dialog-content h2 {
+mat-dialog-content h5 {
   color: var(--color-text-primary);
   font-size: 20px;
   margin: 16px 0;
@@ -26,20 +26,20 @@ mat-dialog-actions {
   gap: 10px;
 }
 
-mat-dialog-actions  .close-btn{
+mat-dialog-actions .close-btn {
   background-color: var(--color-bg-secondary);
   color: var(--color-text-primary);
-  font-size: .8rem; 
+  font-size: .8rem;
   box-shadow: var(--color-shadow);
   border: 1px solid var(--color-border-hr);
   border-radius: 8px;
   padding: 3px 9px;
 }
 
-mat-dialog-actions  .submit-btn{
+mat-dialog-actions .submit-btn {
   background: var(--color-hover-primary);
   color: var(--color-text-primary);
-  font-size: .8rem; 
+  font-size: .8rem;
   box-shadow: var(--color-shadow);
   border: 1px solid var(--color-border-hr);
   color: #fff;
@@ -48,16 +48,17 @@ mat-dialog-actions  .submit-btn{
   cursor: pointer;
 }
 
-mat-dialog-actions  .submit-btn.disabled{
+mat-dialog-actions .submit-btn:disabled {
   opacity: .6;
-  cursor: not-allowed;
+  background-color: var(--color-text-placeholder) !important;
 }
 
 /* Targeting the form inside mat-dialog-content */
-mat-dialog-content .form-label, 
+mat-dialog-content .form-label,
 mat-dialog-content .form-check-label {
   color: var(--color-text-primary);
-  font-size: .8rem; /* Adjust font size for dialog form labels */
+  font-size: .8rem;
+  /* Adjust font size for dialog form labels */
 }
 
 mat-dialog-content .form-check-label {
@@ -65,7 +66,7 @@ mat-dialog-content .form-check-label {
   color: var(--color-text-primary);
 }
 
-mat-dialog-content .form-control, 
+mat-dialog-content .form-control,
 mat-dialog-content .form-select {
   padding: 7px 10px;
   border: 1px solid var(--color-border-hr);
@@ -74,7 +75,8 @@ mat-dialog-content .form-select {
   color: inherit;
   outline: none;
   transition: border-color .2s, box-shadow .2s;
-  font-size: .85rem; /* Adjust font size for input/select in dialog */
+  font-size: .85rem;
+  /* Adjust font size for input/select in dialog */
   color: var(--color-text-primary, #e5e7eb);
 }
 
@@ -89,12 +91,12 @@ mat-dialog-content .form-select option {
 
 /* On hover/focus state for dialog */
 mat-dialog-content .form-select:focus {
-   border-color: var(--color-hover-primary);
-   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-hover-primary) 20%, transparent);
+  border-color: var(--color-hover-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-hover-primary) 20%, transparent);
 }
 
 mat-dialog-content .form-control:focus {
-   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-hover-primary) 20%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-hover-primary) 20%, transparent);
 }
 
 mat-dialog-content .form-check-input {
@@ -140,10 +142,13 @@ mat-dialog-content .form-check-input:disabled {
 mat-dialog-content .link {
   color: var(--color-hover-primary, #695cfe);
   text-decoration: none;
-  font-size: .75rem; /* Adjust font size for links inside dialog */
+  font-size: .75rem;
+  /* Adjust font size for links inside dialog */
 }
 
-mat-dialog-content .link:hover { text-decoration: underline; }
+mat-dialog-content .link:hover {
+  text-decoration: underline;
+}
 
 mat-dialog-content .button-primary {
   width: 100%;
@@ -155,7 +160,8 @@ mat-dialog-content .button-primary {
   font-weight: 600;
   cursor: pointer;
   transition: filter .2s, opacity .2s;
-  font-size: .85rem; /* Adjust font size for button inside dialog */
+  font-size: .85rem;
+  /* Adjust font size for button inside dialog */
 }
 
 mat-dialog-content .button-primary:disabled {
@@ -171,7 +177,8 @@ mat-dialog-content .muted {
   margin: 12px 0 0;
   color: var(--color-text-placeholder);
   text-align: center;
-  font-size: .75rem; /* Adjust font size for muted text inside dialog */
+  font-size: .75rem;
+  /* Adjust font size for muted text inside dialog */
 }
 
 mat-dialog-content small {
@@ -180,14 +187,17 @@ mat-dialog-content small {
 
 /* ========== Responsive Adjustments for dialog ========== */
 @media (max-width: 767px) {
-  mat-dialog-content .form-label, 
+
+  mat-dialog-content .form-label,
   mat-dialog-content .form-check-label {
-    font-size: .75rem; /* Smaller font size for smaller screens */
+    font-size: .75rem;
+    /* Smaller font size for smaller screens */
   }
 
-  mat-dialog-content .form-control, 
+  mat-dialog-content .form-control,
   mat-dialog-content .form-select {
-    font-size: .75rem; /* Smaller font size for form inputs */
+    font-size: .75rem;
+    /* Smaller font size for form inputs */
     padding: 10px;
   }
 
@@ -202,9 +212,11 @@ mat-dialog-content small {
 }
 
 @media (max-width: 991px) {
-  mat-dialog-content .form-control, 
+
+  mat-dialog-content .form-control,
   mat-dialog-content .form-select {
-    font-size: .85rem; /* Adjust font size for medium-sized screens */
+    font-size: .85rem;
+    /* Adjust font size for medium-sized screens */
   }
 
   mat-dialog-content .button-primary {
@@ -215,33 +227,36 @@ mat-dialog-content small {
 
 /* Webkit scrollbar styles */
 mat-dialog-content::-webkit-scrollbar {
-  width: 6px; /* Make the scrollbar track thinner */
-  height: 6px; /* Optional: for horizontal scrollbar */
+  width: 6px;
+  /* Make the scrollbar track thinner */
+  height: 6px;
+  /* Optional: for horizontal scrollbar */
 }
 
 mat-dialog-content::-webkit-scrollbar-track {
-  background: var(--color-bg-sidebar); /* Track color */
-  border-radius: 10px; /* Rounded corners for track */
+  background: var(--color-bg-sidebar);
+  /* Track color */
+  border-radius: 10px;
+  /* Rounded corners for track */
 }
 
 mat-dialog-content::-webkit-scrollbar-thumb {
-  background: #dddddd; /* Thumb color */
-  border-radius: 10px; /* Rounded corners for the thumb */
+  background: #dddddd;
+  /* Thumb color */
+  border-radius: 10px;
+  /* Rounded corners for the thumb */
 }
 
 mat-dialog-content::-webkit-scrollbar-thumb:hover {
-  background:  #dddddd; /* Hover color */
+  background: #dddddd;
+  /* Hover color */
 }
 
 mat-dialog-content::-webkit-scrollbar-button {
-  display: none; /* Hide the scrollbar buttons */
+  display: none;
+  /* Hide the scrollbar buttons */
 }
 
-mat-dialog-actions{
+mat-dialog-actions {
   padding: 12px 8px !important;
 }
-
-
-
-
-

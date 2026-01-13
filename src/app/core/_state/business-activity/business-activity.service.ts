@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, delay } from 'rxjs';
 import { BusinessActivityModel } from './business-activity.model';
 
 @Injectable({ providedIn: 'root' })
@@ -87,6 +87,6 @@ export class BusinessActivityService {
         "in_section": false,
         "in_sub_section": true
       }
-    ]);
+    ]).pipe(delay(3000));
   }
 }

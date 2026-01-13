@@ -46,16 +46,25 @@ export class AddEditBusinessActivity {
     this.dialogRef.close();
   }
 
+  isSubmitting = false;
+
   // Form submit function
   onSubmit() {
     if (this.form.valid) {
+      this.isSubmitting = true;
       console.log('Form Data:', this.form.value);
-      if (this.data) {
-        this.updateBusinessActivity();
-      } else {
-        this.addBusinessActivity();
-      }
-      this.closeDialog();
+
+      // Simulate API call
+      setTimeout(() => {
+        if (this.data) {
+          this.updateBusinessActivity();
+        } else {
+          this.addBusinessActivity();
+        }
+        this.closeDialog();
+        this.isSubmitting = false;
+      }, 1500);
+
     } else {
       this.form.markAllAsTouched();
       this.form.updateValueAndValidity({ onlySelf: false, emitEvent: true });
