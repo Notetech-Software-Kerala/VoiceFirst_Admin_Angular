@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { ToastService } from '../../../partials/shared_services/toast.service';
 import { CommonModule } from '@angular/common';
+import { BrowserDeviceService } from '../../../core/_service/browser-device.service';
+
 
 @Component({
   selector: 'app-login',
@@ -19,7 +21,14 @@ export class Login {
   password = '123456';
   theme: any
 
-  constructor(private fb: FormBuilder, private router: Router, private toast: ToastService) { }
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private toast: ToastService,
+    private deviceService: BrowserDeviceService
+
+  ) { }
+
 
 
 
@@ -46,11 +55,14 @@ export class Login {
     this.hidePassword = !this.hidePassword;
   }
 
-  onSubmit() {
+  async onSubmit() {
     if (this.loginForm.invalid) return;
     this.submitting = true;
     console.log('Login data:', this.loginForm.value);
     if (this.username === this.loginForm.value.email && this.password === this.loginForm.value.password) {
+
+      const device = await this.deviceService.collect();
+      console.log('device', device);
       setTimeout(() => {
         this.submitting = false;
         this.router.navigate(['/dashboard']);
