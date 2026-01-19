@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { AuthService } from '../../core/_auth/auth.service';
+import { TokenStore } from '../../core/_auth/token.store';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,4 +22,11 @@ export class Dashboard {
     { id: 3, user: 'System Admin', action: 'Added "Network Error" Type', time: '11:15 AM', status: 'System', statusColor: 'blue' },
     { id: 4, user: 'Beta Corp', action: 'Subscription Expired', time: '11:30 AM', status: 'Expired', statusColor: 'danger' },
   ];
+
+  private tokenStore = inject(TokenStore);
+  private authService = inject(AuthService);
+
+  ngOnInit(): void {
+
+  }
 }

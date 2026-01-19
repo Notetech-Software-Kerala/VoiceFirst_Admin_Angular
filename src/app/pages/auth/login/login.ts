@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { ToastService } from '../../../partials/shared_services/toast.service';
 import { CommonModule } from '@angular/common';
 import { BrowserDeviceService } from '../../../core/_service/browser-device.service';
+import { AuthService } from '../../../core/_auth/auth.service';
 
 
 @Component({
@@ -25,7 +26,8 @@ export class Login {
     private fb: FormBuilder,
     private router: Router,
     private toast: ToastService,
-    private deviceService: BrowserDeviceService
+    private deviceService: BrowserDeviceService,
+    private authService: AuthService
 
   ) { }
 
@@ -55,27 +57,49 @@ export class Login {
     this.hidePassword = !this.hidePassword;
   }
 
-  async onSubmit() {
+  // async onSubmit() {
+  //   if (this.loginForm.invalid) return;
+  //   this.submitting = true;
+  //   console.log('Login data:', this.loginForm.value);
+  //   if (this.username === this.loginForm.value.email && this.password === this.loginForm.value.password) {
+
+  //     const device = await this.deviceService.collect();
+  //     console.log('device', device);
+  //     setTimeout(() => {
+  //       this.submitting = false;
+  //       this.router.navigate(['/dashboard']);
+  //       this.toast.success(`Welcome to Voice First`, { title: 'Login Success' });
+  //     }, 1000);
+  //   }
+  //   else {
+  //     setTimeout(() => {
+  //       this.submitting = false;
+  //       alert('Invalid credentials');
+  //     }, 1000);
+  //   }
+  //   // simulate async login
+
+  // }
+
+  onSubmit() {
     if (this.loginForm.invalid) return;
     this.submitting = true;
     console.log('Login data:', this.loginForm.value);
-    if (this.username === this.loginForm.value.email && this.password === this.loginForm.value.password) {
-
-      const device = await this.deviceService.collect();
-      console.log('device', device);
-      setTimeout(() => {
+    const payload = {
+      emailOrMobile: this.loginForm.value.email,
+      password: this.loginForm.value.password,
+      uniqueDeviceId: "a2f7c1ed-61b9-4e96-a5ae-53f2d35ca902"
+    }
+    this.authService.login(payload).subscribe({
+      next: (res) => {
         this.submitting = false;
         this.router.navigate(['/dashboard']);
         this.toast.success(`Welcome to Voice First`, { title: 'Login Success' });
-      }, 1000);
-    }
-    else {
-      setTimeout(() => {
+      },
+      error: (err) => {
         this.submitting = false;
-        alert('Invalid credentials');
-      }, 1000);
-    }
-    // simulate async login
-
+        this.toast.error(`Login failed`, { title: 'Login Failed' });
+      }
+    });
   }
 }

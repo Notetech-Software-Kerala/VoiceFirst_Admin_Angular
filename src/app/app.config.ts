@@ -10,7 +10,7 @@ import { BusinessActivityEffects } from './core/_state/business-activity/busines
 import { FEATURE_KEY } from './core/_state/business-activity/business-activity.selectors';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './core/_http/auth.interceptor';
-import { provideAuthBootstrap } from './app.initializer';
+
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -19,7 +19,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideAnimationsAsync(),
     provideHttpClient(withInterceptors([authInterceptor])),
-    provideAuthBootstrap(),
     provideStore({
       [FEATURE_KEY]: businessActivityReducer
     }),

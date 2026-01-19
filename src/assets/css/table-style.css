@@ -123,3 +123,11 @@ body.dark-theme .cdk-overlay-container .mat-mdc-menu-panel.row-menu .mdc-menu-su
 
   /* larger tap target on phones */
 }
+
+.loading-text,
+.no-data-text {
+  color: var(--color-text-placeholder);
+  font-size: 0.875rem;
+  padding: 1rem;
+  display: block;
+}

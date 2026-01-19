@@ -113,12 +113,12 @@
 
                 @if (paginatedBuisnessActivity.length === 0) {
                 <tr>
-                    <td colspan="6" class="text-center p-3 text-muted">
+                    <td colspan="6" class="text-center p-3">
                         @if (loading$ | async) {
-                        <small class="text-muted">Please wait...</small>
+                        <small class="loading-text">Please wait...</small>
 
                         } @else {
-                        <small class="text-muted">No data found</small>
+                        <small class="no-data-text">No data found</small>
                         }
                     </td>
                 </tr>

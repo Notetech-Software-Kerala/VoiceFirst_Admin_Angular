@@ -1,52 +1,91 @@
+// src/app/auth/auth.interceptor.ts
 import {
     HttpErrorResponse,
+    HttpEvent,
+    HttpHandlerFn,
     HttpInterceptorFn,
-    HttpRequest,
+    HttpRequest
 } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError, switchMap, throwError, of } from 'rxjs';
-import { AuthStateService } from '../_auth/auth-state.service';
-import { RefreshManagerService } from '../_auth/refresh-manager.service';
-import { willExpireWithinMs } from '../_auth/jwt.util';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { catchError, filter, finalize, switchMap, take } from 'rxjs/operators';
+import { AuthService } from '../_auth/auth.service';
 import { apiConfig } from '../_config/apiConfig';
 
-const REFRESH_WINDOW_MS = 30_000;
+const isRefreshing$ = new BehaviorSubject<boolean>(false);
+const refreshedToken$ = new BehaviorSubject<string | null>(null);
 
-function isAuthEndpoint(url: string) {
-    return url.includes(apiConfig.login) || url.includes(apiConfig.refresh) || url.includes(apiConfig.logout);
+function isAuthFreeEndpoint(url: string): boolean {
+    return (
+        url.includes(apiConfig.login) ||
+        url.includes(apiConfig.refresh) ||
+        url.includes(apiConfig.logout)
+    );
 }
 
-export const authInterceptor: HttpInterceptorFn = (req, next) => {
-    const state = inject(AuthStateService);
-    const refreshMgr = inject(RefreshManagerService);
+export const authInterceptor: HttpInterceptorFn = (
+    req: HttpRequest<any>,
+    next: HttpHandlerFn
+): Observable<HttpEvent<any>> => {
+    const auth = inject(AuthService);
 
-    // Don't intercept auth endpoints (avoid loops)
-    if (isAuthEndpoint(req.url)) return next(req);
+    // Always send cookies (needed for refresh cookie)
+    let request = req.clone({ withCredentials: true });
 
-    const token = state.accessToken;
+    // ✅ DO NOT attach Authorization for login/refresh/logout
+    if (!isAuthFreeEndpoint(request.url)) {
+        const token = auth.getAccessToken();
+        if (token) {
+            request = request.clone({
+                setHeaders: { Authorization: `Bearer ${token}` }
+            });
+        }
+    }
 
-    const attachToken = (r: HttpRequest<any>, t: string | null) =>
-        t ? r.clone({ setHeaders: { Authorization: `Bearer ${t}` } }) : r;
-
-    // If no token, just continue (backend may allow anonymous)
-    if (!token) return next(req);
-
-    // Proactive refresh if expiring soon
-    const needsRefresh = willExpireWithinMs(token, REFRESH_WINDOW_MS);
-
-    const proceed$ = (t: string) => next(attachToken(req, t));
-
-    return (needsRefresh ? refreshMgr.refreshOnce() : of(token)).pipe(
-        switchMap((t) => proceed$(t)),
+    return next(request).pipe(
         catchError((err: unknown) => {
-            // Optional: if access token invalid/expired (401), attempt refresh once then retry
-            if (err instanceof HttpErrorResponse && err.status === 401) {
-                return refreshMgr.refreshOnce().pipe(
-                    switchMap((t) => next(attachToken(req, t))),
-                    catchError((e) => throwError(() => e))
+            if (!(err instanceof HttpErrorResponse)) return throwError(() => err);
+            if (err.status !== 401) return throwError(() => err);
+
+            // ✅ If refresh/login itself fails, stop
+            if (isAuthFreeEndpoint(request.url)) {
+                auth.clearSession();
+                return throwError(() => err);
+            }
+
+            // If refresh in progress, wait and retry
+            if (isRefreshing$.value) {
+                return refreshedToken$.pipe(
+                    filter((t): t is string => !!t),
+                    take(1),
+                    switchMap((newToken) => {
+                        const retryReq = request.clone({
+                            setHeaders: { Authorization: `Bearer ${newToken}` }
+                        });
+                        return next(retryReq);
+                    })
                 );
             }
-            return throwError(() => err);
+
+            // Start refresh
+            isRefreshing$.next(true);
+            refreshedToken$.next(null);
+
+            return auth.refresh().pipe(
+                switchMap((newToken) => {
+                    refreshedToken$.next(newToken);
+
+                    const retryReq = request.clone({
+                        setHeaders: { Authorization: `Bearer ${newToken}` }
+                    });
+                    return next(retryReq);
+                }),
+                catchError((refreshErr) => {
+                    auth.clearSession();
+                    return throwError(() => refreshErr);
+                }),
+                finalize(() => isRefreshing$.next(false))
+            );
         })
     );
 };
