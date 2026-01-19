@@ -3,44 +3,15 @@
     <form [formGroup]="form" class="row g-3">
 
         <div class="col-md-12">
-            <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="name" formControlName="name" />
-            <!-- @if (f['name'].touched && f['name'].invalid) {
+            <label for="businessActivityName" class="form-label">Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="businessActivityName" formControlName="businessActivityName" />
+            <!-- @if (f['businessActivityName'].touched && f['businessActivityName'].invalid) {
         <div class="text-danger">
-         @if (f['name'].errors?.['required']) {
+         @if (f['businessActivityName'].errors?.['required']) {
             <small>Name is required.</small>
           }
         </div>
       } -->
-        </div>
-
-
-        <div class="col-md-3">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="gridCheck" formControlName="in_company" />
-                <label class="form-check-label" for="gridCheck">Company</label>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="gridCheck" formControlName="in_branch" />
-                <label class="form-check-label" for="gridCheck">Branch</label>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="gridCheck" formControlName="in_section" />
-                <label class="form-check-label" for="gridCheck">Section</label>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="gridCheck" formControlName="in_sub_section" />
-                <label class="form-check-label" for="gridCheck">Sub Section</label>
-            </div>
         </div>
 
         <mat-dialog-actions class="mt-4">

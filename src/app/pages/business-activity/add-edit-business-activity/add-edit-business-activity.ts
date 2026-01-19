@@ -34,11 +34,7 @@ export class AddEditBusinessActivity {
 
   formInItialize() {
     this.form = this.fb.group({
-      name: ['', Validators.required],
-      in_company: [false],
-      in_branch: [false],
-      in_section: [false],
-      in_sub_section: [false],
+      businessActivityName: ['', Validators.required],
     });
   }
 
@@ -74,11 +70,7 @@ export class AddEditBusinessActivity {
   addBusinessActivity() {
     if (this.form.valid) {
       const newBusinessActivity = {
-        name: this.form.value.name,
-        in_company: this.form.value.in_company,
-        in_branch: this.form.value.in_branch,
-        in_section: this.form.value.in_section,
-        in_sub_section: this.form.value.in_sub_section,
+        businessActivityName: this.form.value.businessActivityName,
       }
       console.log("payload", newBusinessActivity);
     }
@@ -87,12 +79,9 @@ export class AddEditBusinessActivity {
   updateBusinessActivity() {
     if (this.form.valid && this.data) {
       const updatedBusinessActivity = {
-        company_business_activity_id: this.data.company_business_activity_id,
-        name: this.form.value.name,
-        in_company: this.form.value.in_company,
-        in_branch: this.form.value.in_branch,
-        in_section: this.form.value.in_section,
-        in_sub_section: this.form.value.in_sub_section,
+        sysBusinessActivityId: this.data.sysBusinessActivityId,
+        businessActivityName: this.form.value.businessActivityName,
+
       }
       console.log("payload", updatedBusinessActivity);
     }

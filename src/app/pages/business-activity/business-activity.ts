@@ -29,7 +29,7 @@ export class BusinessActivity implements OnInit, OnDestroy {
 
   // search/sort state
   searchText = '';
-  sortColumn: keyof BusinessActivityModel = 'name';
+  sortColumn: keyof BusinessActivityModel = 'businessActivityName';
   sortDirection: 'asc' | 'desc' = 'asc';
 
   // pagination state (child emits, parent slices)
@@ -98,7 +98,7 @@ export class BusinessActivity implements OnInit, OnDestroy {
     this.filteredBuisnessActivity = this.businessActivities.filter(u => {
       const matchesText =
         !val ||
-        u.name.toLowerCase().includes(val);
+        u.businessActivityName.toLowerCase().includes(val);
 
       const matchesFilters = Object.entries(this.activeFilters).every(([key, values]) => {
         if (!values || values.length === 0) return true;
@@ -119,15 +119,24 @@ export class BusinessActivity implements OnInit, OnDestroy {
       this.sortColumn = column;
     }
 
-    const dir = this.sortDirection === 'asc' ? 1 : -1;
-    this.filteredBuisnessActivity.sort((a, b) =>
-      a[this.sortColumn] < b[this.sortColumn] ? -1 * dir :
-        a[this.sortColumn] > b[this.sortColumn] ? 1 * dir : 0
-    );
+    if (!this.sortColumn) return; // ✅ guard
 
-    this.currentPage = 1; // reset to first page after sort
+    const dir = this.sortDirection === 'asc' ? 1 : -1;
+    const col = this.sortColumn;
+
+    this.filteredBuisnessActivity.sort((a, b) => {
+      const av = a[col] ?? '';   // ✅ handle null/undefined
+      const bv = b[col] ?? '';
+
+      if (av < bv) return -1 * dir;
+      if (av > bv) return 1 * dir;
+      return 0;
+    });
+
+    this.currentPage = 1;
     this.paginate();
   }
+
 
   paginate() {
     const totalPages = this.totalPageCount();
@@ -183,7 +192,7 @@ export class BusinessActivity implements OnInit, OnDestroy {
         icon: 'delete',
         tone: 'warn',             // 'warn' | 'accent' | 'neutral'
         title: 'Delete item',
-        message: `Are you sure you want to delete “${u.name}”?`,
+        message: `Are you sure you want to delete “${u.businessActivityName}”?`,
         confirmText: 'Delete',
         cancelText: 'Cancel',
       }

@@ -8,85 +8,96 @@ export class BusinessActivityService {
   getAll(): Observable<BusinessActivityModel[]> {
     return of([
       {
-        "company_business_activity_id": 1,
-        "name": "Restroom",
-        "in_company": true,
-        "in_branch": true,
-        "in_section": true,
-        "in_sub_section": true
+        "sysBusinessActivityId": 1,
+        "businessActivityName": "Sales",
+        "createdBy": "admin",
+        "createdAt": "2026-01-01T09:00:00Z",
+        "isActive": true,
+        "updatedBy": "admin",
+        "updatedAt": "2026-01-05T10:15:00Z"
       },
       {
-        "company_business_activity_id": 2,
-        "name": "Cafeteria",
-        "in_company": true,
-        "in_branch": true,
-        "in_section": false,
-        "in_sub_section": false
+        "sysBusinessActivityId": 2,
+        "businessActivityName": "Marketing",
+        "createdBy": "john.doe",
+        "createdAt": "2026-01-02T11:30:00Z",
+        "isActive": true,
+        "updatedBy": null,
+        "updatedAt": null
       },
       {
-        "company_business_activity_id": 3,
-        "name": "Parking",
-        "in_company": true,
-        "in_branch": false,
-        "in_section": false,
-        "in_sub_section": false
+        "sysBusinessActivityId": 3,
+        "businessActivityName": "Operations",
+        "createdBy": "jane.smith",
+        "createdAt": "2026-01-03T08:20:00Z",
+        "isActive": false,
+        "updatedBy": "jane.smith",
+        "updatedAt": "2026-01-12T16:40:00Z"
       },
       {
-        "company_business_activity_id": 4,
-        "name": "Reception",
-        "in_company": true,
-        "in_branch": true,
-        "in_section": true,
-        "in_sub_section": false
+        "sysBusinessActivityId": 4,
+        "businessActivityName": "Customer Support",
+        "createdBy": "support.lead",
+        "createdAt": "2026-01-04T14:10:00Z",
+        "isActive": true,
+        "updatedBy": "support.manager",
+        "updatedAt": "2026-01-14T06:30:00Z"
       },
       {
-        "company_business_activity_id": 5,
-        "name": "Warehouse",
-        "in_company": true,
-        "in_branch": true,
-        "in_section": false,
-        "in_sub_section": false
+        "sysBusinessActivityId": 5,
+        "businessActivityName": "Finance",
+        "createdBy": "finance.user",
+        "createdAt": "2026-01-05T10:05:00Z",
+        "isActive": true,
+        "updatedBy": "finance.manager",
+        "updatedAt": "2026-01-16T09:25:00Z"
       },
       {
-        "company_business_activity_id": 6,
-        "name": "IT Room",
-        "in_company": true,
-        "in_branch": true,
-        "in_section": true,
-        "in_sub_section": true
+        "sysBusinessActivityId": 6,
+        "businessActivityName": "Human Resources",
+        "createdBy": "hr.user",
+        "createdAt": "2026-01-06T13:45:00Z",
+        "isActive": true,
+        "updatedBy": null,
+        "updatedAt": null
       },
       {
-        "company_business_activity_id": 7,
-        "name": "Security Office",
-        "in_company": true,
-        "in_branch": false,
-        "in_section": true,
-        "in_sub_section": false
+        "sysBusinessActivityId": 7,
+        "businessActivityName": "IT Services",
+        "createdBy": "it.admin",
+        "createdAt": "2026-01-07T07:50:00Z",
+        "isActive": true,
+        "updatedBy": "it.admin",
+        "updatedAt": "2026-01-17T18:10:00Z"
       },
       {
-        "company_business_activity_id": 8,
-        "name": "Training Hall",
-        "in_company": true,
-        "in_branch": true,
-        "in_section": false,
-        "in_sub_section": false
+        "sysBusinessActivityId": 8,
+        "businessActivityName": "Procurement",
+        "createdBy": "proc.user",
+        "createdAt": "2026-01-08T12:00:00Z",
+        "isActive": false,
+        "updatedBy": "proc.manager",
+        "updatedAt": "2026-01-18T15:30:00Z"
       },
       {
-        "company_business_activity_id": 9,
-        "name": "HR Office",
-        "in_company": true,
-        "in_branch": true,
-        "in_section": true,
-        "in_sub_section": false
+        "sysBusinessActivityId": 9,
+        "businessActivityName": "Logistics",
+        "createdBy": "log.user",
+        "createdAt": "2026-01-09T16:25:00Z",
+        "isActive": true,
+        "updatedBy": "log.manager",
+        "updatedAt": "2026-01-19T08:45:00Z"
       },
       {
-        "company_business_activity_id": 10,
-        "name": "Storage Room",
-        "in_company": true,
-        "in_branch": true,
-        "in_section": false,
-        "in_sub_section": true
+        "sysBusinessActivityId": 10,
+        "businessActivityName": "Research & Development",
+        "createdBy": "rnd.user",
+        "createdAt": "2026-01-10T09:35:00Z",
+        "isActive": true,
+        "updatedBy": "rnd.lead",
+        "updatedAt": "2026-01-19T11:20:00Z"
       }
-    ]).pipe(delay(3000));
+    ]
+    ).pipe(delay(3000));
   }
 }

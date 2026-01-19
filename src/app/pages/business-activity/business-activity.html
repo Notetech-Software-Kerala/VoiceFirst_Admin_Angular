@@ -74,41 +74,16 @@
         <table class="table align-middle">
             <thead class="table-light">
                 <tr>
-                    <th (click)="sortData('name')" style="cursor:pointer">Name <small>⇅</small></th>
-                    <th class="text-center">Company</th>
-                    <th class="text-center">Branch</th>
-                    <th class="text-center">Section</th>
-                    <th class="text-center">Sub Section</th>
+                    <th>Name <small style="cursor:pointer" (click)="sortData('businessActivityName')">⇅</small></th>
+
                     <th>Action</th>
             </thead>
 
             <tbody>
                 @for (u of paginatedBuisnessActivity; track u) {
                 <tr>
-                    <td>{{ u.name }}</td>
-                    <td class="text-center">
-                        <mat-icon class="msr" [ngClass]="u.in_company ? 'ok-icon' : 'cancel-icon'">
-                            {{ u.in_company ? 'check_circle' : 'cancel' }}
-                        </mat-icon>
-                    </td>
+                    <td>{{ u.businessActivityName }}</td>
 
-                    <td class="text-center">
-                        <mat-icon class="msr" [ngClass]="u.in_branch ? 'ok-icon' : 'cancel-icon'">
-                            {{ u.in_branch ? 'check_circle' : 'cancel' }}
-                        </mat-icon>
-                    </td>
-
-                    <td class="text-center">
-                        <mat-icon class="msr" [ngClass]="u.in_section ? 'ok-icon' : 'cancel-icon'">
-                            {{ u.in_section ? 'check_circle' : 'cancel' }}
-                        </mat-icon>
-                    </td>
-
-                    <td class="text-center">
-                        <mat-icon class="msr" [ngClass]="u.in_sub_section ? 'ok-icon' : 'cancel-icon'">
-                            {{ u.in_sub_section ? 'check_circle' : 'cancel' }}
-                        </mat-icon>
-                    </td>
 
 
                     <td class="action-cell">

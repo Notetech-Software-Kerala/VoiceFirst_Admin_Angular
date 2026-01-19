@@ -6,7 +6,7 @@ import { BusinessActivityModel } from './business-activity.model';
 
 export const adapter: EntityAdapter<BusinessActivityModel> =
   createEntityAdapter<BusinessActivityModel>({
-    selectId: a => a.company_business_activity_id,
+    selectId: a => a.sysBusinessActivityId,
   });
 
 export const initialState: BusinessActivityState =

@@ -2,7 +2,7 @@ export const apiConfig = {
 
     // Auth Endpoints
 
-    login: '/auth/login',
-    refresh: '/auth/refresh',
-    logout: '/auth/logout'
+    login: '/Auth/login',
+    refresh: '/Auth/refresh',
+    logout: '/Auth/logout'
 };
