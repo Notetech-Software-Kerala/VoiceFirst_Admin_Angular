@@ -9,7 +9,7 @@ import { apiConfig } from '../_config/apiConfig';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-    private base = environment.baseUrl;
+    private base = environment.loginBaseUrl;
 
     private userSubject = new BehaviorSubject<UserInfo | null>(null);
     user$ = this.userSubject.asObservable();

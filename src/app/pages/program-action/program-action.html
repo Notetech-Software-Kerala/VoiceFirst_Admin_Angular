@@ -1,0 +1,102 @@
+<div class="card">
+    <h2 class="page-title mb-3">Program Action Management</h2>
+
+    <div class="d-flex flex-wrap align-items-center mb-3 gap-2">
+
+        <!-- Left: search + filters -->
+        <div class="d-flex flex-wrap align-items-center gap-2 flex-grow-1">
+            <app-search-bar [tooltipText]="'Search by action name'" [value]="queryParams.SearchText || ''"
+                (valueChange)="onSearch($event)">
+            </app-search-bar>
+
+        </div>
+
+        <!-- Actions -->
+        <div class="actions ms-auto d-flex flex-wrap gap-2">
+            <button type="button" class="btn-action btn-outline">
+                <mat-icon class="msr">file_download</mat-icon>
+                <span class="btn-text">Export</span>
+            </button>
+
+            <button type="button" class="btn-action btn-primary">
+                <mat-icon class="msr">add</mat-icon>
+                <span class="btn-text">Add</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="table-responsive position-relative">
+        <div *ngIf="(loading$ | async) || isSearching" class="progress position-absolute top-0 start-0 end-0"
+            role="progressbar" aria-label="Loading" style="z-index: 10; height: 4px; background-color: transparent;">
+            <div class="table-premium-loader"></div>
+        </div>
+
+        <table class="table align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th appSortableColumn="actionName" [sortBy]="queryParams.SortBy" [sortOrder]="queryParams.SortOrder"
+                        (sortChange)="onSortChange($event)">
+                        Action Name
+                    </th>
+                    <th appSortableColumn="active" [sortBy]="queryParams.SortBy" [sortOrder]="queryParams.SortOrder"
+                        (sortChange)="onSortChange($event)">
+                        Status
+                    </th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @for (item of programActions; track item.actionId) {
+                <tr>
+                    <td>{{ item.actionName }}</td>
+
+                    <td><app-status-badge [item]="item"></app-status-badge></td>
+
+                    <td class="action-cell">
+                        <button mat-icon-button class="menu-trigger" [matMenuTriggerFor]="rowMenu"
+                            aria-label="More actions">
+                            <mat-icon class="msr">more_vert</mat-icon>
+                        </button>
+
+                        <mat-menu #rowMenu="matMenu" class="row-menu" xPosition="before" yPosition="below">
+                            <button mat-menu-item>
+                                <mat-icon class="msr-edit">edit</mat-icon>
+                                <span>Edit</span>
+                            </button>
+
+                            <button mat-menu-item (click)="onDelete(item)">
+                                <mat-icon class="msr-delete">delete</mat-icon>
+                                <span>Delete</span>
+                            </button>
+
+                            @if (item.deleted) {
+                            <button mat-menu-item>
+                                <mat-icon class="msr">restore</mat-icon>
+                                <span>Restore</span>
+                            </button>
+                            }
+                        </mat-menu>
+                    </td>
+                </tr>
+                }
+
+                @if (programActions.length === 0) {
+                <tr>
+                    <td colspan="5" class="text-center p-3">
+                        @if (loading$ | async) {
+                        <small class="loading-text">Please wait...</small>
+                        } @else {
+                        <small class="no-data-text">No data found</small>
+                        }
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <app-pagination [totalItems]="totalCount" [pageSize]="pageSize" [pageSizes]="pageSizes" [currentPage]="currentPage"
+        (paginationChange)="onPaginationChange($event)">
+    </app-pagination>
+</div>

@@ -1,9 +1,7 @@
 export interface QueryParameterModel {
     SortBy?: string;
-    SortOrder?: string;
+    SortOrder?: 'Asc' | 'Desc';
     SearchText?: string;
     PageNumber?: number;
     Limit?: number;
-    Active?: boolean;
-    Deleted?: boolean;
 }
