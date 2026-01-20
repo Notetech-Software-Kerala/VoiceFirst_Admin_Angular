@@ -3,16 +3,18 @@
     <form [formGroup]="form" class="row g-3">
 
         <div class="col-md-12">
-            <label for="businessActivityName" class="form-label">Name <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="businessActivityName" formControlName="businessActivityName" />
-            <!-- @if (f['businessActivityName'].touched && f['businessActivityName'].invalid) {
+            <label for="Name" class="form-label">Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="Name" formControlName="Name" />
+            <!-- @if (f['Name'].touched && f['Name'].invalid) {
         <div class="text-danger">
-         @if (f['businessActivityName'].errors?.['required']) {
+         @if (f['Name'].errors?.['required']) {
             <small>Name is required.</small>
           }
         </div>
       } -->
         </div>
+
+
 
         <mat-dialog-actions class="mt-4">
             <button type="button" class="close-btn" (click)="closeDialog()">Close</button>

@@ -74,7 +74,9 @@
         <table class="table align-middle">
             <thead class="table-light">
                 <tr>
-                    <th>Name <small style="cursor:pointer" (click)="sortData('businessActivityName')">⇅</small></th>
+                    <th>Name <small style="cursor:pointer" (click)="sortData('Name')">⇅</small></th>
+
+                    <th>Status</th>
 
                     <th>Action</th>
             </thead>
@@ -82,9 +84,18 @@
             <tbody>
                 @for (u of paginatedBuisnessActivity; track u) {
                 <tr>
-                    <td>{{ u.businessActivityName }}</td>
+                    <td>{{ u.Name }}</td>
 
 
+                    <td>
+                        <span class="badge" [ngClass]="{
+          'badge--deleted': u.Delete,
+          'badge--active': !u.Delete && u.Active,
+          'badge--suspended': !u.Delete && !u.Active
+        }">
+                            {{ u.Delete ? 'Deleted' : (u.Active ? 'Active' : 'Suspended') }}
+                        </span>
+                    </td>
 
                     <td class="action-cell">
                         <button mat-icon-button class="menu-trigger" [matMenuTriggerFor]="rowMenu"

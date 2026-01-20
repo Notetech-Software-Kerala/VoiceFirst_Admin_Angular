@@ -34,7 +34,8 @@ export class AddEditBusinessActivity {
 
   formInItialize() {
     this.form = this.fb.group({
-      businessActivityName: ['', Validators.required],
+      Name: ['', Validators.required],
+      Active: [true], // Default to true
     });
   }
 
@@ -70,7 +71,7 @@ export class AddEditBusinessActivity {
   addBusinessActivity() {
     if (this.form.valid) {
       const newBusinessActivity = {
-        businessActivityName: this.form.value.businessActivityName,
+        Name: this.form.value.Name,
       }
       console.log("payload", newBusinessActivity);
     }
@@ -79,9 +80,8 @@ export class AddEditBusinessActivity {
   updateBusinessActivity() {
     if (this.form.valid && this.data) {
       const updatedBusinessActivity = {
-        sysBusinessActivityId: this.data.sysBusinessActivityId,
-        businessActivityName: this.form.value.businessActivityName,
-
+        Id: this.data.Id,
+        Name: this.form.value.Name,
       }
       console.log("payload", updatedBusinessActivity);
     }
