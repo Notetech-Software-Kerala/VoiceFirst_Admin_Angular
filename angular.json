@@ -102,58 +102,12 @@
               "src/styles.css"
             ]
           }
-        },
-        "cypress-run": {
-          "builder": "@cypress/schematic:cypress",
-          "options": {
-            "devServerTarget": "voicefirst_admin:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "voicefirst_admin:serve:production"
-            }
-          }
-        },
-        "cypress-open": {
-          "builder": "@cypress/schematic:cypress",
-          "options": {
-            "watch": true,
-            "headless": false
-          }
-        },
-        "ct": {
-          "builder": "@cypress/schematic:cypress",
-          "options": {
-            "devServerTarget": "voicefirst_admin:serve",
-            "watch": true,
-            "headless": false,
-            "testingType": "component"
-          },
-          "configurations": {
-            "development": {
-              "devServerTarget": "voicefirst_admin:serve:development"
-            }
-          }
-        },
-        "e2e": {
-          "builder": "@cypress/schematic:cypress",
-          "options": {
-            "devServerTarget": "voicefirst_admin:serve",
-            "watch": true,
-            "headless": false
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "voicefirst_admin:serve:production"
-            }
-          }
         }
       }
     }
   },
   "cli": {
     "schematicCollections": [
-      "@cypress/schematic",
       "@schematics/angular"
     ]
   }
