@@ -14,8 +14,12 @@ export class Pagination {
   @Input() pageSizes: number[] = [5, 10, 20];
   @Input() currentPage = 1;
 
+  // Individual events (for backward compatibility)
   @Output() pageChange = new EventEmitter<number>();
   @Output() pageSizeChange = new EventEmitter<number>();
+
+  // Combined event - emits both page and size together
+  @Output() paginationChange = new EventEmitter<{ page: number; size: number }>();
 
   Math = Math;
 
@@ -28,12 +32,19 @@ export class Pagination {
   changePage(page: number) {
     const total = this.totalPages();
     const newPage = Math.min(Math.max(1, page), total || 1);
+
+    // Emit both individual and combined events
     this.pageChange.emit(newPage);
+    this.paginationChange.emit({ page: newPage, size: this.pageSize });
   }
 
   /** Change number of items per page */
   changePageSize(size: number | string) {
-    this.pageSizeChange.emit(Number(size));
+    const newSize = Number(size);
+
+    // Emit both individual and combined events (reset to page 1)
+    this.pageSizeChange.emit(newSize);
+    this.paginationChange.emit({ page: 1, size: newSize });
   }
 
   /** Pagination window like [1, …, 7, 8, 9, …, 20] */

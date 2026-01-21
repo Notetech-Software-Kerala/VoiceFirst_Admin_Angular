@@ -10,6 +10,9 @@ import { BusinessActivityEffects } from './core/_state/business-activity/busines
 import { FEATURE_KEY } from './core/_state/business-activity/business-activity.selectors';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './core/_http/auth.interceptor';
+import { programActionReducer } from './core/_state/program-action/program-action.reducer';
+import { ProgramActionEffects } from './core/_state/program-action/program-action.effects';
+import { FEATURE_KEY as PROGRAM_ACTION_FEATURE_KEY } from './core/_state/program-action/program-action.selectors';
 
 
 export const appConfig: ApplicationConfig = {
@@ -20,9 +23,10 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideHttpClient(withInterceptors([authInterceptor])),
     provideStore({
-      [FEATURE_KEY]: businessActivityReducer
+      [FEATURE_KEY]: businessActivityReducer,
+      [PROGRAM_ACTION_FEATURE_KEY]: programActionReducer
     }),
-    provideEffects([BusinessActivityEffects]),
+    provideEffects([BusinessActivityEffects, ProgramActionEffects]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })
   ]
 };

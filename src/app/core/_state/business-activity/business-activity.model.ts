@@ -1,9 +1,15 @@
+/**
+ * Business Activity Model matching the C# backend structure
+ */
 export interface BusinessActivityModel {
-  sysBusinessActivityId: number;     // or string if your API uses GUIDs/strings
-  businessActivityName: string;
-  createdBy: string;
-  createdAt: string;                // ISO date string; use Date if you parse it
-  isActive: boolean;
-  updatedBy?: string | null;
-  updatedAt?: string | null;
+  Id: number;
+  Name: string;
+  Active: boolean;
+  Delete: boolean;
+  CreatedUser: string;
+  CreatedDate: string;              // ISO date string from DateTime
+  ModifiedUser: string;
+  ModifiedDate: string | null;      // ISO date string or null
+  DeletedUser: string;
+  DeletedDate: string | null;       // ISO date string or null
 }

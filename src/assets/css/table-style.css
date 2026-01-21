@@ -124,10 +124,30 @@ body.dark-theme .cdk-overlay-container .mat-mdc-menu-panel.row-menu .mdc-menu-su
   /* larger tap target on phones */
 }
 
+/* Table Loading Bar */
+.table-premium-loader {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+      transparent,
+      #3b82f6,
+      transparent);
+  animation: loading 1.5s infinite;
+  box-shadow: 0 0 10px #3b82f6;
+}
+
+@keyframes loading {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Status Text */
 .loading-text,
 .no-data-text {
-  color: var(--color-text-placeholder);
-  font-size: 0.875rem;
-  padding: 1rem;
-  display: block;
+  color: #6b7280;
 }

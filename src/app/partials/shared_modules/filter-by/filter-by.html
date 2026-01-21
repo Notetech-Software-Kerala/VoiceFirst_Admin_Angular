@@ -8,16 +8,19 @@
         @for (f of filters; track f.key) {
         <div class="filter-group mb-2">
             <div class="fw-semibold mb-1 filter-label">{{ f.label }}</div>
+
             @for (opt of f.options; track opt) {
             <div class="form-check">
                 <input type="checkbox" class="form-check-input" [id]="f.key + '_' + opt"
-                    [checked]="isChecked(f.key, opt)" (change)="toggleValue(f.key, opt, $event.target.checked)" />
+                    [checked]="isChecked(f.key, opt)" (change)="toggleValue(f.key, opt, $any($event.target).checked)" />
+
                 <label class="form-check-label" [for]="f.key + '_' + opt">
                     {{ opt }}
                 </label>
             </div>
             }
         </div>
+
         @if (f !== filters[filters.length - 1]) {
         <hr class="my-2" />
         }

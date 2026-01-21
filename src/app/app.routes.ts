@@ -34,6 +34,10 @@ export const routes: Routes = [
             {
                 path: 'business-activity',
                 loadComponent: () => import('./pages/business-activity/business-activity').then(m => m.BusinessActivity)
+            },
+            {
+                path: 'program-action',
+                loadComponent: () => import('./pages/program-action/program-action').then(m => m.ProgramAction)
             }
         ]
     }

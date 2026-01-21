@@ -13,6 +13,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatMenuModule } from '@angular/material/menu';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { AddEditProgramActionComponent } from './pages/program-action/add-edit-program-action/add-edit-program-action.component';
 
 @NgModule({
   imports: [
@@ -47,6 +48,5 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     MatMenuModule,
     DragDropModule
   ],
-  declarations: [],
 })
 export class MaterialModule { }

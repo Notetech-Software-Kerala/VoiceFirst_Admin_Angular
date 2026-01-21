@@ -29,7 +29,7 @@ export class BusinessActivity implements OnInit, OnDestroy {
 
   // search/sort state
   searchText = '';
-  sortColumn: keyof BusinessActivityModel = 'businessActivityName';
+  sortColumn: keyof BusinessActivityModel = 'Name';
   sortDirection: 'asc' | 'desc' = 'asc';
 
   // pagination state (child emits, parent slices)
@@ -98,7 +98,7 @@ export class BusinessActivity implements OnInit, OnDestroy {
     this.filteredBuisnessActivity = this.businessActivities.filter(u => {
       const matchesText =
         !val ||
-        u.businessActivityName.toLowerCase().includes(val);
+        u.Name.toLowerCase().includes(val);
 
       const matchesFilters = Object.entries(this.activeFilters).every(([key, values]) => {
         if (!values || values.length === 0) return true;
@@ -119,13 +119,13 @@ export class BusinessActivity implements OnInit, OnDestroy {
       this.sortColumn = column;
     }
 
-    if (!this.sortColumn) return; // ✅ guard
+    if (!this.sortColumn) return;
 
     const dir = this.sortDirection === 'asc' ? 1 : -1;
     const col = this.sortColumn;
 
     this.filteredBuisnessActivity.sort((a, b) => {
-      const av = a[col] ?? '';   // ✅ handle null/undefined
+      const av = a[col] ?? '';
       const bv = b[col] ?? '';
 
       if (av < bv) return -1 * dir;
@@ -192,7 +192,7 @@ export class BusinessActivity implements OnInit, OnDestroy {
         icon: 'delete',
         tone: 'warn',             // 'warn' | 'accent' | 'neutral'
         title: 'Delete item',
-        message: `Are you sure you want to delete “${u.businessActivityName}”?`,
+        message: `Are you sure you want to delete "${u.Name}"?`,
         confirmText: 'Delete',
         cancelText: 'Cancel',
       }
@@ -203,5 +203,19 @@ export class BusinessActivity implements OnInit, OnDestroy {
         // perform delete...
       }
     });
+  }
+
+  getStatusText(u: any): string {
+    if (u.Delete) return 'Deleted';
+    return u.Active ? 'Active' : 'Suspended';
+  }
+
+  getStatusBadgeClass(u: any): string {
+    if (u.Delete) {
+      return 'bg-red-100 text-red-700 border border-red-200';
+    }
+    return u.Active
+      ? 'bg-green-100 text-green-700 border border-green-200'
+      : 'bg-yellow-100 text-yellow-800 border border-yellow-200';
   }
 }
