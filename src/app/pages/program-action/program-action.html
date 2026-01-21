@@ -8,6 +8,10 @@
             <app-search-bar [tooltipText]="'Search by action name'" [value]="queryParams.SearchText || ''"
                 (valueChange)="onSearch($event)">
             </app-search-bar>
+            <app-filter-by [filters]="filterOptions" [activeFilters]="activeFilters" [clearSignal]="clearSignal"
+                (filterChange)="onFilterChange($event)">
+            </app-filter-by>
+
 
         </div>
 
@@ -18,12 +22,30 @@
                 <span class="btn-text">Export</span>
             </button>
 
-            <button type="button" class="btn-action btn-primary">
+            <button type="button" class="btn-action btn-primary" (click)="openAddDialog()">
                 <mat-icon class="msr">add</mat-icon>
                 <span class="btn-text">Add</span>
             </button>
         </div>
     </div>
+
+    @let entries = activeFilters | keyvalue;
+
+    @if (entries.length) {
+    <div class="active-filters d-flex flex-wrap align-items-center gap-2 mb-3">
+        @for (entry of entries; track entry.key) {
+        @for (val of entry.value; track val) {
+        <span class="filter-chip">
+            {{ val }}
+            <button type="button" class="btn-clear" (click)="removeFilter(entry.key, val)">×</button>
+        </span>
+        }
+        }
+        <button type="button" class="btn btn-sm btn-outline-secondary ms-2" (click)="clearAllFilters()">
+            Clear all
+        </button>
+    </div>
+    }
 
     <div class="table-responsive position-relative">
         <div *ngIf="(loading$ | async) || isSearching" class="progress position-absolute top-0 start-0 end-0"
@@ -60,7 +82,7 @@
                         </button>
 
                         <mat-menu #rowMenu="matMenu" class="row-menu" xPosition="before" yPosition="below">
-                            <button mat-menu-item>
+                            <button mat-menu-item (click)="openEditDialog(item)">
                                 <mat-icon class="msr-edit">edit</mat-icon>
                                 <span>Edit</span>
                             </button>

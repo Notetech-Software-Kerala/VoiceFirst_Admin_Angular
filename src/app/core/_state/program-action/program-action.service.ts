@@ -14,27 +14,14 @@ export class ProgramActionService {
   constructor(private http: HttpClient) { }
 
   getAll(queryParams: any): Observable<PaginatedData<ProgramActionModel>> {
+    console.log("Query Params 22", queryParams);
+
     // Build HttpParams, only including parameters with values
-    let params = new HttpParams();
+    let params = new HttpParams({
+      fromObject: queryParams
+    });
 
-    // Only add parameters that have meaningful values
-    if (queryParams.SortBy) {
-      params = params.set('SortBy', queryParams.SortBy);
-    }
-    if (queryParams.SortOrder) {
-      params = params.set('SortOrder', queryParams.SortOrder);
-    }
-    if (queryParams.SearchText) {
-      params = params.set('SearchText', queryParams.SearchText);
-    }
-    if (queryParams.PageNumber && queryParams.PageNumber > 0) {
-      params = params.set('PageNumber', queryParams.PageNumber.toString());
-    }
-    if (queryParams.Limit && queryParams.Limit > 0) {
-      params = params.set('Limit', queryParams.Limit.toString());
-    }
-
-    console.log("QueryParams", queryParams);
+    console.log("QueryParams", params);
 
 
     return this.http.get<ApiResponse<PaginatedData<ProgramActionModel>>>(
@@ -42,6 +29,30 @@ export class ProgramActionService {
       { params }
     ).pipe(
       map(response => response.data)
+    );
+  }
+
+  create(data: { programActionName: string }): Observable<ProgramActionModel> {
+    return this.http.post<ApiResponse<ProgramActionModel>>(
+      `${this.base}${apiConfig.programAction}`,
+      data
+    ).pipe(
+      map(response => response.data)
+    );
+  }
+
+  update(id: number, data: Partial<ProgramActionModel>): Observable<ProgramActionModel> {
+    return this.http.put<ApiResponse<ProgramActionModel>>(
+      `${this.base}${apiConfig.programAction}/${id}`,
+      data
+    ).pipe(
+      map(response => response.data)
+    );
+  }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(
+      `${this.base}${apiConfig.programAction}/${id}`
     );
   }
 }

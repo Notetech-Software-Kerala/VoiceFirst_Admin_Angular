@@ -1,11 +1,107 @@
-import { Component } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MaterialModule } from '../../../material.module';
+import { ProgramActionModel } from '../../../core/_state/program-action/program-action.model';
 
 @Component({
   selector: 'app-add-edit-program-action',
-  standalone: false,
+  imports: [MaterialModule, ReactiveFormsModule],
   templateUrl: './add-edit-program-action.component.html',
-  styleUrl: './add-edit-program-action.component.css',
+  styleUrl: './add-edit-program-action.component.css'
 })
-export class AddEditProgramActionComponent {
+export class AddEditProgramActionComponent implements OnInit {
+  form!: FormGroup;
+  programAction !: ProgramActionModel;
 
+  constructor(
+    private fb: FormBuilder,
+    private dialogRef: MatDialogRef<AddEditProgramActionComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: ProgramActionModel | null,
+  ) { }
+
+
+
+  ngOnInit() {
+    this.formInItialize();
+    // If the dialog was opened with existing business activity data, populate the form
+    if (this.data) {
+      this.programAction = this.data;
+      this.form.patchValue(this.data as Partial<Record<string, any>>);
+    }
+
+  }
+
+  formInItialize() {
+    this.form = this.fb.group({
+      Name: ['', Validators.required],
+      Active: [true], // Default to true
+    });
+  }
+
+  closeDialog(): void {
+    this.dialogRef.close();
+  }
+
+  isSubmitting = false;
+
+  // Form submit function
+  onSubmit() {
+    if (this.form.valid) {
+      this.isSubmitting = true;
+      console.log('Form Data:', this.form.value);
+
+      // Simulate API call
+      setTimeout(() => {
+        if (this.data) {
+          this.updateBusinessActivity();
+        } else {
+          this.addBusinessActivity();
+        }
+        this.closeDialog();
+        this.isSubmitting = false;
+      }, 1500);
+
+    } else {
+      this.form.markAllAsTouched();
+      this.form.updateValueAndValidity({ onlySelf: false, emitEvent: true });
+    }
+  }
+
+  addBusinessActivity() {
+    if (this.form.valid) {
+      const newBusinessActivity = {
+        l: this.form.value.Name,
+      }
+      console.log("payload", newBusinessActivity);
+    }
+  }
+
+  updateBusinessActivity() {
+    if (this.form.valid && this.data) {
+      const updatedBusinessActivity = {
+        actionName: this.form.value.Name,
+      }
+      console.log("payload", updatedBusinessActivity);
+    }
+  }
+
+  // Utility to mark all fields as touched to trigger validation messages
+  markFormGroupTouched(formGroup: FormGroup) {
+    Object.values(formGroup.controls).forEach(control => {
+      control.markAsTouched();
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control); // Recursively check nested form groups
+      }
+    });
+  }
+
+  // Utility function to easily access form control status for display
+  get f() {
+    return this.form.controls;
+  }
+
+  get title(): string {
+    return this.data ? 'Edit Business Activity' : 'Add Business Activity';
+  }
 }

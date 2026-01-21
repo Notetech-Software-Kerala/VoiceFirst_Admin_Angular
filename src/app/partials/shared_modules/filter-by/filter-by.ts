@@ -1,21 +1,23 @@
 import { Component, EventEmitter, HostListener, Input, Output, SimpleChanges } from '@angular/core';
 
 export interface FilterOption {
-  label: string;               // e.g. "City"
-  key: string;                 // e.g. "city"
-  options: string[];           // e.g. ["New York", "London", "Tokyo"]
+  label: string;
+  key: string;
+  options: string[];
+  single?: boolean;
 }
 
 @Component({
   selector: 'app-filter-by',
+  standalone: true,
   imports: [],
   templateUrl: './filter-by.html',
   styleUrl: './filter-by.css',
 })
 export class FilterBy {
   @Input() filters: FilterOption[] = [];
-  @Input() activeFilters: Record<string, string[]> = {}; // 🔹 new input
-  @Input() clearSignal = 0; // 🔹 trigger for Clear All
+  @Input() activeFilters: Record<string, string[]> = {};
+  @Input() clearSignal = 0;
 
   @Output() filterChange = new EventEmitter<Record<string, string[]>>();
 
@@ -34,6 +36,20 @@ export class FilterBy {
   }
 
   toggleValue(key: string, value: string, checked: boolean) {
+    const isSingle = !!this.filters.find(f => f.key === key)?.single;
+
+    if (isSingle) {
+      // ✅ single selection behavior (checkbox UI, radio logic)
+      if (checked) {
+        this.selectedValues[key] = [value];
+      } else {
+        delete this.selectedValues[key];
+      }
+      this.filterChange.emit({ ...this.selectedValues });
+      return;
+    }
+
+    // ✅ multi selection (existing behavior)
     if (!this.selectedValues[key]) this.selectedValues[key] = [];
 
     if (checked) {
@@ -43,7 +59,6 @@ export class FilterBy {
       if (this.selectedValues[key].length === 0) delete this.selectedValues[key];
     }
 
-    // Emit updated filters immediately
     this.filterChange.emit({ ...this.selectedValues });
   }
 
@@ -51,13 +66,11 @@ export class FilterBy {
     return this.selectedValues[key]?.includes(value);
   }
 
-  /** 🔹 When Table component clears filters or removes one, update internal state */
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['activeFilters'] && this.activeFilters) {
       this.selectedValues = JSON.parse(JSON.stringify(this.activeFilters));
     }
 
-    // Detect clearSignal increment → clear all
     if (changes['clearSignal']) {
       this.selectedValues = {};
     }

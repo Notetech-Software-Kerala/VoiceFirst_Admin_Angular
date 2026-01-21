@@ -48,8 +48,5 @@ import { AddEditProgramActionComponent } from './pages/program-action/add-edit-p
     MatMenuModule,
     DragDropModule
   ],
-  declarations: [
-    AddEditProgramActionComponent
-  ],
 })
 export class MaterialModule { }

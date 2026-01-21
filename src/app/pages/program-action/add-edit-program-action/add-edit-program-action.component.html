@@ -1,1 +1,29 @@
-<p>add-edit-program-action works!</p>
+<mat-dialog-content>
+    <h5 class="mb-4">{{title}}</h5>
+    <form [formGroup]="form" class="row g-3">
+
+        <div class="col-md-12">
+            <label for="Name" class="form-label">Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="Name" formControlName="Name" />
+            <!-- @if (f['Name'].touched && f['Name'].invalid) {
+        <div class="text-danger">
+         @if (f['Name'].errors?.['required']) {
+            <small>Name is required.</small>
+          }
+        </div>
+      } -->
+        </div>
+
+
+
+        <mat-dialog-actions class="mt-4">
+            <button type="button" class="close-btn" (click)="closeDialog()">Close</button>
+            <button class="submit-btn" type="submit" (click)="onSubmit()" [disabled]="isSubmitting">
+                @if (isSubmitting) {
+                <span class="btn-loader"></span>
+                }
+                Submit
+            </button>
+        </mat-dialog-actions>
+    </form>
+</mat-dialog-content>
