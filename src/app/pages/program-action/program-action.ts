@@ -18,7 +18,7 @@ import { StatusBadge } from '../../partials/shared_modules/status-badge/status-b
 import { SortableColumnDirective, SortEvent } from '../../partials/shared_directives/sortable-column';
 import { MaterialModule } from '../../material.module';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { Subject, takeUntil, Observable } from 'rxjs';
+import { Subject, takeUntil, Observable, of } from 'rxjs';
 import { QueryParameterModel } from '../../core/_models/query-parameter.model';
 import { ConfirmationService } from '../../partials/shared_services/confirmation';
 import { AddEditProgramActionComponent } from './add-edit-program-action/add-edit-program-action.component';
@@ -40,6 +40,14 @@ export class ProgramAction implements OnInit, OnDestroy {
   totalCount$!: Observable<number>;
   private destroy$ = new Subject<void>();
   isSearching = false; // Track search debounce period
+
+  // SearchBy dropdown options
+  searchByOptions = [
+    { label: 'Action Name', value: 'ActionName' },
+    { label: 'Created By', value: 'CreatedUser' },
+    { label: 'Updated By', value: 'UpdatedUser' },
+    { label: 'Deleted By', value: 'DeletedUser' }
+  ];
 
   // Query parameters - start with empty, backend will use defaults
   queryParams: QueryParameterModel = {
@@ -129,14 +137,33 @@ export class ProgramAction implements OnInit, OnDestroy {
 
   // Search handler - receives debounced value from search-bar
   onSearch(searchText: string) {
-
     this.queryParams = {
       ...this.queryParams,
       SearchText: searchText,
       PageNumber: 1
     };
     this.currentPage = 1;
+    this.isSearching = false; // Search completed
     this.loadData();
+  }
+
+  // Typing handler - receives immediate typing state from search-bar
+  onTypingChange(isTyping: boolean) {
+    this.isSearching = isTyping;
+    this.cdr.markForCheck();
+  }
+
+  // SearchBy handler - receives selected field from dropdown
+  onSearchByChange(searchBy: string) {
+    this.queryParams = {
+      ...this.queryParams,
+      SearchBy: searchBy || undefined, // Remove if empty
+      PageNumber: 1
+    };
+    this.currentPage = 1;
+    if (this.queryParams.SearchText) {
+      this.loadData(); // Only reload if there's search text
+    }
   }
 
   // Sort handler - receives sort event from directive

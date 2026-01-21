@@ -6,7 +6,9 @@
         <!-- Left: search + filters -->
         <div class="d-flex flex-wrap align-items-center gap-2 flex-grow-1">
             <app-search-bar [tooltipText]="'Search by action name'" [value]="queryParams.SearchText || ''"
-                (valueChange)="onSearch($event)">
+                [searchByOptions]="searchByOptions" [searchByValue]="queryParams.SearchBy || ''"
+                (valueChange)="onSearch($event)" (typingChange)="onTypingChange($event)"
+                (searchByChange)="onSearchByChange($event)">
             </app-search-bar>
             <app-filter-by [filters]="filterOptions" [activeFilters]="activeFilters" [clearSignal]="clearSignal"
                 (filterChange)="onFilterChange($event)">
@@ -146,7 +148,7 @@
 
                 @if (programActions.length === 0) {
                 <tr>
-                    <td colspan="5" class="text-center p-3">
+                    <td colspan="6" class="text-center p-3">
                         @if (loading$ | async) {
                         <small class="loading-text">Please wait...</small>
                         } @else {

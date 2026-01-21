@@ -21,6 +21,18 @@ export class SearchBar implements OnInit, OnDestroy {
   /** Event emitted when input changes (debounced) */
   @Output() valueChange = new EventEmitter<string>();
 
+  /** Event emitted immediately when user starts typing (not debounced) */
+  @Output() typingChange = new EventEmitter<boolean>();
+
+  /** SearchBy dropdown options (optional) */
+  @Input() searchByOptions: { label: string; value: string }[] = [];
+
+  /** Selected SearchBy value */
+  @Input() searchByValue: string = '';
+
+  /** Event emitted when SearchBy dropdown changes */
+  @Output() searchByChange = new EventEmitter<string>();
+
   /** Optional label/title */
   @Input() label?: string;
 
@@ -36,6 +48,7 @@ export class SearchBar implements OnInit, OnDestroy {
       distinctUntilChanged(),
       takeUntil(this.destroy$)
     ).subscribe(value => {
+      this.typingChange.emit(false); // Typing stopped
       this.valueChange.emit(value);
     });
   }
@@ -48,11 +61,18 @@ export class SearchBar implements OnInit, OnDestroy {
   onInputChange(event: Event) {
     const input = event.target as HTMLInputElement;
     this.value = input.value;
+    this.typingChange.emit(true); // User is typing
     this.searchSubject$.next(this.value); // Emit to debounced subject
   }
 
   clearInput() {
     this.value = '';
     this.searchSubject$.next(''); // Emit to debounced subject
+  }
+
+  onSearchByChange(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    this.searchByValue = select.value;
+    this.searchByChange.emit(this.searchByValue);
   }
 }
