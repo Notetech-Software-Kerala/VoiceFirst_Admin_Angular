@@ -27,34 +27,32 @@
     position: relative;
     display: flex;
     align-items: center;
-    padding: 0.45rem 0.75rem;
+    padding: 0.65rem 0.75rem;
     background-color: color-mix(in srgb, var(--color-border-hr) 15%, transparent);
     min-width: 140px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
 }
 
-.search-select {
-    appearance: none;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--color-text-primary);
+.search-dropdown-section:hover {
+    background-color: color-mix(in srgb, var(--color-border-hr) 30%, transparent);
+}
+
+.search-select-label {
     font-size: 0.875rem;
-    cursor: pointer;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     padding-right: 1.25rem;
     width: 100%;
-}
-
-.search-select option {
-    background-color: var(--color-bg-sidebar);
-    color: var(--color-text-primary);
-    padding: 0.75rem 1rem !important;
-    font-size: 0.875rem !important;
-    cursor: pointer;
+    font-weight: 500;
 }
 
 .dropdown-icon {
     position: absolute;
-    right: 0.5rem;
+    right: 0.75rem;
     pointer-events: none;
     color: var(--color-text-placeholder);
     display: flex;
@@ -151,4 +149,37 @@
 
 :host-context(body.dark-theme) .search-dropdown-section {
     background-color: color-mix(in srgb, var(--color-border-hr) 20%, transparent);
+}
+
+/* Custom Mat Menu Styling */
+::ng-deep .custom-search-menu {
+    border-radius: 10px !important;
+    margin-top: 8px !important;
+    min-width: 160px !important;
+    background-color: var(--color-bg-sidebar) !important;
+    border: 1px solid var(--color-border-hr) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    overflow: hidden !important;
+}
+
+::ng-deep .custom-search-menu .mat-mdc-menu-item {
+    font-size: 0.875rem !important;
+    color: var(--color-text-primary) !important;
+    height: 40px !important;
+    line-height: 40px !important;
+}
+
+::ng-deep .custom-search-menu .mat-mdc-menu-item:hover {
+    background-color: color-mix(in srgb, var(--color-hover-primary, #695CFE) 10%, transparent) !important;
+    color: var(--color-hover-primary, #695CFE) !important;
+}
+
+::ng-deep .custom-search-menu .mat-mdc-menu-item.selected {
+    background: linear-gradient(135deg, var(--color-hover-primary, #695CFE) 0%, color-mix(in srgb, var(--color-hover-primary, #695CFE) 85%, #000) 100%) !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+
+::ng-deep .custom-search-menu .mat-mdc-menu-item.selected:hover {
+    background: linear-gradient(135deg, var(--color-hover-primary, #695CFE) 0%, color-mix(in srgb, var(--color-hover-primary, #695CFE) 85%, #000) 100%) !important;
 }

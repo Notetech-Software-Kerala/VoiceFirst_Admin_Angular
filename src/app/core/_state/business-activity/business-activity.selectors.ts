@@ -7,13 +7,12 @@ export const FEATURE_KEY = 'businessActivities';
 export const selectBusinessActivityState =
   createFeatureSelector<BusinessActivityState>(FEATURE_KEY);
 
-const {
-  selectAll,
-  selectEntities,
-  selectTotal,
+export const {
+  selectIds: selectBusinessActivityIds,
+  selectEntities: selectBusinessActivityEntities,
+  selectAll: selectAllBusinessActivities,
+  selectTotal: selectBusinessActivityTotal,
 } = adapter.getSelectors(selectBusinessActivityState);
-
-export const selectAllBusinessActivities = selectAll;
 
 export const selectBusinessActivityLoading = createSelector(
   selectBusinessActivityState,
@@ -25,4 +24,22 @@ export const selectBusinessActivityError = createSelector(
   state => state.error
 );
 
-export const selectBusinessActivityTotal = selectTotal;
+export const selectBusinessActivityTotalCount = createSelector(
+  selectBusinessActivityState,
+  state => state.totalCount
+);
+
+export const selectBusinessActivityPageNumber = createSelector(
+  selectBusinessActivityState,
+  state => state.pageNumber
+);
+
+export const selectBusinessActivityPageSize = createSelector(
+  selectBusinessActivityState,
+  state => state.pageSize
+);
+
+export const selectBusinessActivityTotalPages = createSelector(
+  selectBusinessActivityState,
+  state => state.totalPages
+);

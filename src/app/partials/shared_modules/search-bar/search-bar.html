@@ -5,19 +5,26 @@
 
     <div class="unified-search-container">
         @if (searchByOptions.length > 0) {
-        <div class="search-dropdown-section">
-            <select class="search-select" [value]="searchByValue" (change)="onSearchByChange($event)">
-                <option value="">All Fields</option>
-                @for (option of searchByOptions; track option.value) {
-                <option [value]="option.value">{{ option.label }}</option>
-                }
-            </select>
+        <div class="search-dropdown-section" [matMenuTriggerFor]="menu">
+            <span class="search-select-label">{{ getSelectedLabel() }}</span>
             <span class="dropdown-icon">
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
                     <path d="M6 8L2 4h8z" />
                 </svg>
             </span>
         </div>
+        <mat-menu #menu="matMenu" class="custom-search-menu">
+            <button mat-menu-item (click)="selectSearchBy('')" [class.selected]="searchByValue === ''">
+                All Fields
+            </button>
+            @for (option of searchByOptions; track option.value) {
+            <button mat-menu-item (click)="selectSearchBy(option.value)"
+                [class.selected]="searchByValue === option.value">
+                {{ option.label }}
+            </button>
+            }
+        </mat-menu>
+
         <div class="search-divider"></div>
         }
 

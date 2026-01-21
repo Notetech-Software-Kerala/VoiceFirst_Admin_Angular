@@ -6,13 +6,17 @@ import { BusinessActivityModel } from './business-activity.model';
 
 export const adapter: EntityAdapter<BusinessActivityModel> =
   createEntityAdapter<BusinessActivityModel>({
-    selectId: a => a.Id,
+    selectId: a => a.activityId,
   });
 
 export const initialState: BusinessActivityState =
   adapter.getInitialState({
     loading: false,
     error: null,
+    totalCount: 0,
+    pageNumber: 1,
+    pageSize: 10,
+    totalPages: 0,
   });
 
 export const businessActivityReducer = createReducer(
@@ -23,11 +27,15 @@ export const businessActivityReducer = createReducer(
     loading: true,
   })),
 
-  on(BusinessActivityActions.loadSuccess, (state, { activities }) =>
+  on(BusinessActivityActions.loadSuccess, (state, { activities, totalCount, pageNumber, pageSize, totalPages }) =>
     adapter.setAll(activities, {
       ...state,
       loading: false,
       error: null,
+      totalCount,
+      pageNumber,
+      pageSize,
+      totalPages,
     })
   ),
 

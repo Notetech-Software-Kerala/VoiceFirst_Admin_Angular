@@ -1,28 +1,31 @@
 <mat-dialog-content>
-    <h5 class="mb-4">{{title}}</h5>
-    <form [formGroup]="form" class="row g-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="mb-0">{{title}}</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeDialog()"></button>
+    </div>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="row g-3">
 
         <div class="col-md-12">
-            <label for="Name" class="form-label">Name <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="Name" formControlName="Name" />
-            <!-- @if (f['Name'].touched && f['Name'].invalid) {
-        <div class="text-danger">
-         @if (f['Name'].errors?.['required']) {
-            <small>Name is required.</small>
-          }
+            <label for="ActivityName" class="form-label">Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="ActivityName" formControlName="ActivityName"
+                placeholder="Enter activity name"
+                [class.is-invalid]="f['ActivityName'].touched && f['ActivityName'].invalid" />
+            @if (f['ActivityName'].touched && f['ActivityName'].invalid) {
+            <div class="invalid-feedback">
+                @if (f['ActivityName'].errors?.['required']) {
+                Name is required.
+                }
+            </div>
+            }
         </div>
-      } -->
-        </div>
 
-
-
-        <mat-dialog-actions class="mt-4">
-            <button type="button" class="close-btn" (click)="closeDialog()">Close</button>
-            <button class="submit-btn" type="submit" (click)="onSubmit()" [disabled]="isSubmitting">
+        <mat-dialog-actions class="mt-4 px-0 pb-0 justify-content-end gap-2">
+            <button type="button" class="close-btn" (click)="closeDialog()">Cancel</button>
+            <button class="submit-btn" type="submit" [disabled]="isSubmitting">
                 @if (isSubmitting) {
                 <span class="btn-loader"></span>
                 }
-                Submit
+                Save
             </button>
         </mat-dialog-actions>
     </form>

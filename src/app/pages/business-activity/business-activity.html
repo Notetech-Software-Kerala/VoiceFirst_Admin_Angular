@@ -5,20 +5,18 @@
 
         <!-- Left: search + filters -->
         <div class="d-flex flex-wrap align-items-center gap-2 flex-grow-1">
-            <app-search-bar [tooltipText]="'Search by name'" [(value)]="searchText" (valueChange)="applyFilter()">
+            <app-search-bar [tooltipText]="'Search by activity name'" [value]="queryParams.SearchText || ''"
+                [searchByOptions]="searchByOptions" [searchByValue]="queryParams.SearchBy || ''"
+                (valueChange)="onSearch($event)" (typingChange)="onTypingChange($event)"
+                (searchByChange)="onSearchByChange($event)">
             </app-search-bar>
-
-            <!-- <app-filter-by
-      [filters]="filterOptions"
-      [activeFilters]="activeFilters"
-      [clearSignal]="clearSignal"
-      (filterChange)="onFilterChange($event)">
-    </app-filter-by> -->
+            <app-filter-by [filters]="filterOptions" [activeFilters]="activeFilters" [clearSignal]="clearSignal"
+                (filterChange)="onFilterChange($event)">
+            </app-filter-by>
         </div>
 
         <!-- Actions -->
         <div class="actions ms-auto d-flex flex-wrap gap-2">
-
 
             <input #fileInput type="file" accept=".csv" class="d-none" />
             <label class="btn-action btn-outline" for="fileInput">
@@ -26,20 +24,17 @@
                 <span class="btn-text">Import</span>
             </label>
 
-
             <button type="button" class="btn-action btn-outline">
                 <mat-icon class="msr">file_download</mat-icon>
                 <span class="btn-text">Export</span>
             </button>
-
 
             <button type="button" class="btn-action btn-outline">
                 <mat-icon class="msr">insert_chart</mat-icon>
                 <span class="btn-text">Report</span>
             </button>
 
-
-            <button type="button" class="btn-action btn-primary" (click)="openDialog()">
+            <button type="button" class="btn-action btn-primary" (click)="openAddDialog()">
                 <mat-icon class="msr">add</mat-icon>
                 <span class="btn-text">Add</span>
             </button>
@@ -67,34 +62,69 @@
     }
 
     <div class="table-responsive position-relative">
-        <div *ngIf="loading$ | async" class="progress position-absolute top-0 start-0 end-0" role="progressbar"
-            aria-label="Loading" style="z-index: 10; height: 3px; background-color: #ffffff;">
+        <div *ngIf="(loading$ | async) || isSearching" class="progress position-absolute top-0 start-0 end-0"
+            role="progressbar" aria-label="Loading" style="z-index: 10; height: 3px; background-color: #ffffff;">
             <div class="table-premium-loader"></div>
         </div>
         <table class="table align-middle">
             <thead class="table-light">
                 <tr>
-                    <th>Name <small style="cursor:pointer" (click)="sortData('Name')">⇅</small></th>
+                    <th appSortableColumn="ActivityName" [sortBy]="queryParams.SortBy"
+                        [sortOrder]="queryParams.SortOrder" (sortChange)="onSortChange($event)">Activity Name</th>
 
-                    <th>Status</th>
+                    <th appSortableColumn="Active" [sortBy]="queryParams.SortBy" [sortOrder]="queryParams.SortOrder"
+                        (sortChange)="onSortChange($event)">Status</th>
 
+                    <th>Created By</th>
+                    <th>Modified By</th>
+                    <th>Deleted By</th>
                     <th>Action</th>
             </thead>
 
             <tbody>
-                @for (u of paginatedBuisnessActivity; track u) {
+                @for (item of businessActivities; track item.activityId) {
                 <tr>
-                    <td>{{ u.Name }}</td>
+                    <td>{{ item.activityName }}</td>
 
+                    <td><app-status-badge [item]="item"></app-status-badge></td>
+
+                    <!-- Dynamic columns handling nulls -->
+                    <td>
+                        @if (item.createdUser || item.createdDate) {
+                        <div class="d-flex flex-column">
+                            <small class="text-muted">{{ item.createdUser || '-' }}</small>
+                            <small class="text-muted">{{ utilityService.formatDateTimeDdMmYyyy12h(item.createdDate) ||
+                                '-'
+                                }}</small>
+                        </div>
+                        } @else {
+                        <span>-</span>
+                        }
+                    </td>
 
                     <td>
-                        <span class="badge" [ngClass]="{
-          'badge--deleted': u.Delete,
-          'badge--active': !u.Delete && u.Active,
-          'badge--suspended': !u.Delete && !u.Active
-        }">
-                            {{ u.Delete ? 'Deleted' : (u.Active ? 'Active' : 'Suspended') }}
-                        </span>
+                        @if ((item.modifiedUser || item.modifiedDate) && !item.delete) {
+                        <div class="d-flex flex-column">
+                            <small class="text-muted">{{ item.modifiedUser || '-' }}</small>
+                            <small class="text-muted">{{ utilityService.formatDateTimeDdMmYyyy12h(item.modifiedDate) ||
+                                '-' }}</small>
+                        </div>
+                        } @else {
+                        <span>-</span>
+                        }
+                    </td>
+
+                    <td>
+                        @if (item.delete && (item.deletedUser || item.deletedDate)) {
+                        <div class="d-flex flex-column">
+                            <small class="text-muted">{{ item.deletedUser || '-' }}</small>
+                            <small class="text-muted">{{ utilityService.formatDateTimeDdMmYyyy12h(item.deletedDate) ||
+                                '-'
+                                }}</small>
+                        </div>
+                        } @else {
+                        <span>-</span>
+                        }
                     </td>
 
                     <td class="action-cell">
@@ -105,29 +135,42 @@
 
                         <mat-menu #rowMenu="matMenu" class="row-menu" xPosition="before" yPosition="below">
 
-                            <button mat-menu-item (click)="openDialog(u)">
+                            @if (!item.delete) {
+                            <button mat-menu-item (click)="openEditDialog(item)">
                                 <mat-icon class="msr-edit">edit</mat-icon>
                                 <span>Edit</span>
                             </button>
 
-                            <button mat-menu-item (click)="onDelete(u)">
+                            <button mat-menu-item (click)="onSuspend(item)">
+                                <mat-icon [ngClass]="item.active ? 'msr-delete' : 'msr-restore'">{{ item.active ?
+                                    'cancel' : 'check_circle' }}</mat-icon>
+                                <span>{{ item.active ? 'Suspend' : 'Reinstate' }}</span>
+                            </button>
+
+                            <button mat-menu-item (click)="onDelete(item)">
                                 <mat-icon class="msr-delete">delete</mat-icon>
                                 <span>Delete</span>
                             </button>
+                            }
+
+                            @if (item.delete) {
+                            <button mat-menu-item (click)="onRestore(item)">
+                                <mat-icon class="msr-restore">restore_from_trash</mat-icon>
+                                <span>Restore</span>
+                            </button>
+                            }
 
                         </mat-menu>
                     </td>
 
-
                 </tr>
                 }
 
-                @if (paginatedBuisnessActivity.length === 0) {
+                @if (businessActivities.length === 0) {
                 <tr>
                     <td colspan="6" class="text-center p-3">
-                        @if (loading$ | async) {
+                        @if ((loading$ | async) || isSearching) {
                         <small class="loading-text">Please wait...</small>
-
                         } @else {
                         <small class="no-data-text">No data found</small>
                         }
@@ -138,7 +181,7 @@
         </table>
     </div>
 
-    <app-pagination [totalItems]="filteredBuisnessActivity.length" [pageSize]="pageSize" [pageSizes]="pageSizes"
-        [currentPage]="currentPage" (pageChange)="changePage($event)" (pageSizeChange)="changePageSize($event)">
+    <app-pagination [totalItems]="totalCount" [pageSize]="pageSize" [pageSizes]="pageSizes" [currentPage]="currentPage"
+        (paginationChange)="onPaginationChange($event)">
     </app-pagination>
 </div>

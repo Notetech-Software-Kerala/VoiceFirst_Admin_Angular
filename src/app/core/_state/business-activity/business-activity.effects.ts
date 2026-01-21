@@ -15,9 +15,15 @@ export class BusinessActivityEffects {
     this.load$ = createEffect(() =>
       this.actions$.pipe(
         ofType(BusinessActivityActions.load),
-        switchMap(() =>
-          this.service.getAll().pipe(
-            map((activities) => BusinessActivityActions.loadSuccess({ activities })),
+        switchMap(({ queryParams }) =>
+          this.service.getAll(queryParams).pipe(
+            map((paginatedData) => BusinessActivityActions.loadSuccess({
+              activities: paginatedData.items,
+              totalCount: paginatedData.totalCount,
+              pageNumber: paginatedData.pageNumber,
+              pageSize: paginatedData.pageSize,
+              totalPages: paginatedData.totalPages
+            })),
             catchError((err) =>
               of(
                 BusinessActivityActions.loadFailure({
@@ -31,5 +37,3 @@ export class BusinessActivityEffects {
     );
   }
 }
-
-

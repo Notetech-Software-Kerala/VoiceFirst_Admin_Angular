@@ -70,9 +70,13 @@ export class SearchBar implements OnInit, OnDestroy {
     this.searchSubject$.next(''); // Emit to debounced subject
   }
 
-  onSearchByChange(event: Event) {
-    const select = event.target as HTMLSelectElement;
-    this.searchByValue = select.value;
+  selectSearchBy(value: string) {
+    this.searchByValue = value;
     this.searchByChange.emit(this.searchByValue);
+  }
+
+  getSelectedLabel(): string {
+    const option = this.searchByOptions.find(o => o.value === this.searchByValue);
+    return option ? option.label : 'All Fields';
   }
 }

@@ -1,133 +1,54 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
+import { Observable } from 'rxjs';
 import { BusinessActivityModel } from './business-activity.model';
+import { apiConfig } from '../../_config/apiConfig';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { environment } from '../../../environment/environment';
+import { ApiResponse, PaginatedData } from '../../_models/api-response.model';
+import { map } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class BusinessActivityService {
+  private base = environment.baseUrl;
 
-  getAll(): Observable<BusinessActivityModel[]> {
-    return of([
-      {
-        "Id": 1,
-        "Name": "Sales",
-        "Active": true,
-        "Delete": false,
-        "CreatedUser": "admin",
-        "CreatedDate": "2026-01-01T09:00:00Z",
-        "ModifiedUser": "admin",
-        "ModifiedDate": "2026-01-05T10:15:00Z",
-        "DeletedUser": "",
-        "DeletedDate": null
-      },
-      {
-        "Id": 2,
-        "Name": "Marketing",
-        "Active": true,
-        "Delete": false,
-        "CreatedUser": "john.doe",
-        "CreatedDate": "2026-01-02T11:30:00Z",
-        "ModifiedUser": "",
-        "ModifiedDate": null,
-        "DeletedUser": "",
-        "DeletedDate": null
-      },
-      {
-        "Id": 3,
-        "Name": "Operations",
-        "Active": false,
-        "Delete": false,
-        "CreatedUser": "jane.smith",
-        "CreatedDate": "2026-01-03T08:20:00Z",
-        "ModifiedUser": "jane.smith",
-        "ModifiedDate": "2026-01-12T16:40:00Z",
-        "DeletedUser": "",
-        "DeletedDate": null
-      },
-      {
-        "Id": 4,
-        "Name": "Customer Support",
-        "Active": true,
-        "Delete": false,
-        "CreatedUser": "support.lead",
-        "CreatedDate": "2026-01-04T14:10:00Z",
-        "ModifiedUser": "support.manager",
-        "ModifiedDate": "2026-01-14T06:30:00Z",
-        "DeletedUser": "",
-        "DeletedDate": null
-      },
-      {
-        "Id": 5,
-        "Name": "Finance",
-        "Active": true,
-        "Delete": false,
-        "CreatedUser": "finance.user",
-        "CreatedDate": "2026-01-05T10:05:00Z",
-        "ModifiedUser": "finance.manager",
-        "ModifiedDate": "2026-01-16T09:25:00Z",
-        "DeletedUser": "",
-        "DeletedDate": null
-      },
-      {
-        "Id": 6,
-        "Name": "Human Resources",
-        "Active": true,
-        "Delete": false,
-        "CreatedUser": "hr.user",
-        "CreatedDate": "2026-01-06T13:45:00Z",
-        "ModifiedUser": "",
-        "ModifiedDate": null,
-        "DeletedUser": "",
-        "DeletedDate": null
-      },
-      {
-        "Id": 7,
-        "Name": "IT Services",
-        "Active": true,
-        "Delete": false,
-        "CreatedUser": "it.admin",
-        "CreatedDate": "2026-01-07T07:50:00Z",
-        "ModifiedUser": "it.admin",
-        "ModifiedDate": "2026-01-17T18:10:00Z",
-        "DeletedUser": "",
-        "DeletedDate": null
-      },
-      {
-        "Id": 8,
-        "Name": "Procurement",
-        "Active": false,
-        "Delete": true,
-        "CreatedUser": "proc.user",
-        "CreatedDate": "2026-01-08T12:00:00Z",
-        "ModifiedUser": "proc.manager",
-        "ModifiedDate": "2026-01-18T15:30:00Z",
-        "DeletedUser": "",
-        "DeletedDate": null
-      },
-      {
-        "Id": 9,
-        "Name": "Logistics",
-        "Active": true,
-        "Delete": false,
-        "CreatedUser": "log.user",
-        "CreatedDate": "2026-01-09T16:25:00Z",
-        "ModifiedUser": "log.manager",
-        "ModifiedDate": "2026-01-19T08:45:00Z",
-        "DeletedUser": "",
-        "DeletedDate": null
-      },
-      {
-        "Id": 10,
-        "Name": "Research & Development",
-        "Active": true,
-        "Delete": false,
-        "CreatedUser": "rnd.user",
-        "CreatedDate": "2026-01-10T09:35:00Z",
-        "ModifiedUser": "rnd.lead",
-        "ModifiedDate": "2026-01-19T11:20:00Z",
-        "DeletedUser": "",
-        "DeletedDate": null
-      }
-    ]
-    ).pipe(delay(3000));
+  constructor(private http: HttpClient) { }
+
+  getAll(queryParams: any): Observable<PaginatedData<BusinessActivityModel>> {
+    let params = new HttpParams({
+      fromObject: queryParams
+    });
+    return this.http.get<ApiResponse<PaginatedData<BusinessActivityModel>>>(
+      `${this.base}${apiConfig.businessActivity}`,
+      { params }
+    ).pipe(
+      map(response => response.data)
+    );
+  }
+
+  create(data: any): Observable<ApiResponse<BusinessActivityModel>> {
+    return this.http.post<ApiResponse<BusinessActivityModel>>(
+      `${this.base}${apiConfig.businessActivity}`,
+      data
+    )
+  }
+
+  update(id: number, data: Partial<BusinessActivityModel>): Observable<ApiResponse<BusinessActivityModel>> {
+    return this.http.patch<ApiResponse<BusinessActivityModel>>(
+      `${this.base}${apiConfig.businessActivity}/${id}`,
+      data
+    )
+  }
+
+  delete(id: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(
+      `${this.base}${apiConfig.businessActivity}/${id}`
+    );
+  }
+
+  restore(id: number): Observable<ApiResponse<void>> {
+    return this.http.patch<ApiResponse<void>>(
+      `${this.base}${apiConfig.businessActivityRestore}/${id}`,
+      {}
+    );
   }
 }
