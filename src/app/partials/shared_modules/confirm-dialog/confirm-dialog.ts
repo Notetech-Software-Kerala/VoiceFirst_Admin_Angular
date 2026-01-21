@@ -8,7 +8,7 @@ export interface ConfirmDialogData {
   confirmText?: string;
   cancelText?: string;
   icon?: string;          // e.g. 'delete', 'warning', 'logout'
-  tone?: 'warn'|'accent'|'neutral';
+  tone?: 'warn' | 'accent' | 'neutral' | 'success';
 }
 
 @Component({
@@ -18,15 +18,15 @@ export interface ConfirmDialogData {
   styleUrl: './confirm-dialog.css',
 })
 export class ConfirmDialog {
-     
-  
+
+
   constructor(
     public ref: MatDialogRef<ConfirmDialog, boolean>,
     @Inject(MAT_DIALOG_DATA) public data: ConfirmDialogData
-  ) {}
+  ) { }
 
   onConfirm() { this.ref.close(true); }
-  onCancel()  { this.ref.close(false); }
+  onCancel() { this.ref.close(false); }
 
-  get tone(): 'warn'|'accent'|'neutral' { return this.data.tone ?? 'warn'; }
+  get tone(): 'warn' | 'accent' | 'neutral' | 'success' { return this.data.tone ?? 'warn'; }
 }

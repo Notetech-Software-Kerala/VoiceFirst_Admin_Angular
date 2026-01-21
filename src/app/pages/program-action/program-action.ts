@@ -23,6 +23,9 @@ import { QueryParameterModel } from '../../core/_models/query-parameter.model';
 import { ConfirmationService } from '../../partials/shared_services/confirmation';
 import { AddEditProgramActionComponent } from './add-edit-program-action/add-edit-program-action.component';
 import { FilterBy, FilterOption } from '../../partials/shared_modules/filter-by/filter-by';
+import { UtilityService } from '../../partials/shared_services/utility.service';
+import { ProgramActionService } from '../../core/_state/program-action/program-action.service';
+import { ToastService } from '../../partials/shared_services/toast.service';
 
 @Component({
   selector: 'app-program-action',
@@ -58,9 +61,9 @@ export class ProgramAction implements OnInit, OnDestroy {
       label: 'Status',
       key: 'status',
       options: ['Active', 'Inactive', 'Deleted'],
-      single: true // ✅ only one check allowed
-    },
-    { label: 'Role', key: 'role', options: ['Admin', 'User', 'Manager'] },
+      single: true
+    }
+
   ];
   activeFilters: Record<string, string[]> = {};
   clearSignal = 0;
@@ -68,7 +71,10 @@ export class ProgramAction implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private store: Store,
     private cdr: ChangeDetectorRef,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    public utilityService: UtilityService,
+    private programActionService: ProgramActionService,
+    private toastService: ToastService,
   ) { }
 
   ngOnInit() {
@@ -94,6 +100,8 @@ export class ProgramAction implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(data => {
         this.programActions = data;
+        console.log("Program Actions", this.programActions);
+
         this.cdr.markForCheck();
       });
 
@@ -153,15 +161,15 @@ export class ProgramAction implements OnInit, OnDestroy {
     this.loadData();
   }
 
-  // Filter handler - directly maps filter selections to Active/Delete parameters
+  // Filter handler - composable method that handles all filters
   onFilterChange(filters: Record<string, string[]>) {
     this.activeFilters = filters;
-
-    const status = filters['status']?.[0]; // single select
 
     // Reset status filters
     this.statusFilters = {};
 
+    // Special handling for 'status' filter → maps to Active/Deleted booleans
+    const status = filters['status']?.[0];
     if (status === 'Active') {
       this.statusFilters.Active = true;
       this.statusFilters.Deleted = false;
@@ -170,11 +178,28 @@ export class ProgramAction implements OnInit, OnDestroy {
       this.statusFilters.Deleted = false;
     } else if (status === 'Deleted') {
       this.statusFilters.Deleted = true;
-      // Active is not set for deleted items
     }
 
+    // Generic handling: pass all other filters directly to query params
+    // (except 'status' which is handled above)
+    const otherFilters: Record<string, any> = {};
+    Object.keys(filters).forEach(key => {
+      if (key !== 'status' && filters[key]?.length > 0) {
+        // For single-value filters, pass the value directly
+        // For multi-value filters, pass as array or comma-separated string
+        const values = filters[key];
+        otherFilters[key] = values.length === 1 ? values[0] : values.join(',');
+      }
+    });
+
+    // Merge all filters into query params
+    this.queryParams = {
+      ...this.queryParams,
+      ...otherFilters,
+      PageNumber: 1
+    };
+
     // Reset to first page and reload
-    this.queryParams.PageNumber = 1;
     this.currentPage = 1;
     this.loadData();
   }
@@ -189,6 +214,15 @@ export class ProgramAction implements OnInit, OnDestroy {
   }
 
   clearAllFilters() {
+    // Get all filter keys to remove them from queryParams
+    const filterKeys = this.filterOptions.map(f => f.key);
+    // Remove all filter-related params from queryParams
+    filterKeys.forEach(key => {
+      if (key !== 'status') {
+        delete (this.queryParams as any)[key];
+      }
+    });
+
     this.activeFilters = {};
     this.clearSignal++;
     this.onFilterChange({});
@@ -202,7 +236,71 @@ export class ProgramAction implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(confirmed => {
         if (confirmed) {
-          this.store.dispatch(ProgramActionActions.delete({ id: item.actionId }));
+          this.programActionService.delete(item.actionId).subscribe({
+            next: (res) => {
+              console.log("response", res);
+              if (res.statusCode === 200) {
+                this.toastService.success('Program Action deleted successfully');
+                this.loadData();
+              }
+            },
+            error: (error) => {
+              console.log("error", error);
+              this.toastService.error(error.message);
+            }
+          })
+        }
+      });
+  }
+
+  onRestore(item: ProgramActionModel) {
+    this.confirmationService.confirmRestore(item.actionName)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(confirmed => {
+        if (confirmed) {
+          this.programActionService.restore(item.actionId).subscribe({
+            next: (res) => {
+              console.log("response", res);
+              if (res.statusCode === 200) {
+                this.toastService.success('Program Action deleted successfully');
+                this.loadData();
+              }
+            },
+            error: (error) => {
+              console.log("error", error);
+              this.toastService.error(error.message);
+            }
+          })
+        }
+      });
+  }
+
+  onSuspend(item: ProgramActionModel) {
+    const status = item.active ? false : true;
+    this.confirmationService.confirmSuspend(item.actionName, status)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(confirmed => {
+        if (confirmed) {
+          const updatedProgramAction = {
+            active: status,
+          }
+          this.programActionService.update(item.actionId, updatedProgramAction).subscribe({
+            next: (res) => {
+              console.log("response", res);
+              if (res.statusCode === 200) {
+                this.toastService.success('Program Action updated successfully');
+                this.store.dispatch(ProgramActionActions.update({
+                  activity: {
+                    id: item.actionId,
+                    changes: updatedProgramAction
+                  }
+                }));
+              }
+            },
+            error: (error) => {
+              console.log("error", error);
+            }
+          })
         }
       });
   }
@@ -217,8 +315,18 @@ export class ProgramAction implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Dispatch add action
-        this.store.dispatch(ProgramActionActions.add({ activity: result }));
+        if (result.statusCode === 201) {
+          // Add new item
+          this.store.dispatch(ProgramActionActions.add({ activity: result.data }));
+        } else if (result.statusCode === 200) {
+          // Update existing item - use correct NgRx Entity format
+          this.store.dispatch(ProgramActionActions.update({
+            activity: {
+              id: result.data.actionId,
+              changes: result.data
+            }
+          }));
+        }
       }
     });
   }
@@ -236,8 +344,8 @@ export class ProgramAction implements OnInit, OnDestroy {
         // Dispatch update action
         this.store.dispatch(ProgramActionActions.update({
           activity: {
-            id: result.actionId,
-            changes: result
+            id: result.data.actionId,
+            changes: result.data
           }
         }));
       }

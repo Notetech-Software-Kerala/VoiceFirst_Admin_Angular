@@ -64,6 +64,9 @@
                         (sortChange)="onSortChange($event)">
                         Status
                     </th>
+                    <th>Created By</th>
+                    <th>Modified By</th>
+                    <th>Deleted By</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -74,6 +77,36 @@
                     <td>{{ item.actionName }}</td>
 
                     <td><app-status-badge [item]="item"></app-status-badge></td>
+
+                    <td>
+                        @if (item.createdUser || item.createdDate) {
+                        <small class="text-muted">{{ item.createdUser || '-' }}</small><br>
+                        <small class="text-muted">{{ utilityService.formatDateTimeDdMmYyyy12h(item.createdDate) || '-'
+                            }}</small>
+                        } @else {
+                        <span>-</span>
+                        }
+                    </td>
+
+                    <td>
+                        @if (item.modifiedUser || item.modifiedDate) {
+                        <small class="text-muted">{{ item.modifiedUser || '-' }}</small><br>
+                        <small class="text-muted">{{ utilityService.formatDateTimeDdMmYyyy12h(item.modifiedDate) || '-'
+                            }}</small>
+                        } @else {
+                        <span>-</span>
+                        }
+                    </td>
+
+                    <td>
+                        @if (item.deletedUser || item.deletedDate) {
+                        <small class="text-muted">{{ item.deletedUser || '-' }}</small><br>
+                        <small class="text-muted">{{ utilityService.formatDateTimeDdMmYyyy12h(item.deletedDate) || '-'
+                            }}</small>
+                        } @else {
+                        <span>-</span>
+                        }
+                    </td>
 
                     <td class="action-cell">
                         <button mat-icon-button class="menu-trigger" [matMenuTriggerFor]="rowMenu"
@@ -86,15 +119,23 @@
                                 <mat-icon class="msr-edit">edit</mat-icon>
                                 <span>Edit</span>
                             </button>
-
+                            @if (!item.deleted) {
+                            <button mat-menu-item (click)="onSuspend(item)">
+                                <mat-icon [ngClass]="item.active ? 'msr-delete' : 'msr-restore'">{{ item.active ?
+                                    'cancel' : 'check_circle' }}</mat-icon>
+                                <span>{{ item.active ? 'Suspend' : 'Reinstate' }}</span>
+                            </button>
+                            }
+                            @if (!item.deleted) {
                             <button mat-menu-item (click)="onDelete(item)">
                                 <mat-icon class="msr-delete">delete</mat-icon>
                                 <span>Delete</span>
                             </button>
+                            }
 
                             @if (item.deleted) {
-                            <button mat-menu-item>
-                                <mat-icon class="msr">restore</mat-icon>
+                            <button mat-menu-item (click)="onRestore(item)">
+                                <mat-icon class="msr-restore">restore</mat-icon>
                                 <span>Restore</span>
                             </button>
                             }

@@ -14,16 +14,9 @@ export class ProgramActionService {
   constructor(private http: HttpClient) { }
 
   getAll(queryParams: any): Observable<PaginatedData<ProgramActionModel>> {
-    console.log("Query Params 22", queryParams);
-
-    // Build HttpParams, only including parameters with values
     let params = new HttpParams({
       fromObject: queryParams
     });
-
-    console.log("QueryParams", params);
-
-
     return this.http.get<ApiResponse<PaginatedData<ProgramActionModel>>>(
       `${this.base}${apiConfig.programAction}`,
       { params }
@@ -32,27 +25,32 @@ export class ProgramActionService {
     );
   }
 
-  create(data: { programActionName: string }): Observable<ProgramActionModel> {
+  create(data: any): Observable<ApiResponse<ProgramActionModel>> {
     return this.http.post<ApiResponse<ProgramActionModel>>(
       `${this.base}${apiConfig.programAction}`,
       data
-    ).pipe(
-      map(response => response.data)
-    );
+    )
   }
 
-  update(id: number, data: Partial<ProgramActionModel>): Observable<ProgramActionModel> {
-    return this.http.put<ApiResponse<ProgramActionModel>>(
+  update(id: number, data: Partial<ProgramActionModel>): Observable<ApiResponse<ProgramActionModel>> {
+    return this.http.patch<ApiResponse<ProgramActionModel>>(
       `${this.base}${apiConfig.programAction}/${id}`,
       data
-    ).pipe(
-      map(response => response.data)
-    );
+    )
   }
 
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(
+  delete(id: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(
       `${this.base}${apiConfig.programAction}/${id}`
     );
   }
+
+  restore(id: number): Observable<ApiResponse<void>> {
+    return this.http.patch<ApiResponse<void>>(
+      `${this.base}${apiConfig.programActionRestore}/${id}`,
+      {}
+    );
+  }
+
+
 }

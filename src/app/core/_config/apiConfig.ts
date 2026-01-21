@@ -10,5 +10,5 @@ export const apiConfig = {
     // Program Action Endpoints
     programAction: '/program-action',
     getProgramActionLookup: '/program-action/lookup',
-    programActionRestore: '/program-action/restore',
+    programActionRestore: '/program-action/recover',
 };

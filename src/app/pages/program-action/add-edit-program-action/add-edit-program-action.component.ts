@@ -3,6 +3,11 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MaterialModule } from '../../../material.module';
 import { ProgramActionModel } from '../../../core/_state/program-action/program-action.model';
+import { Store } from '@ngrx/store';
+import { ProgramActionService } from '../../../core/_state/program-action/program-action.service';
+import { ProgramActionActions } from '../../../core/_state/program-action/program-action.action';
+import { ToastService } from '../../../partials/shared_services/toast.service';
+import { UtilityService } from '../../../partials/shared_services/utility.service';
 
 @Component({
   selector: 'app-add-edit-program-action',
@@ -17,6 +22,10 @@ export class AddEditProgramActionComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AddEditProgramActionComponent>,
+    private store: Store,
+    private programActionService: ProgramActionService,
+    private utilityService: UtilityService,
+    private toastService: ToastService,
     @Inject(MAT_DIALOG_DATA) public data: ProgramActionModel | null,
   ) { }
 
@@ -24,7 +33,6 @@ export class AddEditProgramActionComponent implements OnInit {
 
   ngOnInit() {
     this.formInItialize();
-    // If the dialog was opened with existing business activity data, populate the form
     if (this.data) {
       this.programAction = this.data;
       this.form.patchValue(this.data as Partial<Record<string, any>>);
@@ -34,13 +42,12 @@ export class AddEditProgramActionComponent implements OnInit {
 
   formInItialize() {
     this.form = this.fb.group({
-      Name: ['', Validators.required],
-      Active: [true], // Default to true
+      actionName: ['', Validators.required],
     });
   }
 
-  closeDialog(): void {
-    this.dialogRef.close();
+  closeDialog(response?: any): void {
+    this.dialogRef.close(response);
   }
 
   isSubmitting = false;
@@ -54,9 +61,9 @@ export class AddEditProgramActionComponent implements OnInit {
       // Simulate API call
       setTimeout(() => {
         if (this.data) {
-          this.updateBusinessActivity();
+          this.updateProgramAction();
         } else {
-          this.addBusinessActivity();
+          this.addProgramAction();
         }
         this.closeDialog();
         this.isSubmitting = false;
@@ -68,21 +75,48 @@ export class AddEditProgramActionComponent implements OnInit {
     }
   }
 
-  addBusinessActivity() {
+  addProgramAction() {
     if (this.form.valid) {
-      const newBusinessActivity = {
-        l: this.form.value.Name,
+      const newProgramAction = {
+        actionName: this.form.value.actionName,
       }
-      console.log("payload", newBusinessActivity);
+      console.log("payload", newProgramAction);
+      this.programActionService.create(newProgramAction).subscribe({
+        next: (res) => {
+          console.log("response", res);
+          if (res.statusCode === 201) {
+            this.toastService.success('Program Action added successfully');
+            this.closeDialog(res);
+          }
+        },
+        error: (error) => {
+          console.log("error", error);
+        }
+      })
     }
   }
 
-  updateBusinessActivity() {
+  updateProgramAction() {
     if (this.form.valid && this.data) {
-      const updatedBusinessActivity = {
-        actionName: this.form.value.Name,
+      const updatedProgramAction = {
+        actionName: this.form.value.actionName,
       }
-      console.log("payload", updatedBusinessActivity);
+      console.log("payload", updatedProgramAction);
+      this.programActionService.update(this.data.actionId, updatedProgramAction).subscribe({
+        next: (res) => {
+          console.log("response", res);
+          if (res.statusCode === 200) {
+            this.toastService.success('Program Action updated successfully');
+            this.closeDialog(res);
+          }
+          else {
+            this.toastService.error(res.message);
+          }
+        },
+        error: (error) => {
+          this.toastService.error(error.message);
+        }
+      })
     }
   }
 
@@ -102,6 +136,6 @@ export class AddEditProgramActionComponent implements OnInit {
   }
 
   get title(): string {
-    return this.data ? 'Edit Business Activity' : 'Add Business Activity';
+    return this.data ? 'Edit Program Action' : 'Add Program Action';
   }
 }

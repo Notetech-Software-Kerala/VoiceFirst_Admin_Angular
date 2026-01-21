@@ -23,9 +23,47 @@ export class ConfirmationService {
       data: {
         icon: 'delete',
         tone: 'warn',
-        title: 'Delete Item',
+        title: 'Delete',
         message: `Are you sure you want to delete "${itemName}"?`,
         confirmText: 'Delete',
+        cancelText: 'Cancel',
+      }
+    });
+
+    return dialogRef.afterClosed().pipe(
+      map(result => !!result) // Convert to boolean
+    );
+  }
+
+  confirmRestore(itemName: string): Observable<boolean> {
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      panelClass: 'modern-confirm-panel',
+      autoFocus: false,
+      data: {
+        icon: 'check_circle',
+        tone: 'success',
+        title: 'Restore',
+        message: `Are you sure you want to restore "${itemName}"?`,
+        confirmText: 'Restore',
+        cancelText: 'Cancel',
+      }
+    });
+
+    return dialogRef.afterClosed().pipe(
+      map(result => !!result) // Convert to boolean
+    );
+  }
+
+  confirmSuspend(itemName: string, status: boolean): Observable<boolean> {
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      panelClass: 'modern-confirm-panel',
+      autoFocus: false,
+      data: {
+        icon: status ? 'check' : 'cancel',
+        tone: status ? 'primary' : 'warn',
+        title: status ? 'Reinstate' : 'Suspend',
+        message: `Are you sure you want to ${status ? 'reinstate' : 'suspend'} "${itemName}"?`,
+        confirmText: status ? 'Reinstate' : 'Suspend',
         cancelText: 'Cancel',
       }
     });
