@@ -25,10 +25,11 @@ import { FilterBy, FilterOption } from '../../partials/shared_modules/filter-by/
 import { UtilityService } from '../../partials/shared_services/utility.service';
 import { ProgramActionService } from '../../core/_state/program-action/program-action.service';
 import { ToastService } from '../../partials/shared_services/toast.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-program-action',
-  imports: [SearchBar, Pagination, StatusBadge, SortableColumnDirective, MaterialModule, FilterBy],
+  imports: [SearchBar, Pagination, StatusBadge, SortableColumnDirective, MaterialModule, FilterBy, CommonModule],
   templateUrl: './program-action.html',
   styleUrl: './program-action.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -72,7 +73,7 @@ export class ProgramAction implements OnInit, OnDestroy {
       single: true
     }
   ];
-  
+
   activeFilters: Record<string, string[]> = {};
   clearSignal = 0;
   constructor(

@@ -25,7 +25,7 @@ import { Pagination } from '../../partials/shared_modules/pagination/pagination'
   styleUrl: './post-office.css',
 })
 export class PostOffice {
- postOffices: PostOfficeModel[] = [];
+  postOffices: PostOfficeModel[] = [];
   loading$!: Observable<boolean>;
   totalCount$!: Observable<number>;
   private destroy$ = new Subject<void>();
@@ -33,7 +33,9 @@ export class PostOffice {
 
   // SearchBy dropdown options
   searchByOptions = [
-    { label: 'Action Name', value: 'ActionName' },
+    { label: 'Post Office Name', value: 'PostOfficeName' },
+    { label: 'Country', value: 'CountryName' },
+    { label: 'ZIP Code', value: 'ZipCode' },
     { label: 'Created By', value: 'CreatedUser' },
     { label: 'Updated By', value: 'UpdatedUser' },
     { label: 'Deleted By', value: 'DeletedUser' }
@@ -305,7 +307,7 @@ export class PostOffice {
             next: (res) => {
               console.log("response", res);
               if (res.statusCode === 200) {
-                this.toastService.success('Post Office updated successfully');
+                this.toastService.success('Post Office Updated Successfully');
                 this.store.dispatch(PostOfficeActions.update({
                   activity: {
                     id: item.postOfficeId,

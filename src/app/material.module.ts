@@ -13,8 +13,8 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatMenuModule } from '@angular/material/menu';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { AddEditProgramActionComponent } from './pages/program-action/add-edit-program-action/add-edit-program-action.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   imports: [
@@ -32,7 +32,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     MatSortModule,
     MatMenuModule,
     DragDropModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatTooltipModule 
   ],
   exports: [
     CommonModule,
@@ -49,7 +50,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     MatSortModule,
     MatMenuModule,
     DragDropModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatTooltipModule 
   ],
 })
 export class MaterialModule { }

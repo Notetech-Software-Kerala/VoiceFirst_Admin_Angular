@@ -58,9 +58,12 @@
         <table class="table align-middle">
             <thead class="table-light">
                 <tr>
-                    <th appSortableColumn="postOfficeName" [sortBy]="queryParams.SortBy" [sortOrder]="queryParams.SortOrder"
-                        (sortChange)="onSortChange($event)">
+                    <th appSortableColumn="postOfficeName" [sortBy]="queryParams.SortBy"
+                        [sortOrder]="queryParams.SortOrder" (sortChange)="onSortChange($event)">
                         Post Office Name
+                    </th>
+                    <th>
+                        Zip Codes
                     </th>
                     <th appSortableColumn="active" [sortBy]="queryParams.SortBy" [sortOrder]="queryParams.SortOrder"
                         (sortChange)="onSortChange($event)">
@@ -77,6 +80,25 @@
                 @for (item of postOffices; track item.postOfficeId) {
                 <tr>
                     <td>{{ item.postOfficeName }}</td>
+
+                    <td>
+                        @if (item.zipCodes.length) {
+                        <div class="zip-list">
+                            @for (zip of item.zipCodes.slice(0, 3); track zip.zipCodeId) {
+                            <span class="zip-chip">{{ zip.zipCode }}</span>
+                            }
+
+                            @if (item.zipCodes.length > 3) {
+                            <span class="zip-more" [matMenuTriggerFor]="zipMenu"
+                                [matMenuTriggerData]="{zips: item.zipCodes}">
+                                +{{ item.zipCodes.length - 3 }} more
+                            </span>
+                            }
+                        </div>
+                        } @else {
+                        <span>-</span>
+                        }
+                    </td>
 
                     <td><app-status-badge [item]="item"></app-status-badge></td>
 
@@ -173,3 +195,13 @@
         (paginationChange)="onPaginationChange($event)">
     </app-pagination>
 </div>
+
+<mat-menu #zipMenu="matMenu" class="zip-overview-menu">
+    <ng-template matMenuContent let-zips="zips">
+        <div class="zip-menu-container" (click)="$event.stopPropagation()">
+            @for (zip of zips; track zip.zipCodeId) {
+            <span class="zip-chip">{{ zip.zipCode }}</span>
+            }
+        </div>
+    </ng-template>
+</mat-menu>

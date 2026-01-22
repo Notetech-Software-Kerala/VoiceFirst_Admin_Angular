@@ -59,3 +59,33 @@
     /* Light blue track */
     border-radius: 4px;
 }
+
+.zip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-width: 220px;
+}
+
+.zip-chip {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background-color: var(--color-chip-bg);
+    color: var(--color-chip-text);
+    font-size: 11px;
+    line-height: 1.4;
+    border: 1px solid var(--color-chip-border);
+    white-space: nowrap;
+}
+
+.zip-more {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background-color: var(--color-chip-more-bg);
+    color: var(--color-chip-more-text);
+    font-size: 11px;
+    line-height: 1.4;
+    border: 1px solid var(--color-chip-more-border);
+    cursor: pointer;
+    white-space: nowrap;
+}
