@@ -1,1 +1,60 @@
-<p>add-edit-post-office works!</p>
+<mat-dialog-content>
+    <h5 class="mb-4">{{title}}</h5>
+    <form [formGroup]="form" class="row g-3">
+
+        <div class="col-md-12">
+            <label for="postOfficeName" class="form-label">Post Office Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="postOfficeName" formControlName="postOfficeName" />
+            <!-- @if (f['postOfficeName'].touched && f['postOfficeName'].invalid) {
+        <div class="text-danger">
+         @if (f['postOfficeName'].errors?.['required']) {
+            <small>Name is required.</small>
+          }
+        </div>
+      } -->
+        </div>
+
+        <div class="col-md-12">
+            <label for="postOfficeName" class="form-label">Country<span class="text-danger">*</span></label>
+            <select class="form-control" formControlName="countryId">
+                <option *ngFor="let country of countryList" [value]="country.countryId">
+                    {{country.countryName}}
+                </option>
+            </select>
+        </div>
+
+        <div class="col-md-12">
+            <label for="zipCode" class="form-label">Zip Code<span class="text-danger">*</span></label><br>
+            <!-- <small class="hint-text">Type value and press Enter</small> -->
+            <mat-form-field appearance="outline" class="w-100">
+                <mat-chip-grid #chipGrid aria-label="Enter zip codes">
+                    @for (zip of form.get('zipCodes')?.value; track zip) {
+                    <mat-chip-row (removed)="removeZip(zip)">
+                        {{zip}}
+                        <button matChipRemove [attr.aria-label]="'remove ' + zip">
+                            <mat-icon style="font-size: .9rem; margin-top: 5px;">cancel</mat-icon>
+                        </button>
+                    </mat-chip-row>
+                    }
+                    <input placeholder="Type zip code & press enter" [matChipInputFor]="chipGrid"
+                        [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
+                        (matChipInputTokenEnd)="addZip($event)" />
+                </mat-chip-grid>
+
+            </mat-form-field>
+
+        </div>
+
+
+
+        <mat-dialog-actions class="mt-4">
+            <button type="button" class="close-btn" (click)="closeDialog()">Close</button>
+            <button class="submit-btn" type="submit" (click)="onSubmit()" [disabled]="isSubmitting">
+                @if (isSubmitting) {
+                <span class="btn-loader"></span>
+                }
+                Submit
+            </button>
+        </mat-dialog-actions>
+    </form>
+</mat-dialog-content>

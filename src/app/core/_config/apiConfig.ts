@@ -22,5 +22,5 @@ export const apiConfig = {
 
     //Country
     country: '/country',
-    getCountryLookup: '/country/active'
+    getCountryLookup: '/country/lookup'
 };
