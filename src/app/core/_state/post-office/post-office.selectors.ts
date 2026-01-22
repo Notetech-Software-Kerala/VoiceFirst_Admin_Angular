@@ -2,10 +2,10 @@ import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { adapter } from './post-office.reducer';
 import { PostOfficeState } from './post-office.state';
 
-export const FEATURE_KEY = 'postOffice';
+export const POST_OFFICE_FEATURE_KEY = 'postOffice';
 
 export const selectPostOfficeState =
-  createFeatureSelector<PostOfficeState>(FEATURE_KEY);
+  createFeatureSelector<PostOfficeState>(POST_OFFICE_FEATURE_KEY);
 
 const {
   selectAll,

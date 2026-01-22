@@ -2,10 +2,10 @@ import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { adapter } from './country.reducer';
 import { CountryState } from './country.state';
 
-export const FEATURE_KEY = 'country';
+export const COUNTRY_FEATURE_KEY = 'country';
 
 export const selectCountryState =
-  createFeatureSelector<CountryState>(FEATURE_KEY);
+  createFeatureSelector<CountryState>(COUNTRY_FEATURE_KEY);
 
 const {
   selectAll,

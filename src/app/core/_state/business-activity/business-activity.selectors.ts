@@ -2,10 +2,10 @@ import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { adapter } from './business-activity.reducer';
 import { BusinessActivityState } from './business-activity.state';
 
-export const FEATURE_KEY = 'businessActivities';
+export const BUSINESS_ACTIVITY_FEATURE_KEY = 'businessActivities';
 
 export const selectBusinessActivityState =
-  createFeatureSelector<BusinessActivityState>(FEATURE_KEY);
+  createFeatureSelector<BusinessActivityState>(BUSINESS_ACTIVITY_FEATURE_KEY);
 
 export const {
   selectIds: selectBusinessActivityIds,

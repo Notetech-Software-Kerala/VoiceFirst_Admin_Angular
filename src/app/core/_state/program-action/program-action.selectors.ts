@@ -2,10 +2,10 @@ import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { adapter } from './program-action.reducer';
 import { ProgramActionState } from './program-action.state';
 
-export const FEATURE_KEY = 'programActions';
+export const PROGRAM_ACTION_FEATURE_KEY = 'programActions';
 
 export const selectProgramActionState =
-  createFeatureSelector<ProgramActionState>(FEATURE_KEY);
+  createFeatureSelector<ProgramActionState>(PROGRAM_ACTION_FEATURE_KEY);
 
 const {
   selectAll,

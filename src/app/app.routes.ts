@@ -38,6 +38,10 @@ export const routes: Routes = [
             {
                 path: 'program-action',
                 loadComponent: () => import('./pages/program-action/program-action').then(m => m.ProgramAction)
+            },
+            {
+                path: 'post-office',
+                loadComponent: () => import('./pages/post-office/post-office').then(m => m.PostOffice)
             }
         ]
     }
