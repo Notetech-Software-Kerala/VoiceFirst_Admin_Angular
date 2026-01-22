@@ -1,9 +1,9 @@
 
 import { EntityState } from '@ngrx/entity';
-import { ProgramActionModel } from './program-action.model';
+import { CountryModel } from './country.model';
 
 
-export interface ProgramActionState extends EntityState<ProgramActionModel> {
+export interface CountryState extends EntityState<CountryModel> {
   loading: boolean;
   error: string | null;
   totalCount: number;

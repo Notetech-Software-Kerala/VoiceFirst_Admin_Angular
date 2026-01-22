@@ -1,6 +1,6 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { adapter } from './program-action.reducer';
-import { ProgramActionState as ProgramActionState } from './program-action.state';
+import { ProgramActionState } from './program-action.state';
 
 export const FEATURE_KEY = 'programActions';
 
