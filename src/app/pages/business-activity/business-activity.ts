@@ -332,12 +332,14 @@ export class BusinessActivity implements OnInit, OnDestroy {
   }
 
   onSuspend(item: BusinessActivityModel) {
-    const active = item.active;
+    const active = item.active ? false : true;
     this.confirmationService.confirmSuspend(item.activityName, active)
       .pipe(takeUntil(this.destroy$))
       .subscribe(confirmed => {
         if (confirmed) {
-          const payload = { ...item, active: !active };
+          const payload = {
+            active: active
+          }
 
           this.businessActivityService.update(item.activityId, payload).subscribe({
             next: (res) => {
@@ -345,7 +347,7 @@ export class BusinessActivity implements OnInit, OnDestroy {
                 const msg = active ? 'suspended' : 'reinstated';
                 this.toastService.success(`Business Activity ${msg} successfully`);
                 this.store.dispatch(BusinessActivityActions.update({
-                  activity: { id: item.activityId, changes: { active: !active } }
+                  activity: { id: item.activityId, changes: { active: active } }
                 }));
               } else {
                 this.toastService.error(res.message);

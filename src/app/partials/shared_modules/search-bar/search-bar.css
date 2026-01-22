@@ -1,20 +1,22 @@
 .search-bar {
     width: 100%;
     margin-top: 10px;
+    font-size: .8rem;
 }
 
 /* Unified search container - single cohesive component */
 .unified-search-container {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     background-color: var(--color-bg-sidebar);
     border: 1px solid var(--color-border-hr);
-    border-radius: 10px;
+    border-radius: 7px;
     overflow: hidden;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     min-width: 300px;
     flex: 1;
     max-width: 500px;
+    height: 36px;
 }
 
 .unified-search-container:focus-within {
@@ -65,6 +67,7 @@
     height: 24px;
     background-color: var(--color-border-hr);
     opacity: 0.5;
+    align-self: center;
 }
 
 /* Input section */
@@ -152,21 +155,25 @@
 }
 
 /* Custom Mat Menu Styling */
+
+::ng-deep.mat-mdc-menu-content {
+    padding: 0 !important;
+}
+
 ::ng-deep .custom-search-menu {
     border-radius: 10px !important;
-    margin-top: 8px !important;
+    margin-top: 2px !important;
     min-width: 160px !important;
     background-color: var(--color-bg-sidebar) !important;
     border: 1px solid var(--color-border-hr) !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
     overflow: hidden !important;
+
 }
 
 ::ng-deep .custom-search-menu .mat-mdc-menu-item {
-    font-size: 0.875rem !important;
+    font-size: 0.8rem !important;
     color: var(--color-text-primary) !important;
-    height: 40px !important;
-    line-height: 40px !important;
 }
 
 ::ng-deep .custom-search-menu .mat-mdc-menu-item:hover {

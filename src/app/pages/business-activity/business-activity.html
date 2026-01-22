@@ -92,8 +92,8 @@
                     <td>
                         @if (item.createdUser || item.createdDate) {
                         <div class="d-flex flex-column">
-                            <small class="text-muted">{{ item.createdUser || '-' }}</small>
-                            <small class="text-muted">{{ utilityService.formatDateTimeDdMmYyyy12h(item.createdDate) ||
+                            <small>{{ item.createdUser || '-' }}</small>
+                            <small>{{ utilityService.formatDateTimeDdMmYyyy12h(item.createdDate) ||
                                 '-'
                                 }}</small>
                         </div>
@@ -103,10 +103,10 @@
                     </td>
 
                     <td>
-                        @if ((item.modifiedUser || item.modifiedDate) && !item.delete) {
+                        @if ((item.modifiedUser || item.modifiedDate) && !item.deleted) {
                         <div class="d-flex flex-column">
-                            <small class="text-muted">{{ item.modifiedUser || '-' }}</small>
-                            <small class="text-muted">{{ utilityService.formatDateTimeDdMmYyyy12h(item.modifiedDate) ||
+                            <small>{{ item.modifiedUser || '-' }}</small>
+                            <small>{{ utilityService.formatDateTimeDdMmYyyy12h(item.modifiedDate) ||
                                 '-' }}</small>
                         </div>
                         } @else {
@@ -115,12 +115,11 @@
                     </td>
 
                     <td>
-                        @if (item.delete && (item.deletedUser || item.deletedDate)) {
+                        @if (item.deleted && (item.deletedUser || item.deletedDate)) {
                         <div class="d-flex flex-column">
-                            <small class="text-muted">{{ item.deletedUser || '-' }}</small>
-                            <small class="text-muted">{{ utilityService.formatDateTimeDdMmYyyy12h(item.deletedDate) ||
-                                '-'
-                                }}</small>
+                            <small>{{ item.deletedUser || '-' }}</small>
+                            <small>{{ utilityService.formatDateTimeDdMmYyyy12h(item.deletedDate) ||
+                                '-' }}</small>
                         </div>
                         } @else {
                         <span>-</span>
@@ -134,32 +133,30 @@
                         </button>
 
                         <mat-menu #rowMenu="matMenu" class="row-menu" xPosition="before" yPosition="below">
-
-                            @if (!item.delete) {
                             <button mat-menu-item (click)="openEditDialog(item)">
                                 <mat-icon class="msr-edit">edit</mat-icon>
                                 <span>Edit</span>
                             </button>
-
+                            @if (!item.deleted) {
                             <button mat-menu-item (click)="onSuspend(item)">
                                 <mat-icon [ngClass]="item.active ? 'msr-delete' : 'msr-restore'">{{ item.active ?
                                     'cancel' : 'check_circle' }}</mat-icon>
                                 <span>{{ item.active ? 'Suspend' : 'Reinstate' }}</span>
                             </button>
-
+                            }
+                            @if (!item.deleted) {
                             <button mat-menu-item (click)="onDelete(item)">
                                 <mat-icon class="msr-delete">delete</mat-icon>
                                 <span>Delete</span>
                             </button>
                             }
 
-                            @if (item.delete) {
+                            @if (item.deleted) {
                             <button mat-menu-item (click)="onRestore(item)">
-                                <mat-icon class="msr-restore">restore_from_trash</mat-icon>
+                                <mat-icon class="msr-restore">restore</mat-icon>
                                 <span>Restore</span>
                             </button>
                             }
-
                         </mat-menu>
                     </td>
 

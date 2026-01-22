@@ -10,10 +10,9 @@ export interface MenuItem {
 
 export const MENU_CONFIG: MenuItem[] = [
   { id: 1, label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
-  { id: 8, label: 'Menu', icon: 'menu_book', route: '/menu' },
-  { id: 9, label: 'Business Activity', icon: 'business_center', route: '/business-activity' },
-  { id: 10, label: 'Program Action', icon: 'business_center', route: '/program-action' },
-  { id: 11, label: 'Issue Type', icon: 'problem', route: '/issue-type' },
+  { id: 2, label: 'Menu', icon: 'menu_book', route: '/menu' },
+  { id: 3, label: 'Business Activity', icon: 'business_center', route: '/business-activity' },
+  { id: 5, label: 'Issue Type', icon: 'problem', route: '/issue-type' },
   {
     id: 6,
     label: 'User',
@@ -21,6 +20,16 @@ export const MENU_CONFIG: MenuItem[] = [
     children: [
       { id: 61, label: 'Employees', route: '/employees' },
       { id: 62, label: 'Roles', route: '/roles' },
+    ],
+  },
+  {
+    id: 7,
+    label: 'Master Data',
+    icon: 'group',
+    children: [
+      { id: 71, label: 'Country', route: '/country' },
+      { id: 72, label: 'Post Office', route: '/post-office' },
+      { id: 73, label: 'Program Action', route: '/program-action' },
     ],
   },
 ];

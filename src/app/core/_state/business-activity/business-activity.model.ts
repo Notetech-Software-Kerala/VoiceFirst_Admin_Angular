@@ -5,7 +5,7 @@ export interface BusinessActivityModel {
   activityId: number;
   activityName: string;
   active: boolean;
-  delete: boolean;
+  deleted: boolean;
 
   createdUser: string;
   createdDate: string;

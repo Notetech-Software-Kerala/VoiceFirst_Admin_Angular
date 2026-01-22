@@ -82,29 +82,37 @@
 
                     <td>
                         @if (item.createdUser || item.createdDate) {
-                        <small class="text-muted">{{ item.createdUser || '-' }}</small><br>
-                        <small class="text-muted">{{ utilityService.formatDateTimeDdMmYyyy12h(item.createdDate) || '-'
-                            }}</small>
+                        <div class="d-flex flex-column">
+                            <small>{{ item.createdUser || '-' }}</small>
+                            <small>{{ utilityService.formatDateTimeDdMmYyyy12h(item.createdDate) ||
+                                '-'
+                                }}</small>
+                        </div>
                         } @else {
                         <span>-</span>
                         }
                     </td>
 
                     <td>
-                        @if (item.modifiedUser || item.modifiedDate) {
-                        <small class="text-muted">{{ item.modifiedUser || '-' }}</small><br>
-                        <small class="text-muted">{{ utilityService.formatDateTimeDdMmYyyy12h(item.modifiedDate) || '-'
-                            }}</small>
+                        @if ((item.modifiedUser || item.modifiedDate) && !item.deleted) {
+                        <div class="d-flex flex-column">
+                            <small>{{ item.modifiedUser || '-' }}</small>
+                            <small>{{ utilityService.formatDateTimeDdMmYyyy12h(item.modifiedDate) ||
+                                '-' }}</small>
+                        </div>
                         } @else {
                         <span>-</span>
                         }
                     </td>
 
                     <td>
-                        @if (item.deletedUser || item.deletedDate) {
-                        <small class="text-muted">{{ item.deletedUser || '-' }}</small><br>
-                        <small class="text-muted">{{ utilityService.formatDateTimeDdMmYyyy12h(item.deletedDate) || '-'
-                            }}</small>
+                        @if (item.deleted && (item.deletedUser || item.deletedDate)) {
+                        <div class="d-flex flex-column">
+                            <small>{{ item.deletedUser || '-' }}</small>
+                            <small>{{ utilityService.formatDateTimeDdMmYyyy12h(item.deletedDate) ||
+                                '-'
+                                }}</small>
+                        </div>
                         } @else {
                         <span>-</span>
                         }
