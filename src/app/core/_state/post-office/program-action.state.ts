@@ -1,7 +1,9 @@
-import { EntityState } from '@ngrx/entity';
-import { BusinessActivityModel } from './business-activity.model';
 
-export interface BusinessActivityState extends EntityState<BusinessActivityModel> {
+import { EntityState } from '@ngrx/entity';
+import { ProgramActionModel } from './program-action.model';
+
+
+export interface ProgramActionState extends EntityState<ProgramActionModel> {
   loading: boolean;
   error: string | null;
   totalCount: number;

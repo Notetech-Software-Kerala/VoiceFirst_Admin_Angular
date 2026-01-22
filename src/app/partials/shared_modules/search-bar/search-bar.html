@@ -3,22 +3,42 @@
     <label class="form-label me-2 mb-0">{{ label }}</label>
     }
 
-    <div class="search-wrapper position-relative flex-grow-1 w-100">
-        <input type="text" class="form-control search-input pe-5" [placeholder]="placeholder" [value]="value"
-            (input)="onInputChange($event)" />
-
-        <!-- Show clear (×) if there's text -->
-        @if (value) {
-        <button type="button" class="clear-btn" (click)="clearInput()" aria-label="Clear search">
-            ×
-        </button>
-        }
-
-        <!-- Show info (ℹ️) with tooltip if empty -->
-        @if (!value) {
-        <div class="info-wrapper" tabindex="0">
-            <span class="info-icon" [attr.data-tooltip]="tooltipText"><mat-icon>info</mat-icon></span>
+    <div class="unified-search-container">
+        @if (searchByOptions.length > 0) {
+        <div class="search-dropdown-section" [matMenuTriggerFor]="menu">
+            <span class="search-select-label">{{ getSelectedLabel() }}</span>
+            <span class="dropdown-icon">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                    <path d="M6 8L2 4h8z" />
+                </svg>
+            </span>
         </div>
+        <mat-menu #menu="matMenu" class="custom-search-menu">
+            <button mat-menu-item (click)="selectSearchBy('')" [class.selected]="searchByValue === ''">
+                All Fields
+            </button>
+            @for (option of searchByOptions; track option.value) {
+            <button mat-menu-item (click)="selectSearchBy(option.value)"
+                [class.selected]="searchByValue === option.value">
+                {{ option.label }}
+            </button>
+            }
+        </mat-menu>
+
+        <div class="search-divider"></div>
         }
+
+        <div class="search-input-section">
+            <input type="text" class="search-input" [placeholder]="placeholder" [value]="value"
+                (input)="onInputChange($event)" />
+
+            @if (value) {
+            <button type="button" class="clear-btn" (click)="clearInput()" aria-label="Clear search">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M2 2l10 10M12 2L2 12" />
+                </svg>
+            </button>
+            }
+        </div>
     </div>
 </div>

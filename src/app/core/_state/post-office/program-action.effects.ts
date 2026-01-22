@@ -1,23 +1,23 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { BusinessActivityActions } from './business-activity.actions';
+import { ProgramActionActions } from './program-action.action';
 import { catchError, map, switchMap, of } from 'rxjs';
-import { BusinessActivityService } from './business-activity.service';
+import { ProgramActionService } from './program-action.service';
 
 @Injectable()
-export class BusinessActivityEffects {
+export class ProgramActionEffects {
   load$;
 
   constructor(
     private actions$: Actions,
-    private service: BusinessActivityService
+    private service: ProgramActionService
   ) {
     this.load$ = createEffect(() =>
       this.actions$.pipe(
-        ofType(BusinessActivityActions.load),
+        ofType(ProgramActionActions.load),
         switchMap(({ queryParams }) =>
           this.service.getAll(queryParams).pipe(
-            map((paginatedData) => BusinessActivityActions.loadSuccess({
+            map((paginatedData) => ProgramActionActions.loadSuccess({
               activities: paginatedData.items,
               totalCount: paginatedData.totalCount,
               pageNumber: paginatedData.pageNumber,
@@ -26,7 +26,7 @@ export class BusinessActivityEffects {
             })),
             catchError((err) =>
               of(
-                BusinessActivityActions.loadFailure({
+                ProgramActionActions.loadFailure({
                   error: err?.message ?? 'Load failed',
                 })
               )
@@ -37,3 +37,5 @@ export class BusinessActivityEffects {
     );
   }
 }
+
+

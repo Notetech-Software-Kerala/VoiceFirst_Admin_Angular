@@ -19,6 +19,12 @@
     margin-top: 6px !important;
 }
 
+.msr-restore {
+    font-size: 1rem;
+    color: #72b674 !important;
+    margin-top: 6px !important;
+}
+
 .mat-mdc-menu-item {
     display: flex;
     position: relative;
