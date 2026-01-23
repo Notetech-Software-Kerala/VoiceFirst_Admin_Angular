@@ -263,6 +263,8 @@ export class BusinessActivity implements OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe(result => {
+      console.log("Add Result", result);
+
       if (result && result.statusCode === 201) {
         this.store.dispatch(BusinessActivityActions.add({ activity: result.data }));
       }

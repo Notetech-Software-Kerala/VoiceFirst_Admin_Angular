@@ -88,23 +88,7 @@ export class AddEditBusinessActivity implements OnInit {
           if (err.error.statusCode === 422) {
             const existingId = err.error.data?.activityId || 1;
             if (existingId) {
-              this.confirmationService.confirmRestore(payload.ActivityName, 'This record already available, do you want to restore?').subscribe(confirmed => {
-                if (confirmed) {
-                  this.businessActivityService.restore(existingId).subscribe({
-                    next: (restoreRes) => {
-                      if (restoreRes.statusCode === 200) {
-                        this.toastService.success('Business Activity restored successfully', 'Success');
-                        this.closeDialog(restoreRes);
-                      }
-                    },
-                    error: (e) => {
-                      this.toastService.error(e.message || 'Failed to restore');
-                    }
-                  });
-                }
-              });
-            } else {
-              this.toastService.warning(err.error.message, 'Duplicate Entry');
+              this.restoreBusinessActivity(existingId, payload.ActivityName);
             }
           }
         }
@@ -127,6 +111,24 @@ export class AddEditBusinessActivity implements OnInit {
           this.isSubmitting = false;
         }
       });
+  }
+
+  restoreBusinessActivity(id: number, name: string) {
+    this.confirmationService.confirmRestore(name, `${name} already available, do you want to restore?`).subscribe(confirmed => {
+      if (confirmed) {
+        this.businessActivityService.restore(id).subscribe({
+          next: (restoreRes) => {
+            if (restoreRes.statusCode === 200) {
+              this.toastService.success('Business Activity restored successfully', 'Success');
+              this.closeDialog(restoreRes);
+            }
+          },
+          error: (e) => {
+            this.toastService.error(e.message || 'Failed to restore');
+          }
+        });
+      }
+    });
   }
 
   get f() {

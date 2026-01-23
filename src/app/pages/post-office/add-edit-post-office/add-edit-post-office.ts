@@ -156,21 +156,7 @@ export class AddEditPostOffice {
           if (error.error.statusCode === 422) {
             const existingId = error.error.data?.postOfficeId;
             if (existingId) {
-              this.confirmationService.confirmRestore(newPostOffice.postOfficeName, 'This record already available, do you want to restore?').subscribe(confirmed => {
-                if (confirmed) {
-                  this.postOfficeService.restore(existingId).subscribe({
-                    next: (restoreRes) => {
-                      if (restoreRes.statusCode === 200) {
-                        this.toastService.success('Post Office restored successfully', 'Success');
-                        this.closeDialog(restoreRes);
-                      }
-                    },
-                    error: (e) => {
-                      this.toastService.error(e.message || 'Failed to restore');
-                    }
-                  });
-                }
-              });
+              this.restorePostOffice(existingId, newPostOffice.postOfficeName);
             }
           }
         }
@@ -206,6 +192,24 @@ export class AddEditPostOffice {
         }
       })
     }
+  }
+
+  restorePostOffice(id: number, name: string) {
+    this.confirmationService.confirmRestore(name, `${name} already available, do you want to restore?`).subscribe(confirmed => {
+      if (confirmed) {
+        this.postOfficeService.restore(id).subscribe({
+          next: (restoreRes) => {
+            if (restoreRes.statusCode === 200) {
+              this.toastService.success('Post Office restored successfully', 'Success');
+              this.closeDialog(restoreRes);
+            }
+          },
+          error: (err) => {
+            this.toastService.error(err.message || 'Failed to restore');
+          }
+        });
+      }
+    });
   }
 
   getChangedValues(formValue: any, originalData: PostOfficeModel): any {

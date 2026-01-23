@@ -99,23 +99,7 @@ export class AddEditProgramActionComponent implements OnInit {
           if (error.error.statusCode === 422) {
             const existingId = error.error.data?.actionId;
             if (existingId) {
-              this.confirmationService.confirmRestore(this.form.value.actionName, 'This record already available, do you want to restore?').subscribe(confirmed => {
-                if (confirmed) {
-                  this.programActionService.restore(existingId).subscribe({
-                    next: (restoreRes) => {
-                      if (restoreRes.statusCode === 200) {
-                        this.toastService.success('Program Action restored successfully', 'Success');
-                        this.closeDialog(restoreRes);
-                      }
-                    },
-                    error: (err) => {
-                      this.toastService.error(err.message || 'Failed to restore');
-                    }
-                  });
-                }
-              });
-            } else {
-              this.toastService.warning(error.error.message, 'Duplicate Entry');
+              this.restoreProgramAction(existingId, this.form.value.actionName);
             }
           }
         }
@@ -144,6 +128,24 @@ export class AddEditProgramActionComponent implements OnInit {
         }
       })
     }
+  }
+
+  restoreProgramAction(id: number, name: string) {
+    this.confirmationService.confirmRestore(name, `${name} already available, do you want to restore?`).subscribe(confirmed => {
+      if (confirmed) {
+        this.programActionService.restore(id).subscribe({
+          next: (restoreRes) => {
+            if (restoreRes.statusCode === 200) {
+              this.toastService.success('Program Action restored successfully', 'Success');
+              this.closeDialog(restoreRes);
+            }
+          },
+          error: (err) => {
+            this.toastService.error(err.message || 'Failed to restore');
+          }
+        });
+      }
+    });
   }
 
   // Utility to mark all fields as touched to trigger validation messages
