@@ -268,6 +268,11 @@ export class BusinessActivity implements OnInit, OnDestroy {
       if (result && result.statusCode === 201) {
         this.store.dispatch(BusinessActivityActions.add({ activity: result.data }));
       }
+      else if (result && result.statusCode === 200) {
+        this.store.dispatch(BusinessActivityActions.update({
+          activity: { id: result.data.activityId, changes: result.data }
+        }));
+      }
     });
   }
 

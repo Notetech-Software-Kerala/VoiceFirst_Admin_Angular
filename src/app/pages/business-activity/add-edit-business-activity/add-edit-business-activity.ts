@@ -86,7 +86,7 @@ export class AddEditBusinessActivity implements OnInit {
           console.error(err);
           this.isSubmitting = false;
           if (err.error.statusCode === 422) {
-            const existingId = err.error.data?.activityId || 1;
+            const existingId = err.error.data?.activityId;
             if (existingId) {
               this.restoreBusinessActivity(existingId, payload.ActivityName);
             }
@@ -124,7 +124,7 @@ export class AddEditBusinessActivity implements OnInit {
             }
           },
           error: (e) => {
-            this.toastService.error(e.message || 'Failed to restore');
+            console.log("error", e);
           }
         });
       }

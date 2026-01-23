@@ -205,7 +205,7 @@ export class AddEditPostOffice {
             }
           },
           error: (err) => {
-            this.toastService.error(err.message || 'Failed to restore');
+            console.log("error", err);
           }
         });
       }
