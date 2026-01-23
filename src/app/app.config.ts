@@ -10,6 +10,7 @@ import { BusinessActivityEffects } from './core/_state/business-activity/busines
 import { BUSINESS_ACTIVITY_FEATURE_KEY } from './core/_state/business-activity/business-activity.selectors';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './core/_http/auth.interceptor';
+import { errorInterceptor } from './core/_http/error.interceptor';
 import { programActionReducer } from './core/_state/program-action/program-action.reducer';
 import { ProgramActionEffects } from './core/_state/program-action/program-action.effects';
 import { PROGRAM_ACTION_FEATURE_KEY } from './core/_state/program-action/program-action.selectors';
@@ -28,7 +29,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideAnimationsAsync(),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
     provideStore({
       [BUSINESS_ACTIVITY_FEATURE_KEY]: businessActivityReducer,
       [PROGRAM_ACTION_FEATURE_KEY]: programActionReducer,
@@ -36,9 +37,9 @@ export const appConfig: ApplicationConfig = {
       [COUNTRY_FEATURE_KEY]: countryReducer
     }),
     provideEffects([
-      BusinessActivityEffects, 
-      ProgramActionEffects, 
-      PostOfficeEffects, 
+      BusinessActivityEffects,
+      ProgramActionEffects,
+      PostOfficeEffects,
       CountryEffects
     ]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })

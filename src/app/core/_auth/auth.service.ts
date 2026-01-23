@@ -1,6 +1,7 @@
 // src/app/auth/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, map, tap } from 'rxjs';
 import { TokenStore } from './token.store';
 import { environment } from '../../environment/environment';
@@ -14,7 +15,7 @@ export class AuthService {
     private userSubject = new BehaviorSubject<UserInfo | null>(null);
     user$ = this.userSubject.asObservable();
 
-    constructor(private http: HttpClient, private tokenStore: TokenStore) { }
+    constructor(private http: HttpClient, private tokenStore: TokenStore, private router: Router) { }
 
     login(req: LoginRequest): Observable<UserInfo> {
         return this.http
@@ -88,5 +89,6 @@ export class AuthService {
     clearSession() {
         this.tokenStore.clear();
         this.userSubject.next(null);
+        this.router.navigate(['/login']);
     }
 }

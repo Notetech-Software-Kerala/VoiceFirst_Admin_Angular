@@ -268,7 +268,7 @@ export class ProgramAction implements OnInit, OnDestroy {
             next: (res) => {
               console.log("response", res);
               if (res.statusCode === 200) {
-                this.toastService.success('Program Action deleted successfully');
+                this.toastService.success('Program Action deleted successfully', 'Success');
                 this.loadData();
               }
             },
@@ -290,7 +290,7 @@ export class ProgramAction implements OnInit, OnDestroy {
             next: (res) => {
               console.log("response", res);
               if (res.statusCode === 200) {
-                this.toastService.success('Program Action deleted successfully');
+                this.toastService.success('Program Action deleted successfully', 'Success');
                 this.loadData();
               }
             },
@@ -316,7 +316,7 @@ export class ProgramAction implements OnInit, OnDestroy {
             next: (res) => {
               console.log("response", res);
               if (res.statusCode === 200) {
-                this.toastService.success('Program Action updated successfully');
+                this.toastService.success(`Program Action ${item.active ? 'Suspended' : 'Reinstated'} successfully`, 'Success');
                 this.store.dispatch(ProgramActionActions.update({
                   activity: {
                     id: item.actionId,

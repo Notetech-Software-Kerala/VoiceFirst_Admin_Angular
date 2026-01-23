@@ -24,10 +24,39 @@ export class ToastService {
     return id;
   }
 
-  success(message: string, o: Partial<ToastOptions> = {}) { return this.show({ type: 'success', message, ...o }); }
-  info(message: string, o: Partial<ToastOptions> = {}) { return this.show({ type: 'info', message, ...o }); }
-  warning(message: string, o: Partial<ToastOptions> = {}) { return this.show({ type: 'warning', message, ...o }); }
-  error(message: string, o: Partial<ToastOptions> = {}) { return this.show({ type: 'error', message, ...o }); }
+  success(message: string, titleOrOptions?: string | Partial<ToastOptions>, o: Partial<ToastOptions> = {}) {
+    return this.handleShow('success', message, titleOrOptions, o);
+  }
+
+  info(message: string, titleOrOptions?: string | Partial<ToastOptions>, o: Partial<ToastOptions> = {}) {
+    return this.handleShow('info', message, titleOrOptions, o);
+  }
+
+  warning(message: string, titleOrOptions?: string | Partial<ToastOptions>, o: Partial<ToastOptions> = {}) {
+    return this.handleShow('warning', message, titleOrOptions, o);
+  }
+
+  error(message: string, titleOrOptions?: string | Partial<ToastOptions>, o: Partial<ToastOptions> = {}) {
+    return this.handleShow('error', message, titleOrOptions, o);
+  }
+
+  private handleShow(
+    type: NonNullable<ToastOptions['type']>,
+    message: string,
+    titleOrOptions?: string | Partial<ToastOptions>,
+    o: Partial<ToastOptions> = {}
+  ) {
+    let title: string | undefined;
+    let options: Partial<ToastOptions> = o;
+
+    if (typeof titleOrOptions === 'string') {
+      title = titleOrOptions;
+    } else if (typeof titleOrOptions === 'object') {
+      options = titleOrOptions;
+    }
+
+    return this.show({ type, message, title, ...options });
+  }
 
   close(id: string) {
     this._toasts$.next(this._toasts$.value.filter(t => t.id !== id));

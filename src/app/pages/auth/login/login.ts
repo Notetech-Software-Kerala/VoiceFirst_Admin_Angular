@@ -94,11 +94,11 @@ export class Login {
       next: (res) => {
         this.submitting = false;
         this.router.navigate(['/dashboard']);
-        this.toast.success(`Welcome to Voice First`, { title: 'Login Success' });
+        this.toast.success(`Welcome to Voice First`, 'Login Success');
       },
       error: (err) => {
         this.submitting = false;
-        this.toast.error(`Login failed`, { title: 'Login Failed' });
+        this.toast.error(`Login failed`, 'Login Failed');
       }
     });
   }

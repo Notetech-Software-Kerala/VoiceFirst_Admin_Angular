@@ -259,13 +259,12 @@ export class PostOffice {
             next: (res) => {
               console.log("response", res);
               if (res.statusCode === 200) {
-                this.toastService.success('Post Office deleted successfully');
+                this.toastService.success('Post Office deleted successfully', 'Success');
                 this.loadData();
               }
             },
             error: (error) => {
               console.log("error", error);
-              this.toastService.error(error.message);
             }
           })
         }
@@ -281,13 +280,13 @@ export class PostOffice {
             next: (res) => {
               console.log("response", res);
               if (res.statusCode === 200) {
-                this.toastService.success('Post Office restored successfully');
+                this.toastService.success('Post Office restored successfully', 'Success');
                 this.loadData();
               }
             },
             error: (error) => {
               console.log("error", error);
-              this.toastService.error(error.message);
+
             }
           })
         }
@@ -307,7 +306,7 @@ export class PostOffice {
             next: (res) => {
               console.log("response", res);
               if (res.statusCode === 200) {
-                this.toastService.success('Post Office Updated Successfully');
+                this.toastService.success(`Post Office ${item.active ? 'Suspended' : 'Reinstated'} Successfully`, 'Success');
                 this.store.dispatch(PostOfficeActions.update({
                   activity: {
                     id: item.postOfficeId,
@@ -334,6 +333,8 @@ export class PostOffice {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
+        console.log("result", result);
+
         if (result.statusCode === 201) {
           // Add new item
           this.store.dispatch(PostOfficeActions.add({ activity: result.data }));

@@ -3,10 +3,6 @@
     background-color: var(--color-chip-more-bg);
     color: var(--color-chip-more-text);
     border: 1px solid var(--color-chip-more-border);
-    border-radius: 999px;
-    /* Pill shape */
-    padding: 0 4px !important;
-    /* Exact padding from zip-chip logic, adjusted for Material internals */
 }
 
 /* Remove Icon */

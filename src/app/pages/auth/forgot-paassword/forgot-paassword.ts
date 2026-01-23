@@ -82,7 +82,7 @@ export class ForgotPaassword implements OnInit {
     setTimeout(() => {
       this.submitting = false;
       this.step = 2;
-      this.toast.success('OTP sent to your email/phone', { title: 'OTP Sent' });
+      this.toast.success('OTP sent to your email/phone', 'OTP Sent');
     }, 1000);
   }
 
@@ -98,7 +98,7 @@ export class ForgotPaassword implements OnInit {
     setTimeout(() => {
       this.submitting = false;
       this.step = 3;
-      this.toast.success('OTP Verified', { title: 'Success' });
+      this.toast.success('OTP Verified', 'Success');
     }, 1000);
   }
 
@@ -113,12 +113,12 @@ export class ForgotPaassword implements OnInit {
     // Simulate API
     setTimeout(() => {
       this.submitting = false;
-      this.toast.success('Password reset successfully. Please login.', { title: 'Success' });
+      this.toast.success('Password reset successfully. Please login.', 'Success');
       this.router.navigate(['/login']);
     }, 1500);
   }
 
   resendOtp() {
-    this.toast.success('OTP has been resent', { title: 'Resent' });
+    this.toast.success('OTP has been resent', 'Resent');
   }
 }

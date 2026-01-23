@@ -35,7 +35,7 @@ export class ConfirmationService {
     );
   }
 
-  confirmRestore(itemName: string): Observable<boolean> {
+  confirmRestore(itemName: string, alertMessage?: string): Observable<boolean> {
     const dialogRef = this.dialog.open(ConfirmDialog, {
       panelClass: 'modern-confirm-panel',
       autoFocus: false,
@@ -43,7 +43,7 @@ export class ConfirmationService {
         icon: 'check_circle',
         tone: 'success',
         title: 'Restore',
-        message: `Are you sure you want to restore "${itemName}"?`,
+        message: alertMessage || `Are you sure you want to restore "${itemName}"?`,
         confirmText: 'Restore',
         cancelText: 'Cancel',
       }

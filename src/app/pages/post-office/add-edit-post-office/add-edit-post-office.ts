@@ -11,6 +11,7 @@ import { CountryModel } from '../../../core/_state/country/country.model';
 import { CountryService } from '../../../core/_state/country/country.service';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { ConfirmationService } from '../../../partials/shared_services/confirmation';
 
 @Component({
   selector: 'app-add-edit-post-office',
@@ -34,6 +35,7 @@ export class AddEditPostOffice {
     private toastService: ToastService,
     private countryService: CountryService,
     private cdr: ChangeDetectorRef,
+    private confirmationService: ConfirmationService,
     @Inject(MAT_DIALOG_DATA) public data: PostOfficeModel | null,
   ) { }
 
@@ -124,7 +126,6 @@ export class AddEditPostOffice {
       } else {
         this.addPostOffice();
       }
-
     }
 
 
@@ -138,45 +139,101 @@ export class AddEditPostOffice {
         zipCodes: this.form.value.zipCodes,
       }
       console.log("payload", newPostOffice);
-      // this.postOfficeService.create(newPostOffice).subscribe({
-      //   next: (res) => {
-      //     console.log("response", res);
-      //     if (res.statusCode === 201) {
-      //       this.toastService.success('Post Office added successfully');
-      //       this.closeDialog(res);
-      //     }
-      //   },
-      //   error: (error) => {
-      //     console.log("error", error);
-      //   }
-      // })
+      this.postOfficeService.create(newPostOffice).subscribe({
+        next: (res) => {
+          console.log("response", res);
+          if (res.statusCode === 201) {
+            this.toastService.success('Post Office added successfully', 'Success');
+            this.closeDialog(res);
+          }
+          else {
+            this.toastService.error(res.message, 'Failed');
+          }
+          this.isSubmitting = false;
+        },
+        error: (error) => {
+          this.isSubmitting = false;
+          if (error.error.statusCode === 422) {
+            const existingId = error.error.data?.postOfficeId;
+            if (existingId) {
+              this.confirmationService.confirmRestore(newPostOffice.postOfficeName, 'This record already available, do you want to restore?').subscribe(confirmed => {
+                if (confirmed) {
+                  this.postOfficeService.restore(existingId).subscribe({
+                    next: (restoreRes) => {
+                      if (restoreRes.statusCode === 200) {
+                        this.toastService.success('Post Office restored successfully', 'Success');
+                        this.closeDialog(restoreRes);
+                      }
+                    },
+                    error: (e) => {
+                      this.toastService.error(e.message || 'Failed to restore');
+                    }
+                  });
+                }
+              });
+            }
+          }
+        }
+      })
     }
   }
 
   updatePostOffice() {
     if (this.form.valid && this.data) {
-      const updatedPostOffice = {
-        postOfficeName: this.form.value.postOfficeName,
-        countryId: this.form.value.countryId,
-        zipCodes: this.form.value.zipCodes,
+      const changes = this.getChangedValues(this.form.value, this.data);
+
+      if (Object.keys(changes).length === 0) {
+        this.toastService.info('No changes detected', 'Info');
+        this.isSubmitting = false;
+        return;
       }
-      console.log("payload", updatedPostOffice);
-      // this.postOfficeService.update(this.data.postOfficeId, updatedPostOffice).subscribe({
-      //   next: (res) => {
-      //     console.log("response", res);
-      //     if (res.statusCode === 200) {
-      //       this.toastService.success('Post Office updated successfully');
-      //       this.closeDialog(res);
-      //     }
-      //     else {
-      //       this.toastService.error(res.message);
-      //     }
-      //   },
-      //   error: (error) => {
-      //     this.toastService.error(error.message);
-      //   }
-      // })
+
+      console.log("payload", changes);
+      this.postOfficeService.update(this.data.postOfficeId, changes).subscribe({
+        next: (res) => {
+          console.log("response", res);
+          if (res.statusCode === 200) {
+            this.toastService.success('Post Office updated successfully', 'Success');
+            this.closeDialog(res);
+          }
+          else {
+            this.toastService.error(res.message, 'Failed');
+          }
+          this.isSubmitting = false;
+        },
+        error: (error) => {
+          this.isSubmitting = false;
+        }
+      })
     }
+  }
+
+  getChangedValues(formValue: any, originalData: PostOfficeModel): any {
+    const changes: any = {};
+
+    if (formValue.postOfficeName !== originalData.postOfficeName) {
+      changes.postOfficeName = formValue.postOfficeName;
+    }
+
+    if (formValue.countryId !== originalData.countryId) {
+      changes.countryId = formValue.countryId;
+    }
+
+    // Compare zip codes (array of strings vs array of objects in model)
+    // originalData.zipCodes is object array, formValue.zipCodes is string array
+    const originalZips = originalData.zipCodes.map(z => z.zipCode).sort().join(',');
+    const newZips = (formValue.zipCodes || []).sort().join(',');
+
+    if (originalZips !== newZips) {
+      changes.zipCodes = formValue.zipCodes.map((zip: string) => {
+        const existing = originalData.zipCodes.find(z => z.zipCode === zip);
+        return existing
+          ? { zipCodeId: existing.zipCodeId, zipCode: existing.zipCode, active: existing.active }
+          : { zipCodeId: 0, zipCode: zip, active: true };
+      });
+    }
+
+    return changes;
   }
 
   // Utility to mark all fields as touched to trigger validation messages

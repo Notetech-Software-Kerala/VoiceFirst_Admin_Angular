@@ -293,7 +293,7 @@ export class BusinessActivity implements OnInit, OnDestroy {
           this.businessActivityService.delete(item.activityId).subscribe({
             next: (res) => {
               if (res.statusCode === 200) {
-                this.toastService.success('Business Activity deleted successfully');
+                this.toastService.success('Business Activity deleted successfully', 'Success');
                 this.loadData();
               } else {
                 this.toastService.error(res.message);
@@ -301,7 +301,6 @@ export class BusinessActivity implements OnInit, OnDestroy {
             },
             error: (err) => {
               console.error(err);
-              this.toastService.error(err.message || 'Failed to delete Business Activity');
             }
           });
         }
@@ -316,7 +315,7 @@ export class BusinessActivity implements OnInit, OnDestroy {
           this.businessActivityService.restore(item.activityId).subscribe({
             next: (res) => {
               if (res.statusCode === 200) {
-                this.toastService.success('Business Activity restored successfully');
+                this.toastService.success('Business Activity restored successfully', 'Success');
                 this.loadData();
               } else {
                 this.toastService.error(res.message);
@@ -324,7 +323,6 @@ export class BusinessActivity implements OnInit, OnDestroy {
             },
             error: (err) => {
               console.error(err);
-              this.toastService.error(err.message || 'Failed to restore Business Activity');
             }
           });
         }
@@ -344,8 +342,8 @@ export class BusinessActivity implements OnInit, OnDestroy {
           this.businessActivityService.update(item.activityId, payload).subscribe({
             next: (res) => {
               if (res.statusCode === 200) {
-                const msg = active ? 'suspended' : 'reinstated';
-                this.toastService.success(`Business Activity ${msg} successfully`);
+                const msg = active ? 'Suspended' : 'Reinstated';
+                this.toastService.success(`Business Activity ${msg} successfully`, 'Success');
                 this.store.dispatch(BusinessActivityActions.update({
                   activity: { id: item.activityId, changes: { active: active } }
                 }));
@@ -355,7 +353,7 @@ export class BusinessActivity implements OnInit, OnDestroy {
             },
             error: (err) => {
               console.error(err);
-              this.toastService.error(err.message || 'Failed to update status');
+
             }
           });
         }
