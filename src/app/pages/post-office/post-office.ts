@@ -371,4 +371,18 @@ export class PostOffice {
       }
     });
   }
+  // Sort zip codes: active first, then deleted
+  sortZipCodes(zips: any[]): any[] {
+    if (!zips) return [];
+    // structuredClone or spread to avoid mutation if needed, though sort makes a copy usually if we do it right
+    // actually array.sort mutates, so we must copy first
+    return [...zips].sort((a, b) => {
+      // deleted=true should be last.
+      // a.deleted vs b.deleted
+      const aDeleted = !!a.deleted;
+      const bDeleted = !!b.deleted;
+      if (aDeleted === bDeleted) return 0;
+      return aDeleted ? 1 : -1;
+    });
+  }
 }

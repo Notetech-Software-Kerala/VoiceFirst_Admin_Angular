@@ -103,9 +103,9 @@
 
 /* Deleted Chip Styling */
 .deleted-chip {
-    background-color: var(--color-bg-secondary, #fafafa) !important;
-    color: var(--color-text-secondary, #666) !important;
-    border: 1px dashed var(--color-border-hr, #ccc) !important;
+    background-color: var(--color-status-error-bg, #fee2e2) !important;
+    color: var(--color-status-error-text, #666) !important;
+    border: 1px dashed var(--color-status-error-border, #ccc) !important;
 }
 
 .deleted-chip .mdc-evolution-chip__text-label {
@@ -114,7 +114,9 @@
 
 .deleted-chip button {
     opacity: 1 !important;
-    color: var(--color-primary, #6259ce) !important;
+    color: var(--color-status-success-text, #6259ce) !important;
     /* Assuming primary color var or fallback */
     margin-left: 4px;
+    margin-top: 4px !important;
+    font-weight: 500 !important;
 }

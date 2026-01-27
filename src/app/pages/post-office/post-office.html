@@ -83,15 +83,16 @@
 
                     <td>
                         @if (item.zipCodes.length) {
+                        @let sortedZips = sortZipCodes(item.zipCodes);
                         <div class="zip-list">
-                            @for (zip of item.zipCodes.slice(0, 3); track zip.zipCodeId) {
-                            <span class="zip-chip">{{ zip.zipCode }}</span>
+                            @for (zip of sortedZips.slice(0, 3); track zip.zipCodeId) {
+                            <span class="zip-chip" [class.zip-deleted]="zip.deleted">{{ zip.zipCode }}</span>
                             }
 
-                            @if (item.zipCodes.length > 3) {
+                            @if (sortedZips.length > 3) {
                             <span class="zip-more" [matMenuTriggerFor]="zipMenu"
-                                [matMenuTriggerData]="{zips: item.zipCodes}">
-                                +{{ item.zipCodes.length - 3 }} more
+                                [matMenuTriggerData]="{zips: sortedZips}">
+                                +{{ sortedZips.length - 3 }} more
                             </span>
                             }
                         </div>
@@ -200,7 +201,7 @@
     <ng-template matMenuContent let-zips="zips">
         <div class="zip-menu-container" (click)="$event.stopPropagation()">
             @for (zip of zips; track zip.zipCodeId) {
-            <span class="zip-chip">{{ zip.zipCode }}</span>
+            <span class="zip-chip" [class.zip-deleted]="zip.deleted">{{ zip.zipCode }}</span>
             }
         </div>
     </ng-template>

@@ -32,7 +32,8 @@
                     <mat-chip-row (removed)="removeZip(zip)" [class.deleted-chip]="zip.deleted">
                         {{zip.zipCode}}
                         @if (zip.deleted) {
-                        <button matChipRemove (click)="restoreZip(zip)" [attr.aria-label]="'restore ' + zip.zipCode">
+                        <button matChipTrailingIcon (click)="restoreZip(zip)"
+                            [attr.aria-label]="'restore ' + zip.zipCode">
                             <mat-icon style="font-size: .9rem; margin-top: 4px;">restore</mat-icon>
                         </button>
                         } @else {
