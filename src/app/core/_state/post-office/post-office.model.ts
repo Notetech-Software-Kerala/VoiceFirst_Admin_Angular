@@ -25,10 +25,11 @@ export interface ZipCode {
   zipCode: string;
 
   active: boolean;
-
+  deleted: boolean;
   createdDate: string;   // ISO date-time string
   createdUser: string;
 
   modifiedDate: string | null;
   modifiedUser: string | null; // in sample it's " "
+
 }

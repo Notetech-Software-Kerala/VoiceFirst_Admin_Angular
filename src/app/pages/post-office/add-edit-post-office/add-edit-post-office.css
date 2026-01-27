@@ -100,3 +100,21 @@
     /* Ensure opacity is 1 if browser dims it */
     opacity: 1;
 }
+
+/* Deleted Chip Styling */
+.deleted-chip {
+    background-color: var(--color-bg-secondary, #fafafa) !important;
+    color: var(--color-text-secondary, #666) !important;
+    border: 1px dashed var(--color-border-hr, #ccc) !important;
+}
+
+.deleted-chip .mdc-evolution-chip__text-label {
+    text-decoration: line-through;
+}
+
+.deleted-chip button {
+    opacity: 1 !important;
+    color: var(--color-primary, #6259ce) !important;
+    /* Assuming primary color var or fallback */
+    margin-left: 4px;
+}

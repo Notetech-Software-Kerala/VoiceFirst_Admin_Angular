@@ -47,7 +47,12 @@ export class AddEditPostOffice {
       this.postOffice = this.data;
       const formData = {
         ...this.data,
-        zipCodes: this.data.zipCodes.map(z => z.zipCode)
+        zipCodes: this.data.zipCodes.map(z => ({
+          zipCode: z.zipCode,
+          zipCodeId: z.zipCodeId,
+          deleted: z.deleted,
+          active: z.active
+        }))
       };
       this.form.patchValue(formData);
     }
@@ -93,8 +98,9 @@ export class AddEditPostOffice {
     if (value) {
       const currentZips = this.form.get('zipCodes')?.value || [];
       // Optional: Check duplicates
-      if (!currentZips.includes(value)) {
-        const updatedZips = [...currentZips, value];
+      const exists = currentZips.some((z: any) => z.zipCode === value);
+      if (!exists) {
+        const updatedZips = [...currentZips, { zipCode: value, zipCodeId: 0, deleted: false, active: true }];
         this.form.get('zipCodes')?.setValue(updatedZips);
         this.form.get('zipCodes')?.updateValueAndValidity();
       }
@@ -104,16 +110,72 @@ export class AddEditPostOffice {
     event.chipInput!.clear();
   }
 
-  removeZip(zip: string): void {
+  removeZip(zip: any): void {
     const currentZips = this.form.get('zipCodes')?.value || [];
-    const index = currentZips.indexOf(zip);
+    const index = currentZips.findIndex((z: any) => z.zipCode === zip.zipCode);
 
-    if (index >= 0) {
+    if (index < 0) {
+      return;
+    }
+
+    // If editing an existing post office and this zip exists on the server,
+    // call the deleteZipcode API with its id. Otherwise just remove locally.
+    if (zip.zipCodeId && zip.zipCodeId !== 0) {
+      this.confirmationService.confirmDelete(`Zip code ${zip.zipCode}`).subscribe(confirmed => {
+        if (!confirmed) {
+          return;
+        }
+
+        this.postOfficeService.deleteZipcode(zip.zipCodeId).subscribe({
+          next: (res) => {
+            if ((res as any).statusCode === 200) {
+              // Don't remove from list, just mark as deleted so it shows the restore button
+              const updatedZips = [...currentZips];
+              updatedZips[index] = { ...updatedZips[index], deleted: true, active: false };
+              this.form.get('zipCodes')?.setValue(updatedZips);
+              this.form.get('zipCodes')?.updateValueAndValidity();
+
+              this.toastService.success('Zip code removed successfully', 'Success');
+            } else {
+              this.toastService.error((res as any).message || 'Failed to remove zip code', 'Failed');
+            }
+          },
+          error: () => {
+
+          }
+        });
+      });
+    } else {
       const updatedZips = [...currentZips];
       updatedZips.splice(index, 1);
       this.form.get('zipCodes')?.setValue(updatedZips);
       this.form.get('zipCodes')?.updateValueAndValidity();
     }
+  }
+
+  restoreZip(zip: any): void {
+    this.confirmationService.confirmRestore(zip.zipCode, `Do you want to restore zip code ${zip.zipCode}?`).subscribe(confirmed => {
+      if (confirmed) {
+        this.postOfficeService.restoreZipcode(zip.zipCodeId).subscribe({
+          next: (res) => {
+            if (res.statusCode === 200) {
+              const currentZips = this.form.get('zipCodes')?.value || [];
+              const updatedZips = currentZips.map((z: any) => {
+                if (z.zipCodeId === zip.zipCodeId) {
+                  return { ...z, deleted: false, active: true };
+                }
+                return z;
+              });
+              this.form.get('zipCodes')?.setValue(updatedZips);
+              this.toastService.success('Zip code restored successfully', 'Success');
+            }
+          },
+          error: (err) => {
+            console.log("error", err);
+          }
+        });
+      }
+    });
   }
 
   // Form submit function
@@ -223,18 +285,17 @@ export class AddEditPostOffice {
       changes.countryId = formValue.countryId;
     }
 
-    // Compare zip codes (array of strings vs array of objects in model)
-    // originalData.zipCodes is object array, formValue.zipCodes is string array
-    const originalZips = originalData.zipCodes.map(z => z.zipCode).sort().join(',');
-    const newZips = (formValue.zipCodes || []).sort().join(',');
+    // Zip codes: deletions are handled by deleteZipcode API.
+    // For updates we only send newly added zip codes.
+    const formZips = formValue.zipCodes || [];
 
-    if (originalZips !== newZips) {
-      changes.zipCodes = formValue.zipCodes.map((zip: string) => {
-        const existing = originalData.zipCodes.find(z => z.zipCode === zip);
-        return existing
-          ? { zipCodeId: existing.zipCodeId, zipCode: existing.zipCode, active: existing.active }
-          : { zipCodeId: 0, zipCode: zip, active: true };
-      });
+    // Filter out only new ones (zipCodeId == 0)
+    const addedZips = formZips.filter((z: any) => z.zipCodeId === 0);
+
+    if (addedZips.length > 0) {
+      changes.zipCodes = addedZips.map((z: any) => ({
+        zipCode: z.zipCode
+      }));
     }
 
     return changes;

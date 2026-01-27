@@ -53,4 +53,20 @@ export class PostOfficeService {
   }
 
 
+  //Zipcode related APIs
+
+  deleteZipcode(id: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(
+      `${this.base}${apiConfig.zipcode}/${id}`
+    );
+  }
+
+  restoreZipcode(id: number): Observable<ApiResponse<void>> {
+    return this.http.patch<ApiResponse<void>>(
+      `${this.base}${apiConfig.zipcodeRestore}/${id}`,
+      {}
+    );
+  }
+
+
 }

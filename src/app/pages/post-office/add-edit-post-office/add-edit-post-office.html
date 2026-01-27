@@ -28,12 +28,18 @@
             <!-- <small class="hint-text">Type value and press Enter</small> -->
             <mat-form-field appearance="outline" class="w-100">
                 <mat-chip-grid #chipGrid aria-label="Enter zip codes">
-                    @for (zip of form.get('zipCodes')?.value; track zip) {
-                    <mat-chip-row (removed)="removeZip(zip)">
-                        {{zip}}
-                        <button matChipRemove [attr.aria-label]="'remove ' + zip">
-                            <mat-icon style="font-size: .9rem; margin-top: 5px;">cancel</mat-icon>
+                    @for (zip of form.get('zipCodes')?.value; track zip.zipCode) {
+                    <mat-chip-row (removed)="removeZip(zip)" [class.deleted-chip]="zip.deleted">
+                        {{zip.zipCode}}
+                        @if (zip.deleted) {
+                        <button matChipRemove (click)="restoreZip(zip)" [attr.aria-label]="'restore ' + zip.zipCode">
+                            <mat-icon style="font-size: .9rem; margin-top: 4px;">restore</mat-icon>
                         </button>
+                        } @else {
+                        <button matChipRemove [attr.aria-label]="'remove ' + zip.zipCode">
+                            <mat-icon style="font-size: .9rem; margin-top: 4px;">cancel</mat-icon>
+                        </button>
+                        }
                     </mat-chip-row>
                     }
                     <input placeholder="Type zip code & press enter" [matChipInputFor]="chipGrid"
