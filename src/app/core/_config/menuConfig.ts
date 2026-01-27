@@ -25,11 +25,11 @@ export const MENU_CONFIG: MenuItem[] = [
   {
     id: 7,
     label: 'Master Data',
-    icon: 'group',
+    icon: 'settings',
     children: [
-      { id: 71, label: 'Country', route: '/country' },
-      { id: 72, label: 'Post Office', route: '/post-office' },
-      { id: 73, label: 'Program Action', route: '/program-action' },
+      { id: 71, label: 'Country', route: '/country', icon: 'globe' },
+      { id: 72, label: 'Post Office', route: '/post-office', icon: 'post' },
+      { id: 73, label: 'Program Action', route: '/program-action', icon: 'directions' },
     ],
   },
 ];
