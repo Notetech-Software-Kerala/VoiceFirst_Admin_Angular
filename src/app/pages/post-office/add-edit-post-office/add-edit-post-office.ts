@@ -198,7 +198,7 @@ export class AddEditPostOffice {
       const newPostOffice = {
         postOfficeName: this.form.value.postOfficeName,
         countryId: this.form.value.countryId,
-        zipCodes: this.form.value.zipCodes,
+        zipCodes: (this.form.value.zipCodes || []).map((z: any) => z.zipCode),
       }
       console.log("payload", newPostOffice);
       this.postOfficeService.create(newPostOffice).subscribe({
