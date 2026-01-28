@@ -8,6 +8,7 @@ import { ProgramActionService } from '../../../core/_state/program-action/progra
 import { ProgramActionActions } from '../../../core/_state/program-action/program-action.action';
 import { ToastService } from '../../../partials/shared_services/toast.service';
 import { UtilityService } from '../../../partials/shared_services/utility.service';
+import { ConfirmationService } from '../../../partials/shared_services/confirmation';
 
 @Component({
   selector: 'app-add-edit-program-action',
@@ -26,6 +27,7 @@ export class AddEditProgramActionComponent implements OnInit {
     private programActionService: ProgramActionService,
     private utilityService: UtilityService,
     private toastService: ToastService,
+    private confirmationService: ConfirmationService,
     @Inject(MAT_DIALOG_DATA) public data: ProgramActionModel | null,
   ) { }
 
@@ -85,12 +87,21 @@ export class AddEditProgramActionComponent implements OnInit {
         next: (res) => {
           console.log("response", res);
           if (res.statusCode === 201) {
-            this.toastService.success('Program Action added successfully');
+            this.toastService.success('Program Action added successfully', 'Success');
+
             this.closeDialog(res);
           }
+          this.isSubmitting = false;
         },
         error: (error) => {
-          console.log("error", error);
+          console.log("error", error.error);
+          this.isSubmitting = false;
+          if (error.error.statusCode === 422) {
+            const existingId = error.error.data?.actionId;
+            if (existingId) {
+              this.restoreProgramAction(existingId, this.form.value.actionName);
+            }
+          }
         }
       })
     }
@@ -106,18 +117,35 @@ export class AddEditProgramActionComponent implements OnInit {
         next: (res) => {
           console.log("response", res);
           if (res.statusCode === 200) {
-            this.toastService.success('Program Action updated successfully');
+            this.toastService.success('Program Action updated successfully', 'Success');
             this.closeDialog(res);
           }
-          else {
-            this.toastService.error(res.message);
-          }
+          this.isSubmitting = false;
+
         },
         error: (error) => {
-          this.toastService.error(error.message);
+          this.isSubmitting = false;
         }
       })
     }
+  }
+
+  restoreProgramAction(id: number, name: string) {
+    this.confirmationService.confirmRestore(name, `${name} already available, do you want to restore?`).subscribe(confirmed => {
+      if (confirmed) {
+        this.programActionService.restore(id).subscribe({
+          next: (restoreRes) => {
+            if (restoreRes.statusCode === 200) {
+              this.toastService.success('Program Action restored successfully', 'Success');
+              this.closeDialog(restoreRes);
+            }
+          },
+          error: (err) => {
+            console.log("error", err);
+          }
+        });
+      }
+    });
   }
 
   // Utility to mark all fields as touched to trigger validation messages

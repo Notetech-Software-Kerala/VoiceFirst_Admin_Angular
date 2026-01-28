@@ -14,12 +14,16 @@
           <label for="email" class="form-label">Email</label>
           <input id="email" type="email" class="form-control" formControlName="email" placeholder="you@example.com"
             autocomplete="email" [attr.aria-invalid]="f['email'].invalid && f['email'].touched" />
-          <div class="text-danger small mt-1" *ngIf="f['email'].touched && f['email'].errors?.['required']">
+          @if (f['email'].touched && f['email'].errors?.['required']) {
+          <div class="text-danger small mt-1">
             Email is required.
           </div>
-          <div class="text-danger small mt-1" *ngIf="f['email'].touched && f['email'].errors?.['email']">
+          }
+          @if (f['email'].touched && f['email'].errors?.['email']) {
+          <div class="text-danger small mt-1">
             Please enter a valid email address.
           </div>
+          }
         </div>
 
         <!-- Password -->
@@ -38,12 +42,16 @@
               </span>
             </button>
           </div>
-          <div class="text-danger small mt-1" *ngIf="f['password'].touched && f['password'].errors?.['required']">
+          @if (f['password'].touched && f['password'].errors?.['required']) {
+          <div class="text-danger small mt-1">
             Password is required.
           </div>
-          <div class="text-danger small mt-1" *ngIf="f['password'].touched && f['password'].errors?.['minlength']">
+          }
+          @if (f['password'].touched && f['password'].errors?.['minlength']) {
+          <div class="text-danger small mt-1">
             Must be at least 6 characters.
           </div>
+          }
         </div>
 
         <!-- Remember me + Forgot password -->

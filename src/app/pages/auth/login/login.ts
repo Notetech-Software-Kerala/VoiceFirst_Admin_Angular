@@ -38,7 +38,7 @@ export class Login {
     this.theme = localStorage.getItem('theme');
 
     this.loginForm = this.fb.group({
-      email: ['athul@notetech.com', [Validators.required, Validators.email]],
+      email: ['anil.p@notetech.com', [Validators.required, Validators.email]],
       password: ['123456', [Validators.required, Validators.minLength(6)]],
       remember: [false]
     });
@@ -88,17 +88,17 @@ export class Login {
     const payload = {
       emailOrMobile: this.loginForm.value.email,
       password: this.loginForm.value.password,
-      uniqueDeviceId: "a2f7c1ed-61b9-4e96-a5ae-53f2d35ca902"
+      uniqueDeviceId: "e3ee5465-e103-4200-b882-50da1c700e42"
     }
     this.authService.login(payload).subscribe({
       next: (res) => {
         this.submitting = false;
         this.router.navigate(['/dashboard']);
-        this.toast.success(`Welcome to Voice First`, { title: 'Login Success' });
+        this.toast.success(`Welcome to Voice First`, 'Login Success');
       },
       error: (err) => {
         this.submitting = false;
-        this.toast.error(`Login failed`, { title: 'Login Failed' });
+        this.toast.error(`Login failed`, 'Login Failed');
       }
     });
   }

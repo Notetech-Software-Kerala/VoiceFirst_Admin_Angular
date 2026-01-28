@@ -24,6 +24,28 @@
   --color-shadow: rgba(0, 0, 0, 0.05);
   --invalid-border-color: #ffaab2;
   --footer-text-color: #8d8d99;
+
+  /* Status Colors */
+  --color-status-success-bg: #dcfce7;
+  --color-status-success-text: #15803d;
+  --color-status-success-border: #bbf7d0;
+
+  --color-status-warning-bg: #fef9c3;
+  --color-status-warning-text: #854d0e;
+  --color-status-warning-border: #fde68a;
+
+  --color-status-error-bg: #fee2e2;
+  --color-status-error-text: #b91c1c;
+  --color-status-error-border: #fecaca;
+
+  /* Chip Colors */
+  --color-chip-bg: #f1f5f9;
+  --color-chip-text: #0f172a;
+  --color-chip-border: #e2e8f0;
+
+  --color-chip-more-bg: #e0f2fe;
+  --color-chip-more-text: #0369a1;
+  --color-chip-more-border: #bae6fd;
 }
 
 body.dark-theme {
@@ -38,6 +60,28 @@ body.dark-theme {
   --color-shadow: rgba(0, 0, 0, 0.3);
   --invalid-border-color: #dc3545;
   --footer-text-color: #73868f;
+
+  /* Status Colors (Dark) */
+  --color-status-success-bg: rgba(21, 128, 61, 0.2);
+  --color-status-success-text: #86efac;
+  --color-status-success-border: rgba(134, 239, 172, 0.2);
+
+  --color-status-warning-bg: rgba(133, 77, 14, 0.2);
+  --color-status-warning-text: #fde047;
+  --color-status-warning-border: rgba(253, 224, 71, 0.2);
+
+  --color-status-error-bg: rgba(185, 28, 28, 0.2);
+  --color-status-error-text: #fca5a5;
+  --color-status-error-border: rgba(252, 165, 165, 0.2);
+
+  /* Chip Colors (Dark) */
+  --color-chip-bg: rgba(241, 245, 249, 0.1);
+  --color-chip-text: #f8fafc;
+  --color-chip-border: rgba(255, 255, 255, 0.1);
+
+  --color-chip-more-bg: rgba(2, 125, 207, 0.2);
+  --color-chip-more-text: #7dd3fc;
+  --color-chip-more-border: rgba(56, 189, 248, 0.2);
 }
 
 body {

@@ -152,4 +152,24 @@ body.dark-theme .cdk-overlay-container .mat-mdc-menu-panel.row-menu .mdc-menu-su
   color: #6b7280;
 }
 
-/* --------------------------------- */
+/* Tooltip styling for '+N more' zip codes */
+/* Zip Overview Menu (Popover) */
+.cdk-overlay-container .mat-mdc-menu-panel.zip-overview-menu {
+  background-color: var(--color-bg-sidebar) !important;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--color-border-hr);
+  max-width: 320px;
+  min-width: 200px;
+}
+
+.cdk-overlay-container .mat-mdc-menu-panel.zip-overview-menu .mat-mdc-menu-content {
+  padding: 0 !important;
+}
+
+.zip-menu-container {
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}

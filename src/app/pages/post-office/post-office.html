@@ -1,11 +1,11 @@
 <div class="card">
-    <h2 class="page-title mb-3">Business Activity Management</h2>
+    <h2 class="page-title mb-3">Post Office Management</h2>
 
     <div class="d-flex flex-wrap align-items-center mb-3 gap-2">
 
         <!-- Left: search + filters -->
         <div class="d-flex flex-wrap align-items-center gap-2 flex-grow-1">
-            <app-search-bar [tooltipText]="'Search by activity name'" [value]="queryParams.SearchText || ''"
+            <app-search-bar [tooltipText]="'Search by action name'" [value]="queryParams.SearchText || ''"
                 [searchByOptions]="searchByOptions" [searchByValue]="queryParams.SearchBy || ''"
                 (valueChange)="onSearch($event)" (typingChange)="onTypingChange($event)"
                 (searchByChange)="onSearchByChange($event)">
@@ -13,35 +13,23 @@
             <app-filter-by [filters]="filterOptions" [activeFilters]="activeFilters" [clearSignal]="clearSignal"
                 (filterChange)="onFilterChange($event)">
             </app-filter-by>
+
+
         </div>
 
         <!-- Actions -->
         <div class="actions ms-auto d-flex flex-wrap gap-2">
-
-            <input #fileInput type="file" accept=".csv" class="d-none" />
-            <label class="btn-action btn-outline" for="fileInput">
-                <mat-icon class="msr">file_upload</mat-icon>
-                <span class="btn-text">Import</span>
-            </label>
-
             <button type="button" class="btn-action btn-outline">
                 <mat-icon class="msr">file_download</mat-icon>
                 <span class="btn-text">Export</span>
-            </button>
-
-            <button type="button" class="btn-action btn-outline">
-                <mat-icon class="msr">insert_chart</mat-icon>
-                <span class="btn-text">Report</span>
             </button>
 
             <button type="button" class="btn-action btn-primary" (click)="openAddDialog()">
                 <mat-icon class="msr">add</mat-icon>
                 <span class="btn-text">Add</span>
             </button>
-
         </div>
     </div>
-
 
     @let entries = activeFilters | keyvalue;
 
@@ -64,33 +52,59 @@
     <div class="table-responsive position-relative">
         @if ((loading$ | async) || isSearching) {
         <div class="progress position-absolute top-0 start-0 end-0" role="progressbar" aria-label="Loading"
-            style="z-index: 10; height: 3px; background-color: #ffffff;">
+            style="z-index: 10; height: 4px; background-color: transparent;">
             <div class="table-premium-loader"></div>
         </div>
         }
+
         <table class="table align-middle">
             <thead class="table-light">
                 <tr>
-                    <th appSortableColumn="ActivityName" [sortBy]="queryParams.SortBy"
-                        [sortOrder]="queryParams.SortOrder" (sortChange)="onSortChange($event)">Activity Name</th>
-
-                    <th appSortableColumn="Active" [sortBy]="queryParams.SortBy" [sortOrder]="queryParams.SortOrder"
-                        (sortChange)="onSortChange($event)">Status</th>
-
+                    <th appSortableColumn="postOfficeName" [sortBy]="queryParams.SortBy"
+                        [sortOrder]="queryParams.SortOrder" (sortChange)="onSortChange($event)">
+                        Post Office Name
+                    </th>
+                    <th>
+                        Zip Codes
+                    </th>
+                    <th appSortableColumn="active" [sortBy]="queryParams.SortBy" [sortOrder]="queryParams.SortOrder"
+                        (sortChange)="onSortChange($event)">
+                        Status
+                    </th>
                     <th>Created By</th>
                     <th>Modified By</th>
                     <th>Deleted By</th>
                     <th>Action</th>
+                </tr>
             </thead>
 
             <tbody>
-                @for (item of businessActivities; track item.activityId) {
+                @for (item of postOffices; track item.postOfficeId) {
                 <tr>
-                    <td>{{ item.activityName }}</td>
+                    <td>{{ item.postOfficeName }}</td>
+
+                    <td>
+                        @if (item.zipCodes.length) {
+                        @let sortedZips = sortZipCodes(item.zipCodes);
+                        <div class="zip-list">
+                            @for (zip of sortedZips.slice(0, 3); track zip.zipCodeId) {
+                            <span class="zip-chip" [class.zip-deleted]="zip.deleted">{{ zip.zipCode }}</span>
+                            }
+
+                            @if (sortedZips.length > 3) {
+                            <span class="zip-more" [matMenuTriggerFor]="zipMenu"
+                                [matMenuTriggerData]="{zips: sortedZips}">
+                                +{{ sortedZips.length - 3 }} more
+                            </span>
+                            }
+                        </div>
+                        } @else {
+                        <span>-</span>
+                        }
+                    </td>
 
                     <td><app-status-badge [item]="item"></app-status-badge></td>
 
-                    <!-- Dynamic columns handling nulls -->
                     <td>
                         @if (item.createdUser || item.createdDate) {
                         <div class="d-flex flex-column">
@@ -121,7 +135,8 @@
                         <div class="d-flex flex-column">
                             <small>{{ item.deletedUser || '-' }}</small>
                             <small>{{ utilityService.formatDateTimeDdMmYyyy12h(item.deletedDate) ||
-                                '-' }}</small>
+                                '-'
+                                }}</small>
                         </div>
                         } @else {
                         <span>-</span>
@@ -161,14 +176,13 @@
                             }
                         </mat-menu>
                     </td>
-
                 </tr>
                 }
 
-                @if (businessActivities.length === 0) {
+                @if (postOffices.length === 0) {
                 <tr>
                     <td colspan="6" class="text-center p-3">
-                        @if ((loading$ | async) || isSearching) {
+                        @if (loading$ | async) {
                         <small class="loading-text">Please wait...</small>
                         } @else {
                         <small class="no-data-text">No data found</small>
@@ -184,3 +198,13 @@
         (paginationChange)="onPaginationChange($event)">
     </app-pagination>
 </div>
+
+<mat-menu #zipMenu="matMenu" class="zip-overview-menu">
+    <ng-template matMenuContent let-zips="zips">
+        <div class="zip-menu-container" (click)="$event.stopPropagation()">
+            @for (zip of zips; track zip.zipCodeId) {
+            <span class="zip-chip" [class.zip-deleted]="zip.deleted">{{ zip.zipCode }}</span>
+            }
+        </div>
+    </ng-template>
+</mat-menu>

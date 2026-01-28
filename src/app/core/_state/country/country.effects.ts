@@ -1,23 +1,23 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { ProgramActionActions } from './program-action.action';
+import { CountryActions } from './country.action';
 import { catchError, map, switchMap, of } from 'rxjs';
-import { ProgramActionService } from './program-action.service';
+import { CountryService } from './country.service';
 
 @Injectable()
-export class ProgramActionEffects {
+export class CountryEffects {
   load$;
 
   constructor(
     private actions$: Actions,
-    private service: ProgramActionService
+    private service: CountryService
   ) {
     this.load$ = createEffect(() =>
       this.actions$.pipe(
-        ofType(ProgramActionActions.load),
+        ofType(CountryActions.load),
         switchMap(({ queryParams }) =>
           this.service.getAll(queryParams).pipe(
-            map((paginatedData) => ProgramActionActions.loadSuccess({
+            map((paginatedData) => CountryActions.loadSuccess({
               activities: paginatedData.items,
               totalCount: paginatedData.totalCount,
               pageNumber: paginatedData.pageNumber,
@@ -26,7 +26,7 @@ export class ProgramActionEffects {
             })),
             catchError((err) =>
               of(
-                ProgramActionActions.loadFailure({
+                CountryActions.loadFailure({
                   error: err?.message ?? 'Load failed',
                 })
               )

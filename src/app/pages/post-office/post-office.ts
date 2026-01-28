@@ -1,42 +1,31 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
+import { PostOfficeModel } from '../../core/_state/post-office/post-office.model';
+import { Observable, Subject, takeUntil } from 'rxjs';
+import { QueryParameterModel } from '../../core/_models/query-parameter.model';
+import { FilterBy, FilterOption } from '../../partials/shared_modules/filter-by/filter-by';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { ProgramActionActions } from '../../core/_state/program-action/program-action.action';
-import { ProgramActionModel } from '../../core/_state/program-action/program-action.model';
-import {
-  selectAllProgramActions,
-  selectProgramActionLoading,
-  selectProgramActionTotalCount,
-  selectProgramActionPageNumber,
-  selectProgramActionPageSize,
-  selectProgramActionTotalPages
-} from '../../core/_state/program-action/program-action.selectors';
-import { ConfirmDialog } from '../../partials/shared_modules/confirm-dialog/confirm-dialog';
-import { SearchBar } from '../../partials/shared_modules/search-bar/search-bar';
-import { Pagination } from '../../partials/shared_modules/pagination/pagination';
-import { StatusBadge } from '../../partials/shared_modules/status-badge/status-badge';
+import { ConfirmationService } from '../../partials/shared_services/confirmation';
+import { UtilityService } from '../../partials/shared_services/utility.service';
+import { PostOfficeService } from '../../core/_state/post-office/post-office.service';
+import { ToastService } from '../../partials/shared_services/toast.service';
+import { selectAllPostOffices, selectPostOfficeLoading, selectPostOfficeTotalCount, selectPostOfficeTotalPages } from '../../core/_state/post-office/post-office.selectors';
+import { PostOfficeActions } from '../../core/_state/post-office/post-office.action';
+import { AddEditPostOffice } from './add-edit-post-office/add-edit-post-office';
 import { SortableColumnDirective, SortEvent } from '../../partials/shared_directives/sortable-column';
 import { MaterialModule } from '../../material.module';
-import { Subject, takeUntil, Observable, of } from 'rxjs';
-import { QueryParameterModel } from '../../core/_models/query-parameter.model';
-import { ConfirmationService } from '../../partials/shared_services/confirmation';
-import { AddEditProgramActionComponent } from './add-edit-program-action/add-edit-program-action.component';
-import { FilterBy, FilterOption } from '../../partials/shared_modules/filter-by/filter-by';
-import { UtilityService } from '../../partials/shared_services/utility.service';
-import { ProgramActionService } from '../../core/_state/program-action/program-action.service';
-import { ToastService } from '../../partials/shared_services/toast.service';
-import { CommonModule } from '@angular/common';
+import { StatusBadge } from "../../partials/shared_modules/status-badge/status-badge";
+import { SearchBar } from '../../partials/shared_modules/search-bar/search-bar';
+import { Pagination } from '../../partials/shared_modules/pagination/pagination';
 
 @Component({
-  selector: 'app-program-action',
-  imports: [SearchBar, Pagination, StatusBadge, SortableColumnDirective, MaterialModule, FilterBy, CommonModule],
-  templateUrl: './program-action.html',
-  styleUrl: './program-action.css',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  selector: 'app-post-office',
+  imports: [MaterialModule, StatusBadge, SearchBar, FilterBy, SortableColumnDirective, Pagination],
+  templateUrl: './post-office.html',
+  styleUrl: './post-office.css',
 })
-
-export class ProgramAction implements OnInit, OnDestroy {
-  programActions: ProgramActionModel[] = [];
+export class PostOffice {
+  postOffices: PostOfficeModel[] = [];
   loading$!: Observable<boolean>;
   totalCount$!: Observable<number>;
   private destroy$ = new Subject<void>();
@@ -44,7 +33,9 @@ export class ProgramAction implements OnInit, OnDestroy {
 
   // SearchBy dropdown options
   searchByOptions = [
-    { label: 'Action Name', value: 'ActionName' },
+    { label: 'Post Office Name', value: 'PostOfficeName' },
+    { label: 'Country', value: 'CountryName' },
+    { label: 'ZIP Code', value: 'ZipCode' },
     { label: 'Created By', value: 'CreatedUser' },
     { label: 'Updated By', value: 'UpdatedUser' },
     { label: 'Deleted By', value: 'DeletedUser' }
@@ -72,8 +63,8 @@ export class ProgramAction implements OnInit, OnDestroy {
       options: ['Active', 'Inactive', 'Deleted'],
       single: true
     }
-  ];
 
+  ];
   activeFilters: Record<string, string[]> = {};
   clearSignal = 0;
   constructor(
@@ -82,34 +73,34 @@ export class ProgramAction implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private confirmationService: ConfirmationService,
     public utilityService: UtilityService,
-    private programActionService: ProgramActionService,
+    private postOfficeService: PostOfficeService,
     private toastService: ToastService,
   ) { }
 
   ngOnInit() {
-    this.loading$ = this.store.select(selectProgramActionLoading);
-    this.totalCount$ = this.store.select(selectProgramActionTotalCount);
+    this.loading$ = this.store.select(selectPostOfficeLoading);
+    this.totalCount$ = this.store.select(selectPostOfficeTotalCount);
 
     // Subscribe to pagination metadata
-    this.store.select(selectProgramActionTotalCount)
+    this.store.select(selectPostOfficeTotalCount)
       .pipe(takeUntil(this.destroy$))
       .subscribe(count => {
         this.totalCount = count;
         this.cdr.markForCheck();
       });
 
-    this.store.select(selectProgramActionTotalPages)
+    this.store.select(selectPostOfficeTotalPages)
       .pipe(takeUntil(this.destroy$))
       .subscribe(pages => {
         this.totalPages = pages;
         this.cdr.markForCheck();
       });
 
-    this.store.select(selectAllProgramActions)
+    this.store.select(selectAllPostOffices)
       .pipe(takeUntil(this.destroy$))
       .subscribe(data => {
-        this.programActions = data;
-        console.log("Program Actions", this.programActions);
+        this.postOffices = data;
+        console.log("Post Offices", this.postOffices);
 
         this.cdr.markForCheck();
       });
@@ -133,7 +124,7 @@ export class ProgramAction implements OnInit, OnDestroy {
 
     console.log("Query Params 11", params);
 
-    this.store.dispatch(ProgramActionActions.load({ queryParams: params }));
+    this.store.dispatch(PostOfficeActions.load({ queryParams: params }));
   }
 
   // Search handler - receives debounced value from search-bar
@@ -259,68 +250,67 @@ export class ProgramAction implements OnInit, OnDestroy {
 
 
   // Delete confirmation using shared service
-  onDelete(item: ProgramActionModel) {
-    this.confirmationService.confirmDelete(item.actionName)
+  onDelete(item: PostOfficeModel) {
+    this.confirmationService.confirmDelete(item.postOfficeName)
       .pipe(takeUntil(this.destroy$))
       .subscribe(confirmed => {
         if (confirmed) {
-          this.programActionService.delete(item.actionId).subscribe({
+          this.postOfficeService.delete(item.postOfficeId).subscribe({
             next: (res) => {
               console.log("response", res);
               if (res.statusCode === 200) {
-                this.toastService.success('Program Action deleted successfully', 'Success');
+                this.toastService.success('Post Office deleted successfully', 'Success');
                 this.loadData();
               }
             },
             error: (error) => {
               console.log("error", error);
-              this.toastService.error(error.message);
             }
           })
         }
       });
   }
 
-  onRestore(item: ProgramActionModel) {
-    this.confirmationService.confirmRestore(item.actionName)
+  onRestore(item: PostOfficeModel) {
+    this.confirmationService.confirmRestore(item.postOfficeName)
       .pipe(takeUntil(this.destroy$))
       .subscribe(confirmed => {
         if (confirmed) {
-          this.programActionService.restore(item.actionId).subscribe({
+          this.postOfficeService.restore(item.postOfficeId).subscribe({
             next: (res) => {
               console.log("response", res);
               if (res.statusCode === 200) {
-                this.toastService.success('Program Action deleted successfully', 'Success');
+                this.toastService.success('Post Office restored successfully', 'Success');
                 this.loadData();
               }
             },
             error: (error) => {
               console.log("error", error);
-              this.toastService.error(error.message);
+
             }
           })
         }
       });
   }
 
-  onSuspend(item: ProgramActionModel) {
+  onSuspend(item: PostOfficeModel) {
     const status = item.active ? false : true;
-    this.confirmationService.confirmSuspend(item.actionName, status)
+    this.confirmationService.confirmSuspend(item.postOfficeName, status)
       .pipe(takeUntil(this.destroy$))
       .subscribe(confirmed => {
         if (confirmed) {
-          const updatedProgramAction = {
+          const updatedPostOffice = {
             active: status,
           }
-          this.programActionService.update(item.actionId, updatedProgramAction).subscribe({
+          this.postOfficeService.update(item.postOfficeId, updatedPostOffice).subscribe({
             next: (res) => {
               console.log("response", res);
               if (res.statusCode === 200) {
-                this.toastService.success(`Program Action ${item.active ? 'Suspended' : 'Reinstated'} successfully`, 'Success');
-                this.store.dispatch(ProgramActionActions.update({
+                this.toastService.success(`Post Office ${item.active ? 'Suspended' : 'Reinstated'} Successfully`, 'Success');
+                this.store.dispatch(PostOfficeActions.update({
                   activity: {
-                    id: item.actionId,
-                    changes: updatedProgramAction
+                    id: item.postOfficeId,
+                    changes: updatedPostOffice
                   }
                 }));
               }
@@ -335,7 +325,7 @@ export class ProgramAction implements OnInit, OnDestroy {
 
   // Open add dialog
   openAddDialog() {
-    const dialogRef = this.dialog.open(AddEditProgramActionComponent, {
+    const dialogRef = this.dialog.open(AddEditPostOffice, {
       width: '500px',
       disableClose: true,
       data: null
@@ -343,14 +333,16 @@ export class ProgramAction implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
+        console.log("result", result);
+
         if (result.statusCode === 201) {
           // Add new item
-          this.store.dispatch(ProgramActionActions.add({ activity: result.data }));
+          this.store.dispatch(PostOfficeActions.add({ activity: result.data }));
         } else if (result.statusCode === 200) {
           // Update existing item - use correct NgRx Entity format
-          this.store.dispatch(ProgramActionActions.update({
+          this.store.dispatch(PostOfficeActions.update({
             activity: {
-              id: result.data.actionId,
+              id: result.data.postOfficeId,
               changes: result.data
             }
           }));
@@ -360,8 +352,8 @@ export class ProgramAction implements OnInit, OnDestroy {
   }
 
   // Open edit dialog
-  openEditDialog(item: ProgramActionModel) {
-    const dialogRef = this.dialog.open(AddEditProgramActionComponent, {
+  openEditDialog(item: PostOfficeModel) {
+    const dialogRef = this.dialog.open(AddEditPostOffice, {
       width: '500px',
       disableClose: true,
       data: item
@@ -370,14 +362,27 @@ export class ProgramAction implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         // Dispatch update action
-        this.store.dispatch(ProgramActionActions.update({
+        this.store.dispatch(PostOfficeActions.update({
           activity: {
-            id: result.data.actionId,
+            id: result.data.postOfficeId,
             changes: result.data
           }
         }));
       }
     });
   }
+  // Sort zip codes: active first, then deleted
+  sortZipCodes(zips: any[]): any[] {
+    if (!zips) return [];
+    // structuredClone or spread to avoid mutation if needed, though sort makes a copy usually if we do it right
+    // actually array.sort mutates, so we must copy first
+    return [...zips].sort((a, b) => {
+      // deleted=true should be last.
+      // a.deleted vs b.deleted
+      const aDeleted = !!a.deleted;
+      const bDeleted = !!b.deleted;
+      if (aDeleted === bDeleted) return 0;
+      return aDeleted ? 1 : -1;
+    });
+  }
 }
-

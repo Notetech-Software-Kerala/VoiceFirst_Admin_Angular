@@ -6,6 +6,7 @@ import { MaterialModule } from '../../../material.module';
 import { BusinessActivityService } from '../../../core/_state/business-activity/business-activity.service';
 import { ToastService } from '../../../partials/shared_services/toast.service';
 import { finalize } from 'rxjs';
+import { ConfirmationService } from '../../../partials/shared_services/confirmation';
 
 @Component({
   selector: 'app-add-edit-business-activity',
@@ -23,7 +24,8 @@ export class AddEditBusinessActivity implements OnInit {
     private dialogRef: MatDialogRef<AddEditBusinessActivity>,
     @Inject(MAT_DIALOG_DATA) public data: BusinessActivityModel | null,
     private businessActivityService: BusinessActivityService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private confirmationService: ConfirmationService
   ) { }
 
   ngOnInit() {
@@ -75,15 +77,20 @@ export class AddEditBusinessActivity implements OnInit {
       .subscribe({
         next: (res) => {
           if (res.statusCode === 201) {
-            this.toastService.success('Business Activity added successfully');
+            this.toastService.success('Business Activity added successfully', 'Success');
             this.closeDialog(res);
-          } else {
-            this.toastService.error(res.message);
           }
+          this.isSubmitting = false;
         },
         error: (err) => {
           console.error(err);
-          this.toastService.error('Failed to add Business Activity');
+          this.isSubmitting = false;
+          if (err.error.statusCode === 422) {
+            const existingId = err.error.data?.activityId;
+            if (existingId) {
+              this.restoreBusinessActivity(existingId, payload.ActivityName);
+            }
+          }
         }
       });
   }
@@ -94,17 +101,34 @@ export class AddEditBusinessActivity implements OnInit {
       .subscribe({
         next: (res) => {
           if (res.statusCode === 200) {
-            this.toastService.success('Business Activity updated successfully');
+            this.toastService.success('Business Activity updated successfully', 'Success');
             this.closeDialog(res);
-          } else {
-            this.toastService.error(res.message);
           }
+          this.isSubmitting = false;
         },
         error: (err) => {
           console.error(err);
-          this.toastService.error('Failed to update Business Activity');
+          this.isSubmitting = false;
         }
       });
+  }
+
+  restoreBusinessActivity(id: number, name: string) {
+    this.confirmationService.confirmRestore(name, `${name} already available, do you want to restore?`).subscribe(confirmed => {
+      if (confirmed) {
+        this.businessActivityService.restore(id).subscribe({
+          next: (restoreRes) => {
+            if (restoreRes.statusCode === 200) {
+              this.toastService.success('Business Activity restored successfully', 'Success');
+              this.closeDialog(restoreRes);
+            }
+          },
+          error: (e) => {
+            console.log("error", e);
+          }
+        });
+      }
+    });
   }
 
   get f() {

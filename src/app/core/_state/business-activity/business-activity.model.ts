@@ -1,6 +1,4 @@
-/**
- * Business Activity Model matching the C# backend structure
- */
+
 export interface BusinessActivityModel {
   activityId: number;
   activityName: string;

@@ -1,7 +1,7 @@
 import { createReducer, on } from '@ngrx/store';
 import { createEntityAdapter, EntityAdapter } from '@ngrx/entity';
 import { ProgramActionActions } from './program-action.action';
-import { ProgramActionState as ProgramActionState } from './program-action.state';
+import { ProgramActionState } from './program-action.state';
 import { ProgramActionModel } from './program-action.model';
 
 export const adapter: EntityAdapter<ProgramActionModel> =

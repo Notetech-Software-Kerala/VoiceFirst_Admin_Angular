@@ -458,7 +458,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 2px;
+    padding: 10px 2px 10px 9px;
     text-decoration: none;
     color: var(--color-text-primary);
     border-radius: 8px;
@@ -608,7 +608,7 @@
 
 /* Submenus compact */
 .submenu {
-    padding-left: 32px;
+    padding-left: 29px;
 }
 
 /* .submenu-link {
