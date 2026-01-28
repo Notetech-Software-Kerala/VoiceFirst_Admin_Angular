@@ -50,10 +50,12 @@
     }
 
     <div class="table-responsive position-relative">
-        <div *ngIf="(loading$ | async) || isSearching" class="progress position-absolute top-0 start-0 end-0"
-            role="progressbar" aria-label="Loading" style="z-index: 10; height: 4px; background-color: transparent;">
+        @if ((loading$ | async) || isSearching) {
+        <div class="progress position-absolute top-0 start-0 end-0" role="progressbar" aria-label="Loading"
+            style="z-index: 10; height: 4px; background-color: transparent;">
             <div class="table-premium-loader"></div>
         </div>
+        }
 
         <table class="table align-middle">
             <thead class="table-light">

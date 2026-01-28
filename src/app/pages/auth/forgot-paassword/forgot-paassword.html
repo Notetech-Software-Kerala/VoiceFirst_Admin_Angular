@@ -17,10 +17,11 @@
                     <input id="email" type="text" class="form-control" formControlName="email"
                         placeholder="Enter email or phone"
                         [attr.aria-invalid]="fEmail['email'].invalid && fEmail['email'].touched">
-                    <div class="text-danger small mt-1"
-                        *ngIf="fEmail['email'].touched && fEmail['email'].errors?.['required']">
+                    @if (fEmail['email'].touched && fEmail['email'].errors?.['required']) {
+                    <div class="text-danger small mt-1">
                         This field is required.
                     </div>
+                    }
                 </div>
 
                 <button class="button-primary w-100 mb-3" type="submit" [disabled]="emailForm.invalid || submitting">
@@ -40,13 +41,16 @@
                     <input id="otp" type="text" class="form-control text-center" formControlName="otp"
                         placeholder="••••" maxlength="6"
                         [attr.aria-invalid]="fOtp['otp'].invalid && fOtp['otp'].touched">
-                    <div class="text-danger small mt-1" *ngIf="fOtp['otp'].touched && fOtp['otp'].errors?.['required']">
+                    @if (fOtp['otp'].touched && fOtp['otp'].errors?.['required']) {
+                    <div class="text-danger small mt-1">
                         OTP is required.
                     </div>
-                    <div class="text-danger small mt-1"
-                        *ngIf="fOtp['otp'].touched && fOtp['otp'].errors?.['minlength']">
+                    }
+                    @if (fOtp['otp'].touched && fOtp['otp'].errors?.['minlength']) {
+                    <div class="text-danger small mt-1">
                         OTP must be at least 4 digits.
                     </div>
+                    }
                 </div>
 
                 <button class="button-primary w-100 mb-3" type="submit" [disabled]="otpForm.invalid || submitting">
@@ -79,14 +83,16 @@
                             <i class="fa-solid eye-icon" [ngClass]="hidePassword ? 'fa-eye' : 'fa-eye-slash'"></i>
                         </button>
                     </div>
-                    <div class="text-danger small mt-1"
-                        *ngIf="fReset['password'].touched && fReset['password'].errors?.['required']">
+                    @if (fReset['password'].touched && fReset['password'].errors?.['required']) {
+                    <div class="text-danger small mt-1">
                         Password is required.
                     </div>
-                    <div class="text-danger small mt-1"
-                        *ngIf="fReset['password'].touched && fReset['password'].errors?.['minlength']">
+                    }
+                    @if (fReset['password'].touched && fReset['password'].errors?.['minlength']) {
+                    <div class="text-danger small mt-1">
                         Must be at least 6 characters.
                     </div>
+                    }
                 </div>
 
                 <!-- Confirm Password -->
@@ -103,10 +109,11 @@
                                 [ngClass]="hideConfirmPassword ? 'fa-eye' : 'fa-eye-slash'"></i>
                         </button>
                     </div>
-                    <div class="text-danger small mt-1"
-                        *ngIf="fReset['confirmPassword'].touched && resetForm.hasError('mismatch')">
+                    @if (fReset['confirmPassword'].touched && resetForm.hasError('mismatch')) {
+                    <div class="text-danger small mt-1">
                         Passwords do not match.
                     </div>
+                    }
                 </div>
 
                 <button class="button-primary w-100 mb-3" type="submit" [disabled]="resetForm.invalid || submitting">
