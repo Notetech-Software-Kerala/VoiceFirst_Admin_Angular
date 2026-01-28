@@ -21,11 +21,18 @@ export const apiConfig = {
     postOfficeRestore: '/post-office/recover',
 
     // Zipcode
-
     zipcode: '/zipcode',
     zipcodeRestore: '/zipcode/recover',
 
     //Country
     country: '/country',
-    getCountryLookup: '/country/lookup'
+    getCountryLookup: '/country/lookup',
+
+    //Application
+    getApplicationLookup: '/application/lookup',
+
+    //Program
+    program: '/program',
+    getProgramLookup: '/program/lookup',
+    programRestore: '/program/recover',
 };
