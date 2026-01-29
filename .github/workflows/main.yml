@@ -1,0 +1,94 @@
+name: Deploy VoiceFirst_Admin Angular App
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: [self-hosted, windows]
+    env:
+      IIS_PATH: D:\VoiceFirst_Admin_Angular
+      APP_POOL_NAME: VoiceFirstAdminWeb
+      SITE_NAME: VoiceFirstAdminWeb
+      IIS_PORT: 8011
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Clean previous Angular build
+        run: |
+          if (Test-Path dist) {
+            Remove-Item -Recurse -Force dist
+          }
+        shell: powershell
+
+      - name: Build Angular app
+        run: npm run build
+
+      - name: Create or update IIS App Pool and Website
+        run: |
+          Import-Module WebAdministration
+
+          # Ensure IIS_PATH exists
+          if (!(Test-Path "$env:IIS_PATH")) {
+            New-Item -ItemType Directory -Path $env:IIS_PATH | Out-Null
+          }
+
+          # Create or update App Pool
+          if (!(Get-WebAppPoolState -Name $env:APP_POOL_NAME -ErrorAction SilentlyContinue)) {
+            New-WebAppPool -Name $env:APP_POOL_NAME
+          }
+          Set-ItemProperty IIS:\AppPools\$env:APP_POOL_NAME -Name managedRuntimeVersion -Value "v4.0"
+
+          # Create or update Website
+          if (!(Test-Path IIS:\Sites\$env:SITE_NAME)) {
+            New-Website -Name $env:SITE_NAME -Port $env:IIS_PORT -PhysicalPath $env:IIS_PATH -ApplicationPool $env:APP_POOL_NAME
+          } else {
+            Set-ItemProperty IIS:\Sites\$env:SITE_NAME -Name applicationPool -Value $env:APP_POOL_NAME
+            Set-ItemProperty IIS:\Sites\$env:SITE_NAME -Name physicalPath -Value $env:IIS_PATH
+          }
+        shell: powershell
+
+      - name: Stop IIS App Pool
+        run: |
+          Import-Module WebAdministration
+          if ((Get-WebAppPoolState -Name $env:APP_POOL_NAME).Value -eq 'Started') {
+            Stop-WebAppPool -Name $env:APP_POOL_NAME
+          }
+        shell: powershell
+
+      - name: Clean previous IIS deployment
+        run: |
+          if (Test-Path "$env:IIS_PATH") {
+            Remove-Item -Recurse -Force "$env:IIS_PATH\*"
+          }
+        shell: powershell
+
+      - name: Copy build output to IIS web root
+        run: |
+          if (Test-Path "$env:IIS_PATH") {
+            Remove-Item -Recurse -Force "$env:IIS_PATH\*"
+          } else {
+            New-Item -ItemType Directory -Path $env:IIS_PATH
+          }
+          Copy-Item -Path dist\* -Destination $env:IIS_PATH -Recurse
+        shell: powershell
+
+      - name: Start IIS App Pool
+        run: |
+          Import-Module WebAdministration
+          if ((Get-WebAppPoolState -Name $env:APP_POOL_NAME).Value -ne 'Started') {
+            Start-WebAppPool -Name $env:APP_POOL_NAME
+          }
+        shell: powershell
+
+      - name: Notify deployment complete
+        run: echo "Deployment complete."

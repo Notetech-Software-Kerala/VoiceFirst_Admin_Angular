@@ -53,7 +53,7 @@ export class AddEditProgram {
     this.form = this.fb.group({
       programName: ['', Validators.required],
       label: ['', Validators.required],
-      route: ['', Validators.required],
+      route: ['', [Validators.required, Validators.pattern('^[A-Za-z0-9](.*[A-Za-z0-9])?$')]],
       platformId: [null, Validators.required],
       companyId: [null],
       actionIds: this.fb.array([]) // Initialize as FormArray for checkboxes
@@ -85,6 +85,19 @@ export class AddEditProgram {
       next: (response: any) => {
         if (response && response.data) {
           this.originalData = response.data;
+
+          if (this.isEditMode && response.data.action) {
+            const existingIds = new Set(this.programActionList.map(a => a.actionId));
+            response.data.action.forEach((programAction: ProgramActionModel) => {
+              if (!existingIds.has(programAction.actionId)) {
+                this.programActionList.push(programAction);
+                existingIds.add(programAction.actionId);
+              }
+            });
+            // Optional: Sort by name so they appear integrated
+            this.programActionList.sort((a, b) => a.actionName.localeCompare(b.actionName));
+          }
+
           this.patchForm(response.data);
         }
       },
@@ -105,9 +118,18 @@ export class AddEditProgram {
     });
 
     // Handle actionIds Checkboxes
-    const actionIds = data.actionIds || data.action?.map((a: any) => a.actionId) || [];
+    // Select only those actions that are marked ACTIVE in the fetched program data
+    const activeActions = data.action
+      ? data.action.filter((a: any) => a.active === true)
+      : [];
+
+    const activeActionIds = activeActions.map((a: any) => a.actionId);
+
+    // If we have action data, use that. Otherwise fallback to actionIds if present (e.g. from create payload simulation)
+    const idsToCheck = data.action ? activeActionIds : (data.actionIds || []);
+
     this.programActionList.forEach(action => {
-      if (actionIds.includes(action.actionId)) {
+      if (idsToCheck.includes(action.actionId)) {
         this.toggleAction(action.actionId, true);
       }
     });
@@ -203,6 +225,8 @@ export class AddEditProgram {
         return;
       }
 
+      console.log("Update payload", changes);
+
       this.programService.update(this.programId, changes).subscribe({
         next: (res) => {
           this.submitting = false;
@@ -244,14 +268,43 @@ export class AddEditProgram {
       changes.companyId = formValue.companyId;
     }
 
-    const originalActionIds = originalData.action?.map(a => a.actionId) || [];
-    const newActionIds = formValue.actionIds || [];
+    // Advanced Action Update Logic
+    const originalActionMap = new Map<number, boolean>();
+    originalData.action?.forEach(a => originalActionMap.set(a.actionId, a.active));
 
-    const sortedOriginal = [...originalActionIds].sort();
-    const sortedNew = [...newActionIds].sort();
+    const currentActionIds = new Set<number>(formValue.actionIds);
 
-    if (JSON.stringify(sortedOriginal) !== JSON.stringify(sortedNew)) {
-      changes.actionIds = newActionIds;
+    const insertActions: number[] = [];
+    const updateActions: { actionId: number, active: boolean }[] = [];
+
+    // Calculate Insertions (Present in Form, Not in Original)
+    currentActionIds.forEach(id => {
+      if (!originalActionMap.has(id)) {
+        insertActions.push(id);
+      }
+    });
+
+    // Calculate Updates (Present in Original, Status Changed)
+    originalActionMap.forEach((wasActive, id) => {
+      const isSelected = currentActionIds.has(id);
+
+      // Case 1: Was Active, Now Unchecked -> Deactivate
+      if (wasActive && !isSelected) {
+        updateActions.push({ actionId: id, active: false });
+      }
+
+      // Case 2: Was Inactive, Now Checked -> Activate
+      if (!wasActive && isSelected) {
+        updateActions.push({ actionId: id, active: true });
+      }
+    });
+
+    if (insertActions.length > 0) {
+      changes.insertActions = insertActions;
+    }
+
+    if (updateActions.length > 0) {
+      changes.updateActions = updateActions;
     }
 
     return changes;
