@@ -2,11 +2,6 @@ name: Deploy VoiceFirst_Admin Angular App
 
 on:
   workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Deployment environment (e.g., production, staging)'
-        required: true
-        default: 'production'
 
 jobs:
   build-and-deploy:
@@ -16,7 +11,8 @@ jobs:
       APP_POOL_NAME: VoiceFirstAdminWeb
       SITE_NAME: VoiceFirstAdminWeb
       IIS_PORT: 8011
-    steps:
+    
+      steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -37,7 +33,7 @@ jobs:
         shell: pwsh
 
       - name: Build Angular app
-        run: npm run build -- --configuration ${{ github.event.inputs.environment }}
+        run: npm run build
 
       - name: Create or update IIS App Pool and Website
         run: |
@@ -97,4 +93,4 @@ jobs:
         shell: pwsh
 
       - name: Notify deployment complete
-        run: echo "Deployment to ${{ github.event.inputs.environment }} complete."
+        run: echo "Deployment complete."
