@@ -42,6 +42,12 @@ export class SearchBar implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   ngOnInit() {
+    // Default to first option if not set and options exist
+    if (!this.searchByValue && this.searchByOptions.length > 0) {
+      this.searchByValue = this.searchByOptions[0].value;
+      this.searchByChange.emit(this.searchByValue);
+    }
+
     // Setup debounced search
     this.searchSubject$.pipe(
       debounceTime(this.debounceTime),
@@ -77,6 +83,6 @@ export class SearchBar implements OnInit, OnDestroy {
 
   getSelectedLabel(): string {
     const option = this.searchByOptions.find(o => o.value === this.searchByValue);
-    return option ? option.label : 'All Fields';
+    return option?.label || '';
   }
 }

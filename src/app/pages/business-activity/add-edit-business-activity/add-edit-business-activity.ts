@@ -6,7 +6,7 @@ import { MaterialModule } from '../../../material.module';
 import { BusinessActivityService } from '../../../core/_state/business-activity/business-activity.service';
 import { ToastService } from '../../../partials/shared_services/toast.service';
 import { finalize } from 'rxjs';
-import { ConfirmationService } from '../../../partials/shared_services/confirmation';
+import { ConfirmationService } from '../../../partials/shared_directives/confirmation';
 
 @Component({
   selector: 'app-add-edit-business-activity',

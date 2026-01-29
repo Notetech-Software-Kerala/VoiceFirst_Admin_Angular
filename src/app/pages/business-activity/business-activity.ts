@@ -11,7 +11,7 @@ import {
   selectBusinessActivityTotalPages
 } from '../../core/_state/business-activity/business-activity.selectors';
 import { AddEditBusinessActivity } from './add-edit-business-activity/add-edit-business-activity';
-import { ConfirmationService } from '../../partials/shared_services/confirmation';
+import { ConfirmationService } from '../../partials/shared_directives/confirmation';
 import { SearchBar } from '../../partials/shared_modules/search-bar/search-bar';
 import { Pagination } from '../../partials/shared_modules/pagination/pagination';
 import { MaterialModule } from '../../material.module';

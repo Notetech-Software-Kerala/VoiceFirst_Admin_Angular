@@ -8,7 +8,7 @@ import { ProgramActionService } from '../../../core/_state/program-action/progra
 import { ProgramActionActions } from '../../../core/_state/program-action/program-action.action';
 import { ToastService } from '../../../partials/shared_services/toast.service';
 import { UtilityService } from '../../../partials/shared_services/utility.service';
-import { ConfirmationService } from '../../../partials/shared_services/confirmation';
+import { ConfirmationService } from '../../../partials/shared_directives/confirmation';
 
 @Component({
   selector: 'app-add-edit-program-action',

@@ -1,0 +1,126 @@
+<div class="main-container">
+    <div class="card">
+
+        <div class="actions ms-auto d-flex flex-wrap gap-2">
+            <button type="button" class="btn-action btn-outline" (click)="goBack()">
+                <mat-icon class="msr">arrow_back</mat-icon>
+                <span class="btn-text">Back</span>
+            </button>
+        </div>
+
+        <div class="card-body">
+            <h5 class="mb-4">{{title}}</h5>
+            <form [formGroup]="form" class="row g-3">
+
+                <div class="col-md-6">
+                    <label for="programName" class="form-label">Program Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="programName" formControlName="programName"
+                        placeholder="Enter program name" />
+                    @if (form.get('programName')?.touched && form.get('programName')?.invalid) {
+                    <div class="text-danger small mt-1">
+                        @if (form.get('programName')?.hasError('required')) {
+                        Program Name is required.
+                        }
+                    </div>
+                    }
+                </div>
+
+                <div class="col-md-6">
+                    <label for="label" class="form-label">Label <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="label" formControlName="label"
+                        placeholder="Enter label" />
+                    @if (form.get('label')?.touched && form.get('label')?.invalid) {
+                    <div class="text-danger small mt-1">
+                        @if (form.get('label')?.hasError('required')) {
+                        Label is required.
+                        }
+                    </div>
+                    }
+                </div>
+
+                <div class="col-md-6">
+                    <label for="platformId" class="form-label">Platform <span class="text-danger">*</span></label>
+                    <select class="form-control" id="platformId" formControlName="platformId">
+                        <option [ngValue]="null" disabled>Select Platform</option>
+                        @for (platform of platformList; track platform.platformId) {
+                        <option [value]="platform.platformId">{{ platform.platformName }}</option>
+                        }
+                    </select>
+                    @if (form.get('platformId')?.touched && form.get('platformId')?.invalid) {
+                    <div class="text-danger small mt-1">
+                        @if (form.get('platformId')?.hasError('required')) {
+                        Platform is required.
+                        }
+                    </div>
+                    }
+                </div>
+
+                <div class="col-md-6">
+                    <label for="companyId" class="form-label">Company</label>
+                    <select class="form-control" id="companyId" formControlName="companyId">
+                        <option [ngValue]="null" disabled>Select Company</option>
+                        @for (company of companyList; track company.companyId) {
+                        <option [value]="company.companyId">{{ company.companyName }}</option>
+                        }
+                    </select>
+                    <!-- @if (form.get('companyId')?.touched && form.get('companyId')?.invalid) {
+                    <div class="text-danger small mt-1">
+                        @if (form.get('companyId')?.hasError('required')) {
+                        Company is required.
+                        }
+                    </div>
+                    } -->
+                </div>
+
+                <div class="col-md-12">
+                    <label for="route" class="form-label">Route <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="route" formControlName="route"
+                        placeholder="Enter route" />
+                    @if (form.get('route')?.touched && form.get('route')?.invalid) {
+                    <div class="text-danger small mt-1">
+                        @if (form.get('route')?.hasError('required')) {
+                        Route is required.
+                        }
+                    </div>
+                    }
+                </div>
+
+
+                <div class="col-12">
+                    <label class="form-label fw-bold mb-2">Program Actions</label>
+                    <div class="d-flex flex-wrap gap-3 p-3 border rounded bg-white">
+                        @for (action of programActionList; track action.actionId) {
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" [value]="action.actionId"
+                                [id]="'action-' + action.actionId" [checked]="isChecked(action.actionId)"
+                                (change)="onActionChange($event, action.actionId)">
+                            <label class="form-check-label" [for]="'action-' + action.actionId">
+                                {{ action.actionName }}
+                            </label>
+                        </div>
+                        }
+                        @if (programActionList.length === 0) {
+                        <div class="text-muted small">
+                            No actions available.
+                        </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="col-12 mt-4 d-flex justify-content-end gap-2">
+                    <mat-dialog-actions class="mt-4">
+                        <button type="button" class="close-btn" (click)="goBack()">Cancel</button>
+                        <button class="submit-btn" type="submit" [disabled]="submitting" (click)="onSubmit()">
+                            @if (submitting) {
+                            <span class="btn-loader"></span>
+                            }
+                            Submit
+                        </button>
+                    </mat-dialog-actions>
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

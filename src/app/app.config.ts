@@ -20,6 +20,9 @@ import { PostOfficeEffects } from './core/_state/post-office/post-office.effects
 import { countryReducer } from './core/_state/country/country.reducer';
 import { COUNTRY_FEATURE_KEY } from './core/_state/country/country.selectors';
 import { CountryEffects } from './core/_state/country/country.effects';
+import { programReducer } from './core/_state/program/program.reducer';
+import { PROGRAM_FEATURE_KEY } from './core/_state/program/program.selectors';
+import { ProgramEffects } from './core/_state/program/program.effects';
 
 
 
@@ -34,13 +37,15 @@ export const appConfig: ApplicationConfig = {
       [BUSINESS_ACTIVITY_FEATURE_KEY]: businessActivityReducer,
       [PROGRAM_ACTION_FEATURE_KEY]: programActionReducer,
       [POST_OFFICE_FEATURE_KEY]: postOfficeReducer,
-      [COUNTRY_FEATURE_KEY]: countryReducer
+      [COUNTRY_FEATURE_KEY]: countryReducer,
+      [PROGRAM_FEATURE_KEY]: programReducer
     }),
     provideEffects([
       BusinessActivityEffects,
       ProgramActionEffects,
       PostOfficeEffects,
-      CountryEffects
+      CountryEffects,
+      ProgramEffects
     ]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })
   ]

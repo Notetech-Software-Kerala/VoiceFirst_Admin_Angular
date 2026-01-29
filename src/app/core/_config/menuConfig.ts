@@ -12,7 +12,8 @@ export const MENU_CONFIG: MenuItem[] = [
   { id: 1, label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
   { id: 2, label: 'Menu', icon: 'menu_book', route: '/menu' },
   { id: 3, label: 'Business Activity', icon: 'business_center', route: '/business-activity' },
-  { id: 5, label: 'Issue Type', icon: 'problem', route: '/issue-type' },
+  { id: 4, label: 'Issue Type', icon: 'problem', route: '/issue-type' },
+  { id: 5, label: 'Program', icon: 'problem', route: '/program' },
   {
     id: 6,
     label: 'User',
