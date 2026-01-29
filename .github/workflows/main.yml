@@ -11,8 +11,7 @@ jobs:
       APP_POOL_NAME: VoiceFirstAdminWeb
       SITE_NAME: VoiceFirstAdminWeb
       IIS_PORT: 8011
-    
-      steps:
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -23,7 +22,6 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-
 
       - name: Clean previous Angular build
         run: |
