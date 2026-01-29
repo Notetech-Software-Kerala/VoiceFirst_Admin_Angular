@@ -40,7 +40,7 @@ export class ProgramList {
     { label: 'Platform', value: 'PlatformName' },
     { label: 'Company', value: 'CompanyName' },
     { label: 'Created By', value: 'CreatedUser' },
-    { label: 'Updated By', value: 'UpdatedUser' },
+    { label: 'Updated By', value: 'ModifiedUser' },
     { label: 'Deleted By', value: 'DeletedUser' }
   ];
 
