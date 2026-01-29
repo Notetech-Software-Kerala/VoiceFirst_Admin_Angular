@@ -38,4 +38,9 @@ export const apiConfig = {
 
     // Platform
     getPlatformLookup: '/platform/lookup',
+
+    //Role
+    role: '/role',
+    getRoleLookup: '/role/lookup',
+    roleRestore: '/role/recover',
 };

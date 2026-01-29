@@ -23,6 +23,9 @@ import { CountryEffects } from './core/_state/country/country.effects';
 import { programReducer } from './core/_state/program/program.reducer';
 import { PROGRAM_FEATURE_KEY } from './core/_state/program/program.selectors';
 import { ProgramEffects } from './core/_state/program/program.effects';
+import { roleReducer } from './core/_state/role/role.reducer';
+import { ROLE_FEATURE_KEY } from './core/_state/role/role.selectors';
+import { RoleEffects } from './core/_state/role/role.effects';
 
 
 
@@ -38,14 +41,16 @@ export const appConfig: ApplicationConfig = {
       [PROGRAM_ACTION_FEATURE_KEY]: programActionReducer,
       [POST_OFFICE_FEATURE_KEY]: postOfficeReducer,
       [COUNTRY_FEATURE_KEY]: countryReducer,
-      [PROGRAM_FEATURE_KEY]: programReducer
+      [PROGRAM_FEATURE_KEY]: programReducer,
+      [ROLE_FEATURE_KEY]: roleReducer
     }),
     provideEffects([
       BusinessActivityEffects,
       ProgramActionEffects,
       PostOfficeEffects,
       CountryEffects,
-      ProgramEffects
+      ProgramEffects,
+      RoleEffects
     ]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })
   ]

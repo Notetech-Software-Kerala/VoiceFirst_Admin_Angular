@@ -25,7 +25,7 @@ export const routes: Routes = [
     {
         path: '',
         component: BaseLayout,
-        canActivate: [authGuard],
+        // canActivate: [authGuard],
         children: [
             {
                 path: 'dashboard',
@@ -58,6 +58,24 @@ export const routes: Routes = [
                     {
                         path: 'edit/:id',
                         loadComponent: () => import('./pages/program/add-edit-program/add-edit-program').then(m => m.AddEditProgram)
+                    }
+                ]
+            },
+            {
+                path: 'role',
+                loadComponent: () => import('./pages/roles/roles').then(m => m.Roles),
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () => import('./pages/roles/role-list/role-list').then(m => m.RoleList)
+                    },
+                    {
+                        path: 'add',
+                        loadComponent: () => import('./pages/roles/add-edit-role/add-edit-role').then(m => m.AddEditRole)
+                    },
+                    {
+                        path: 'edit/:id',
+                        loadComponent: () => import('./pages/roles/add-edit-role/add-edit-role').then(m => m.AddEditRole)
                     }
                 ]
             }

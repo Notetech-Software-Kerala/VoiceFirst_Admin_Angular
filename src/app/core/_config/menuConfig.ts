@@ -19,8 +19,8 @@ export const MENU_CONFIG: MenuItem[] = [
     label: 'User',
     icon: 'group',
     children: [
-      { id: 61, label: 'Employees', route: '/employees' },
-      { id: 62, label: 'Roles', route: '/roles' },
+      { id: 61, label: 'Employees', route: '/employees', icon: 'group' },
+      { id: 62, label: 'Roles', route: '/role', icon: 'security' },
     ],
   },
   {

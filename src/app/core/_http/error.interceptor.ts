@@ -18,7 +18,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             if (error.status === 401) {
                 const isLogin = req.url.includes(apiConfig.login);
                 if (!isLogin) {
-                    toastService.error('Session Expired. Please login again.', 'Session Expired');
+                    // toastService.error('Session Expired. Please login again.', 'Session Expired');
                 }
             }
             // 403: Forbidden
