@@ -45,6 +45,12 @@ export class ProgramService {
     );
   }
 
+  getById(id: number): Observable<ApiResponse<ProgramModel>> {
+    return this.http.get<ApiResponse<ProgramModel>>(
+      `${this.base}${apiConfig.program}/${id}`
+    );
+  }
+
   restore(id: number): Observable<ApiResponse<void>> {
     return this.http.patch<ApiResponse<void>>(
       `${this.base}${apiConfig.programRestore}/${id}`,

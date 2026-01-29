@@ -17,11 +17,9 @@
         <div class="col-md-12">
             <label for="postOfficeName" class="form-label">Country<span class="text-danger">*</span></label>
             <select class="form-control" formControlName="countryId">
-                @for (country of countryList; track country.countryId) {
-                <option [value]="country.countryId">
+                <option *ngFor="let country of countryList" [value]="country.countryId">
                     {{country.countryName}}
                 </option>
-                }
             </select>
         </div>
 

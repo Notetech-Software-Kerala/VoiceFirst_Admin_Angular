@@ -14,7 +14,7 @@ const {
   selectTotal,
 } = adapter.getSelectors(selectProgramState);
 
-export const selectAllProgramActions = selectAll;
+export const selectAllPrograms = selectAll;
 
 export const selectProgramLoading = createSelector(
   selectProgramState,

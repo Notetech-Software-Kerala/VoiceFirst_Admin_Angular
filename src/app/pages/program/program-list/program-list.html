@@ -1,0 +1,139 @@
+<div class="card">
+    <h2 class="page-title mb-3">Program Management</h2>
+
+    <div class="d-flex flex-wrap align-items-center mb-3 gap-2">
+
+        <!-- Left: search + filters -->
+        <div class="d-flex flex-wrap align-items-center gap-2 flex-grow-1">
+            <app-search-bar [tooltipText]="'Search by action name'" [value]="queryParams.SearchText || ''"
+                [searchByOptions]="searchByOptions" [searchByValue]="queryParams.SearchBy || ''"
+                (valueChange)="onSearch($event)" (typingChange)="onTypingChange($event)"
+                (searchByChange)="onSearchByChange($event)">
+            </app-search-bar>
+            <app-filter-by [filters]="filterOptions" [activeFilters]="activeFilters" [clearSignal]="clearSignal"
+                (filterChange)="onFilterChange($event)">
+            </app-filter-by>
+
+
+        </div>
+
+        <!-- Actions -->
+        <div class="actions ms-auto d-flex flex-wrap gap-2">
+            <button type="button" class="btn-action btn-outline">
+                <mat-icon class="msr">file_download</mat-icon>
+                <span class="btn-text">Export</span>
+            </button>
+
+            <button type="button" class="btn-action btn-primary" (click)="navigateToAdd()">
+                <mat-icon class="msr">add</mat-icon>
+                <span class="btn-text">Add</span>
+            </button>
+        </div>
+    </div>
+
+    @let entries = activeFilters | keyvalue;
+
+    @if (entries.length) {
+    <div class="active-filters d-flex flex-wrap align-items-center gap-2 mb-3">
+        @for (entry of entries; track entry.key) {
+        @for (val of entry.value; track val) {
+        <span class="filter-chip">
+            {{ val }}
+            <button type="button" class="btn-clear" (click)="removeFilter(entry.key, val)">×</button>
+        </span>
+        }
+        }
+        <button type="button" class="btn btn-sm btn-outline-secondary ms-2" (click)="clearAllFilters()">
+            Clear all
+        </button>
+    </div>
+    }
+
+    <div class="table-responsive position-relative">
+        @if ((loading$ | async) || isSearching) {
+        <div class="progress position-absolute top-0 start-0 end-0" role="progressbar" aria-label="Loading"
+            style="z-index: 10; height: 4px; background-color: transparent;">
+            <div class="table-premium-loader"></div>
+        </div>
+        }
+
+        <table class="table align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th appSortableColumn="programName" [sortBy]="queryParams.SortBy"
+                        [sortOrder]="queryParams.SortOrder" (sortChange)="onSortChange($event)">
+                        Program Name
+                    </th>
+                    <th>Route</th>
+                    <th>Label</th>
+                    <th appSortableColumn="active" [sortBy]="queryParams.SortBy" [sortOrder]="queryParams.SortOrder"
+                        (sortChange)="onSortChange($event)">
+                        Status
+                    </th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @for (item of programs; track item.programId) {
+                <tr>
+                    <td>{{ item.programName }}</td>
+                    <td>{{ item.route }}</td>
+                    <td>{{ item.label }}</td>
+                    <td><app-status-badge [item]="item"></app-status-badge></td>
+
+                    <td class="action-cell">
+                        <button mat-icon-button class="menu-trigger" [matMenuTriggerFor]="rowMenu"
+                            aria-label="More actions">
+                            <mat-icon class="msr">more_vert</mat-icon>
+                        </button>
+
+                        <mat-menu #rowMenu="matMenu" class="row-menu" xPosition="before" yPosition="below">
+                            <button mat-menu-item (click)="navigateToEdit(item)">
+                                <mat-icon class="msr-edit">edit</mat-icon>
+                                <span>Edit</span>
+                            </button>
+                            @if (!item.deleted) {
+                            <button mat-menu-item (click)="onSuspend(item)">
+                                <mat-icon [ngClass]="item.active ? 'msr-delete' : 'msr-restore'">{{ item.active ?
+                                    'cancel' : 'check_circle' }}</mat-icon>
+                                <span>{{ item.active ? 'Suspend' : 'Reinstate' }}</span>
+                            </button>
+                            }
+                            @if (!item.deleted) {
+                            <button mat-menu-item (click)="onDelete(item)">
+                                <mat-icon class="msr-delete">delete</mat-icon>
+                                <span>Delete</span>
+                            </button>
+                            }
+
+                            @if (item.deleted) {
+                            <button mat-menu-item (click)="onRestore(item)">
+                                <mat-icon class="msr-restore">restore</mat-icon>
+                                <span>Restore</span>
+                            </button>
+                            }
+                        </mat-menu>
+                    </td>
+                </tr>
+                }
+
+                @if (programs.length === 0) {
+                <tr>
+                    <td colspan="6" class="text-center p-3">
+                        @if (loading$ | async) {
+                        <small class="loading-text">Please wait...</small>
+                        } @else {
+                        <small class="no-data-text">No data found</small>
+                        }
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <app-pagination [totalItems]="totalCount" [pageSize]="pageSize" [pageSizes]="pageSizes" [currentPage]="currentPage"
+        (paginationChange)="onPaginationChange($event)">
+    </app-pagination>
+</div>

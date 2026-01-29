@@ -42,6 +42,24 @@ export const routes: Routes = [
             {
                 path: 'post-office',
                 loadComponent: () => import('./pages/post-office/post-office').then(m => m.PostOffice)
+            },
+            {
+                path: 'program',
+                loadComponent: () => import('./pages/program/program').then(m => m.Program),
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () => import('./pages/program/program-list/program-list').then(m => m.ProgramList)
+                    },
+                    {
+                        path: 'add',
+                        loadComponent: () => import('./pages/program/add-edit-program/add-edit-program').then(m => m.AddEditProgram)
+                    },
+                    {
+                        path: 'edit/:id',
+                        loadComponent: () => import('./pages/program/add-edit-program/add-edit-program').then(m => m.AddEditProgram)
+                    }
+                ]
             }
         ]
     }

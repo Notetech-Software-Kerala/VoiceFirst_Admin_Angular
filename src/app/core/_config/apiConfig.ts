@@ -35,4 +35,10 @@ export const apiConfig = {
     program: '/program',
     getProgramLookup: '/program/lookup',
     programRestore: '/program/recover',
+
+    // Company
+    getCompanyLookup: '/company/lookup',
+
+    // Platform
+    getPlatformLookup: '/platform/lookup',
 };

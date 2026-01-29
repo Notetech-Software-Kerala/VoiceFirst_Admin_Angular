@@ -52,5 +52,10 @@ export class ProgramActionService {
     );
   }
 
+  lookup(): Observable<ApiResponse<ProgramActionModel[]>> {
+    return this.http.get<ApiResponse<ProgramActionModel[]>>(
+      `${this.base}${apiConfig.getProgramActionLookup}`
+    );
+  }
 
 }

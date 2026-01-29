@@ -1,12 +1,12 @@
 // src/app/core/validation.service.ts
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from '../../environment/environment';
-import { apiConfig } from '../../core/_config/apiConfig';
-import { ApiResponse } from '../../core/_auth/auth.model';
-import { Observable } from 'rxjs';
 
-export interface ApplicationModel {
+import { Observable } from 'rxjs';
+import { environment } from '../../../environment/environment';
+import { apiConfig } from '../../_config/apiConfig';
+
+export interface PlatformModel {
     platformId: number,
     platformName: string
 }
@@ -14,7 +14,7 @@ export interface ApplicationModel {
 @Injectable({
     providedIn: 'root'
 })
-export class ApplicationService {
+export class PlatformService {
 
     private base = environment.baseUrl;
 
