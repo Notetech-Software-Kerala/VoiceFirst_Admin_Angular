@@ -40,7 +40,7 @@
 
                 <div class="col-md-6">
                     <label for="platformId" class="form-label">Platform <span class="text-danger">*</span></label>
-                    <select class="form-control" id="platformId" formControlName="platformId">
+                    <select class="form-control" id="platformId" formControlName="platformId" required>
                         <option [ngValue]="null" disabled>Select Platform</option>
                         @for (platform of platformList; track platform.platformId) {
                         <option [value]="platform.platformId">{{ platform.platformName }}</option>
@@ -75,11 +75,14 @@
                 <div class="col-md-12">
                     <label for="route" class="form-label">Route <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="route" formControlName="route"
-                        placeholder="Enter route" />
+                        placeholder="Enter route (eg:business-activity, user)" />
                     @if (form.get('route')?.touched && form.get('route')?.invalid) {
                     <div class="text-danger small mt-1">
                         @if (form.get('route')?.hasError('required')) {
                         Route is required.
+                        }
+                        @if (form.get('route')?.hasError('pattern')) {
+                        Route must start and end with a letter.
                         }
                     </div>
                     }
