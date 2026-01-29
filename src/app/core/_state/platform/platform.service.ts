@@ -23,7 +23,7 @@ export class PlatformService {
 
     lookup(): Observable<any> {
         return this.http.get<any>(
-            `${this.base}${apiConfig.getApplicationLookup}`
+            `${this.base}${apiConfig.getPlatformLookup}`
         )
     }
 }

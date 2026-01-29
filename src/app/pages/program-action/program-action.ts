@@ -19,7 +19,7 @@ import { SortableColumnDirective, SortEvent } from '../../partials/shared_direct
 import { MaterialModule } from '../../material.module';
 import { Subject, takeUntil, Observable, of } from 'rxjs';
 import { QueryParameterModel } from '../../core/_models/query-parameter.model';
-import { ConfirmationService } from '../../partials/shared_services/confirmation';
+import { ConfirmationService } from '../../partials/shared_directives/confirmation';
 import { AddEditProgramActionComponent } from './add-edit-program-action/add-edit-program-action.component';
 import { FilterBy, FilterOption } from '../../partials/shared_modules/filter-by/filter-by';
 import { UtilityService } from '../../partials/shared_services/utility.service';

@@ -14,9 +14,9 @@
             </span>
         </div>
         <mat-menu #menu="matMenu" class="custom-search-menu">
-            <button mat-menu-item (click)="selectSearchBy('')" [class.selected]="searchByValue === ''">
+            <!-- <button mat-menu-item (click)="selectSearchBy('')" [class.selected]="searchByValue === ''">
                 All Fields
-            </button>
+            </button> -->
             @for (option of searchByOptions; track option.value) {
             <button mat-menu-item (click)="selectSearchBy(option.value)"
                 [class.selected]="searchByValue === option.value">

@@ -5,7 +5,7 @@ import { QueryParameterModel } from '../../core/_models/query-parameter.model';
 import { FilterBy, FilterOption } from '../../partials/shared_modules/filter-by/filter-by';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { ConfirmationService } from '../../partials/shared_services/confirmation';
+import { ConfirmationService } from '../../partials/shared_directives/confirmation';
 import { UtilityService } from '../../partials/shared_services/utility.service';
 import { ProgramService } from '../../core/_state/program/program.service';
 import { ToastService } from '../../partials/shared_services/toast.service';

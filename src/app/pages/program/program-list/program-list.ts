@@ -10,7 +10,7 @@ import { selectProgramLoading, selectProgramTotalCount, selectProgramTotalPages,
 import { ProgramService } from '../../../core/_state/program/program.service';
 import { SortableColumnDirective, SortEvent } from '../../../partials/shared_directives/sortable-column';
 import { FilterBy, FilterOption } from '../../../partials/shared_modules/filter-by/filter-by';
-import { ConfirmationService } from '../../../partials/shared_services/confirmation';
+import { ConfirmationService } from '../../../partials/shared_directives/confirmation';
 import { ToastService } from '../../../partials/shared_services/toast.service';
 import { UtilityService } from '../../../partials/shared_services/utility.service';
 import { CommonModule } from '@angular/common';
@@ -45,9 +45,7 @@ export class ProgramList {
   ];
 
   // Query parameters - start with empty, backend will use defaults
-  queryParams: QueryParameterModel = {
-    SearchText: '' // Initialize to empty string to avoid 'undefined' in input
-  };
+  queryParams: QueryParameterModel = {};
 
   // Pagination state
   pageSize = 10;

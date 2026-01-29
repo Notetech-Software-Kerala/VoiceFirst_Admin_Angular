@@ -11,7 +11,7 @@ import { CountryModel } from '../../../core/_state/country/country.model';
 import { CountryService } from '../../../core/_state/country/country.service';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { ConfirmationService } from '../../../partials/shared_services/confirmation';
+import { ConfirmationService } from '../../../partials/shared_directives/confirmation';
 
 @Component({
   selector: 'app-add-edit-post-office',

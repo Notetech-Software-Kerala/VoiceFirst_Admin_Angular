@@ -28,9 +28,6 @@ export const apiConfig = {
     country: '/country',
     getCountryLookup: '/country/lookup',
 
-    //Application
-    getApplicationLookup: '/application/lookup',
-
     //Program
     program: '/program',
     getProgramLookup: '/program/lookup',
