@@ -28,7 +28,7 @@ jobs:
           if (Test-Path dist) {
             Remove-Item -Recurse -Force dist
           }
-        shell: pwsh
+          shell: powershell
 
       - name: Build Angular app
         run: npm run build
@@ -55,7 +55,7 @@ jobs:
             Set-ItemProperty IIS:\Sites\$env:SITE_NAME -Name applicationPool -Value $env:APP_POOL_NAME
             Set-ItemProperty IIS:\Sites\$env:SITE_NAME -Name physicalPath -Value $env:IIS_PATH
           }
-        shell: pwsh
+          shell: powershell
 
       - name: Stop IIS App Pool
         run: |
@@ -63,14 +63,14 @@ jobs:
           if ((Get-WebAppPoolState -Name $env:APP_POOL_NAME).Value -eq 'Started') {
             Stop-WebAppPool -Name $env:APP_POOL_NAME
           }
-        shell: pwsh
+          shell: powershell
 
       - name: Clean previous IIS deployment
         run: |
           if (Test-Path "$env:IIS_PATH") {
             Remove-Item -Recurse -Force "$env:IIS_PATH\*"
           }
-        shell: pwsh
+          shell: powershell
 
       - name: Copy build output to IIS web root
         run: |
@@ -80,7 +80,7 @@ jobs:
             New-Item -ItemType Directory -Path $env:IIS_PATH
           }
           Copy-Item -Path dist\* -Destination $env:IIS_PATH -Recurse
-        shell: pwsh
+          shell: powershell
 
       - name: Start IIS App Pool
         run: |
@@ -88,7 +88,7 @@ jobs:
           if ((Get-WebAppPoolState -Name $env:APP_POOL_NAME).Value -ne 'Started') {
             Start-WebAppPool -Name $env:APP_POOL_NAME
           }
-        shell: pwsh
+          shell: powershell
 
       - name: Notify deployment complete
         run: echo "Deployment complete."
