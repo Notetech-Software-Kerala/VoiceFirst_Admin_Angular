@@ -82,6 +82,11 @@ jobs:
           Copy-Item -Path dist\voicefirst_admin\browser\* -Destination $env:IIS_PATH -Recurse
         shell: powershell
 
+      - name: Copy web.config to IIS web root
+        run: |
+          Copy-Item -Path src\Web.config -Destination $env:IIS_PATH -Force
+        shell: powershell
+
       - name: Start IIS App Pool
         run: |
           Import-Module WebAdministration
