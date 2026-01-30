@@ -28,8 +28,8 @@ export const postOfficeReducer = createReducer(
     loading: true,
   })),
 
-  on(PostOfficeActions.loadSuccess, (state, { activities, totalCount, pageNumber, pageSize, totalPages }) =>
-    adapter.setAll(activities, {
+  on(PostOfficeActions.loadSuccess, (state, { postOffices, totalCount, pageNumber, pageSize, totalPages }) =>
+    adapter.setAll(postOffices, {
       ...state,
       loading: false,
       error: null,
@@ -46,12 +46,12 @@ export const postOfficeReducer = createReducer(
     error,
   })),
 
-  on(PostOfficeActions.add, (state, { activity }) =>
-    adapter.addOne(activity, state)
+  on(PostOfficeActions.add, (state, { postOffice }) =>
+    adapter.addOne(postOffice, state)
   ),
 
-  on(PostOfficeActions.update, (state, { activity }) =>
-    adapter.updateOne(activity, state)
+  on(PostOfficeActions.update, (state, { postOffice }) =>
+    adapter.updateOne(postOffice, state)
   ),
 
   on(PostOfficeActions.delete, (state, { id }) =>

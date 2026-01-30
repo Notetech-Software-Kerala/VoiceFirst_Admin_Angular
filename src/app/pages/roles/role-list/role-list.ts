@@ -310,7 +310,7 @@ export class RoleList {
               if (res.statusCode === 200) {
                 this.toastService.success(`Role ${item.active ? 'Suspended' : 'Reinstated'} successfully`, 'Success');
                 this.store.dispatch(RoleActions.update({
-                  activity: {
+                  role: {
                     id: item.roleId,
                     changes: updatedRoleAction
                   }

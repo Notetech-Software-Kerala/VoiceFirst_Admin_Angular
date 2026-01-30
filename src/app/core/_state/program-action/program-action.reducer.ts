@@ -27,8 +27,8 @@ export const programActionReducer = createReducer(
     loading: true,
   })),
 
-  on(ProgramActionActions.loadSuccess, (state, { activities, totalCount, pageNumber, pageSize, totalPages }) =>
-    adapter.setAll(activities, {
+  on(ProgramActionActions.loadSuccess, (state, { programActions, totalCount, pageNumber, pageSize, totalPages }) =>
+    adapter.setAll(programActions, {
       ...state,
       loading: false,
       error: null,
@@ -45,12 +45,12 @@ export const programActionReducer = createReducer(
     error,
   })),
 
-  on(ProgramActionActions.add, (state, { activity }) =>
-    adapter.addOne(activity, state)
+  on(ProgramActionActions.add, (state, { programAction }) =>
+    adapter.addOne(programAction, state)
   ),
 
-  on(ProgramActionActions.update, (state, { activity }) =>
-    adapter.updateOne(activity, state)
+  on(ProgramActionActions.update, (state, { programAction }) =>
+    adapter.updateOne(programAction, state)
   ),
 
   on(ProgramActionActions.delete, (state, { id }) =>

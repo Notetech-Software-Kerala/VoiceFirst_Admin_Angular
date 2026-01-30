@@ -29,8 +29,8 @@ export const roleReducer = createReducer(
     loading: true,
   })),
 
-  on(RoleActions.loadSuccess, (state, { activities, totalCount, pageNumber, pageSize, totalPages }) =>
-    adapter.setAll(activities, {
+  on(RoleActions.loadSuccess, (state, { roles, totalCount, pageNumber, pageSize, totalPages }) =>
+    adapter.setAll(roles, {
       ...state,
       loading: false,
       error: null,
@@ -47,12 +47,12 @@ export const roleReducer = createReducer(
     error,
   })),
 
-  on(RoleActions.add, (state, { activity }) =>
-    adapter.addOne(activity, state)
+  on(RoleActions.add, (state, { role }) =>
+    adapter.addOne(role, state)
   ),
 
-  on(RoleActions.update, (state, { activity }) =>
-    adapter.updateOne(activity, state)
+  on(RoleActions.update, (state, { role }) =>
+    adapter.updateOne(role, state)
   ),
 
   on(RoleActions.delete, (state, { id }) =>

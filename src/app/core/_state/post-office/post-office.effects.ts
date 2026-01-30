@@ -18,7 +18,7 @@ export class PostOfficeEffects {
         switchMap(({ queryParams }) =>
           this.service.getAll(queryParams).pipe(
             map((paginatedData) => PostOfficeActions.loadSuccess({
-              activities: paginatedData.items,
+              postOffices: paginatedData.items,
               totalCount: paginatedData.totalCount,
               pageNumber: paginatedData.pageNumber,
               pageSize: paginatedData.pageSize,

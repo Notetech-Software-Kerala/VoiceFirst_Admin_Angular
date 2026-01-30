@@ -10,15 +10,15 @@ export const ProgramActions = createActionGroup({
   events: {
     'Load': props<{ queryParams: QueryParameterModel }>(),
     'Load Success': props<{
-      activities: ProgramModel[];
+      programs: ProgramModel[];
       totalCount: number;
       pageNumber: number;
       pageSize: number;
       totalPages: number;
     }>(),
     'Load Failure': props<{ error: string }>(),
-    'Add': props<{ activity: ProgramModel }>(),
-    'Update': props<{ activity: Update<ProgramModel> }>(),
+    'Add': props<{ program: ProgramModel }>(),
+    'Update': props<{ program: Update<ProgramModel> }>(),
     'Delete': props<{ id: number }>(),
   },
 });

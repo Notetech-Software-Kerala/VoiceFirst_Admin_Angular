@@ -43,4 +43,10 @@ export const apiConfig = {
     role: '/role',
     getRoleLookup: '/role/lookup',
     roleRestore: '/role/recover',
+
+    //Plan
+    plan: '/plan',
+    getPlanLookup: '/plan/lookup',
+    planRestore: '/plan/recover',
+    getProgramDetailsByPlanId: '/plan/program-details',
 };

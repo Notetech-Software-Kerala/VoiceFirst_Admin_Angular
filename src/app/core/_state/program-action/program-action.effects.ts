@@ -18,7 +18,7 @@ export class ProgramActionEffects {
         switchMap(({ queryParams }) =>
           this.service.getAll(queryParams).pipe(
             map((paginatedData) => ProgramActionActions.loadSuccess({
-              activities: paginatedData.items,
+              programActions: paginatedData.items,
               totalCount: paginatedData.totalCount,
               pageNumber: paginatedData.pageNumber,
               pageSize: paginatedData.pageSize,

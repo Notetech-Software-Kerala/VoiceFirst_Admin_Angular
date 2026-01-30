@@ -311,7 +311,7 @@ export class ProgramList {
               if (res.statusCode === 200) {
                 this.toastService.success(`Program Action ${item.active ? 'Suspended' : 'Reinstated'} successfully`, 'Success');
                 this.store.dispatch(ProgramActions.update({
-                  activity: {
+                  program: {
                     id: item.programId,
                     changes: updatedProgramAction
                   }

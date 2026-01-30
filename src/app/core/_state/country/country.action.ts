@@ -10,15 +10,15 @@ export const CountryActions = createActionGroup({
   events: {
     'Load': props<{ queryParams: QueryParameterModel }>(),
     'Load Success': props<{
-      activities: CountryModel[];
+      countries: CountryModel[];
       totalCount: number;
       pageNumber: number;
       pageSize: number;
       totalPages: number;
     }>(),
     'Load Failure': props<{ error: string }>(),
-    'Add': props<{ activity: CountryModel }>(),
-    'Update': props<{ activity: Update<CountryModel> }>(),
+    'Add': props<{ country: CountryModel }>(),
+    'Update': props<{ country: Update<CountryModel> }>(),
     'Delete': props<{ id: number }>(),
   },
 });

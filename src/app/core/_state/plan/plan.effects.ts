@@ -1,24 +1,24 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { RoleActions } from './role.action';
+import { PlanActions } from './plan.action';
 import { catchError, map, switchMap, of } from 'rxjs';
-import { RoleService } from './role.service';
+import { PlanService } from './plan.service';
 
 @Injectable()
-export class RoleEffects {
+export class PlanEffects {
   load$;
 
   constructor(
     private actions$: Actions,
-    private service: RoleService
+    private service: PlanService
   ) {
     this.load$ = createEffect(() =>
       this.actions$.pipe(
-        ofType(RoleActions.load),
+        ofType(PlanActions.load),
         switchMap(({ queryParams }) =>
           this.service.getAll(queryParams).pipe(
-            map((paginatedData) => RoleActions.loadSuccess({
-              roles: paginatedData.items,
+            map((paginatedData) => PlanActions.loadSuccess({
+              plans: paginatedData.items,
               totalCount: paginatedData.totalCount,
               pageNumber: paginatedData.pageNumber,
               pageSize: paginatedData.pageSize,
@@ -26,7 +26,7 @@ export class RoleEffects {
             })),
             catchError((err) =>
               of(
-                RoleActions.loadFailure({
+                PlanActions.loadFailure({
                   error: err?.message ?? 'Load failed',
                 })
               )

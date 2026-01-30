@@ -10,15 +10,15 @@ export const PostOfficeActions = createActionGroup({
   events: {
     'Load': props<{ queryParams: QueryParameterModel }>(),
     'Load Success': props<{
-      activities: PostOfficeModel[];
+      postOffices: PostOfficeModel[];
       totalCount: number;
       pageNumber: number;
       pageSize: number;
       totalPages: number;
     }>(),
     'Load Failure': props<{ error: string }>(),
-    'Add': props<{ activity: PostOfficeModel }>(),
-    'Update': props<{ activity: Update<PostOfficeModel> }>(),
+    'Add': props<{ postOffice: PostOfficeModel }>(),
+    'Update': props<{ postOffice: Update<PostOfficeModel> }>(),
     'Delete': props<{ id: number }>(),
   },
 });

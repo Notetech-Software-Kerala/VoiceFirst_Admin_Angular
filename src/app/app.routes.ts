@@ -78,6 +78,24 @@ export const routes: Routes = [
                         loadComponent: () => import('./pages/roles/add-edit-role/add-edit-role').then(m => m.AddEditRole)
                     }
                 ]
+            },
+            {
+                path: 'plan',
+                loadComponent: () => import('./pages/plan/plan').then(m => m.Plan),
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () => import('./pages/plan/plan-list/plan-list').then(m => m.PlanList)
+                    },
+                    {
+                        path: 'add',
+                        loadComponent: () => import('./pages/plan/add-edit-plan/add-edit-plan').then(m => m.AddEditPlan)
+                    },
+                    {
+                        path: 'edit/:id',
+                        loadComponent: () => import('./pages/plan/add-edit-plan/add-edit-plan').then(m => m.AddEditPlan)
+                    }
+                ]
             }
         ]
     }

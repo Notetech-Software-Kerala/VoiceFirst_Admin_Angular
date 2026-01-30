@@ -318,7 +318,7 @@ export class ProgramAction implements OnInit, OnDestroy {
               if (res.statusCode === 200) {
                 this.toastService.success(`Program Action ${item.active ? 'Suspended' : 'Reinstated'} successfully`, 'Success');
                 this.store.dispatch(ProgramActionActions.update({
-                  activity: {
+                  programAction: {
                     id: item.actionId,
                     changes: updatedProgramAction
                   }
@@ -345,11 +345,11 @@ export class ProgramAction implements OnInit, OnDestroy {
       if (result) {
         if (result.statusCode === 201) {
           // Add new item
-          this.store.dispatch(ProgramActionActions.add({ activity: result.data }));
+          this.store.dispatch(ProgramActionActions.add({ programAction: result.data }));
         } else if (result.statusCode === 200) {
           // Update existing item - use correct NgRx Entity format
           this.store.dispatch(ProgramActionActions.update({
-            activity: {
+            programAction: {
               id: result.data.actionId,
               changes: result.data
             }
@@ -371,7 +371,7 @@ export class ProgramAction implements OnInit, OnDestroy {
       if (result) {
         // Dispatch update action
         this.store.dispatch(ProgramActionActions.update({
-          activity: {
+          programAction: {
             id: result.data.actionId,
             changes: result.data
           }
