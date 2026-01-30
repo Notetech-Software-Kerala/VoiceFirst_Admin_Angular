@@ -42,8 +42,8 @@ jobs:
             New-Item -ItemType Directory -Path $env:IIS_PATH | Out-Null
           }
 
-          # Create or update App Pool
-          if (!(Get-WebAppPoolState -Name $env:APP_POOL_NAME -ErrorAction SilentlyContinue)) {
+          # Create App Pool if it doesn't exist
+          if (!(Test-Path IIS:\AppPools\$env:APP_POOL_NAME)) {
             New-WebAppPool -Name $env:APP_POOL_NAME
           }
           Set-ItemProperty IIS:\AppPools\$env:APP_POOL_NAME -Name managedRuntimeVersion -Value "v4.0"
