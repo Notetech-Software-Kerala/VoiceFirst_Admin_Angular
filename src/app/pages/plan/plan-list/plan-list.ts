@@ -1,31 +1,33 @@
+import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component } from '@angular/core';
-import { PostOfficeModel } from '../../core/_state/post-office/post-office.model';
+import { MaterialModule } from '../../../material.module';
+import { SortableColumnDirective, SortEvent } from '../../../partials/shared_directives/sortable-column';
+import { FilterBy, FilterOption } from '../../../partials/shared_modules/filter-by/filter-by';
+import { Pagination } from '../../../partials/shared_modules/pagination/pagination';
+import { SearchBar } from '../../../partials/shared_modules/search-bar/search-bar';
+import { StatusBadge } from '../../../partials/shared_modules/status-badge/status-badge';
+import { PlanModel } from '../../../core/_state/plan/plan.model';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { QueryParameterModel } from '../../core/_models/query-parameter.model';
-import { FilterBy, FilterOption } from '../../partials/shared_modules/filter-by/filter-by';
+import { QueryParameterModel } from '../../../core/_models/query-parameter.model';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { ConfirmationService } from '../../partials/shared_directives/confirmation';
-import { UtilityService } from '../../partials/shared_services/utility.service';
-import { PostOfficeService } from '../../core/_state/post-office/post-office.service';
-import { ToastService } from '../../partials/shared_services/toast.service';
-import { selectAllPostOffices, selectPostOfficeLoading, selectPostOfficeTotalCount, selectPostOfficeTotalPages } from '../../core/_state/post-office/post-office.selectors';
-import { PostOfficeActions } from '../../core/_state/post-office/post-office.action';
-import { AddEditPostOffice } from './add-edit-post-office/add-edit-post-office';
-import { SortableColumnDirective, SortEvent } from '../../partials/shared_directives/sortable-column';
-import { MaterialModule } from '../../material.module';
-import { StatusBadge } from "../../partials/shared_modules/status-badge/status-badge";
-import { SearchBar } from '../../partials/shared_modules/search-bar/search-bar';
-import { Pagination } from '../../partials/shared_modules/pagination/pagination';
+import { ConfirmationService } from '../../../partials/shared_directives/confirmation';
+import { UtilityService } from '../../../partials/shared_services/utility.service';
+import { PlanService } from '../../../core/_state/plan/plan.service';
+import { ToastService } from '../../../partials/shared_services/toast.service';
+import { selectRoleLoading } from '../../../core/_state/role/role.selectors';
+import { Router } from '@angular/router';
+import { selectAllPlans, selectPlanLoading, selectPlanTotalCount, selectPlanTotalPages } from '../../../core/_state/plan/plan.selectors';
+import { PlanActions } from '../../../core/_state/plan/plan.action';
 
 @Component({
-  selector: 'app-post-office',
-  imports: [MaterialModule, StatusBadge, SearchBar, FilterBy, SortableColumnDirective, Pagination],
-  templateUrl: './post-office.html',
-  styleUrl: './post-office.css',
+  selector: 'app-plan-list',
+  imports: [SearchBar, Pagination, StatusBadge, SortableColumnDirective, MaterialModule, FilterBy, CommonModule],
+  templateUrl: './plan-list.html',
+  styleUrl: './plan-list.css',
 })
-export class PostOffice {
-  postOffices: PostOfficeModel[] = [];
+export class PlanList {
+  plans: PlanModel[] = [];
   loading$!: Observable<boolean>;
   totalCount$!: Observable<number>;
   private destroy$ = new Subject<void>();
@@ -33,18 +35,14 @@ export class PostOffice {
 
   // SearchBy dropdown options
   searchByOptions = [
-    { label: 'Post Office Name', value: 'PostOfficeName' },
-    { label: 'Country', value: 'CountryName' },
-    { label: 'ZIP Code', value: 'ZipCode' },
+    { label: 'Plan Name', value: 'PlanName' },
     { label: 'Created By', value: 'CreatedUser' },
     { label: 'Updated By', value: 'UpdatedUser' },
     { label: 'Deleted By', value: 'DeletedUser' }
   ];
 
   // Query parameters - start with empty, backend will use defaults
-  queryParams: QueryParameterModel = {
-    SearchText: '' // Initialize to empty string to avoid 'undefined' in input
-  };
+  queryParams: QueryParameterModel = {};
 
   // Pagination state
   pageSize = 10;
@@ -63,8 +61,8 @@ export class PostOffice {
       options: ['Active', 'Inactive', 'Deleted'],
       single: true
     }
-
   ];
+
   activeFilters: Record<string, string[]> = {};
   clearSignal = 0;
   constructor(
@@ -73,34 +71,35 @@ export class PostOffice {
     private cdr: ChangeDetectorRef,
     private confirmationService: ConfirmationService,
     public utilityService: UtilityService,
-    private postOfficeService: PostOfficeService,
+    private planService: PlanService,
     private toastService: ToastService,
+    private router: Router
   ) { }
 
   ngOnInit() {
-    this.loading$ = this.store.select(selectPostOfficeLoading);
-    this.totalCount$ = this.store.select(selectPostOfficeTotalCount);
+    this.loading$ = this.store.select(selectPlanLoading);
+    this.totalCount$ = this.store.select(selectPlanTotalCount);
 
     // Subscribe to pagination metadata
-    this.store.select(selectPostOfficeTotalCount)
+    this.store.select(selectPlanTotalCount)
       .pipe(takeUntil(this.destroy$))
       .subscribe(count => {
         this.totalCount = count;
         this.cdr.markForCheck();
       });
 
-    this.store.select(selectPostOfficeTotalPages)
+    this.store.select(selectPlanTotalPages)
       .pipe(takeUntil(this.destroy$))
       .subscribe(pages => {
         this.totalPages = pages;
         this.cdr.markForCheck();
       });
 
-    this.store.select(selectAllPostOffices)
+    this.store.select(selectAllPlans)
       .pipe(takeUntil(this.destroy$))
       .subscribe(data => {
-        this.postOffices = data;
-        console.log("Post Offices", this.postOffices);
+        this.plans = data;
+        console.log("Plans", this.plans);
 
         this.cdr.markForCheck();
       });
@@ -124,7 +123,7 @@ export class PostOffice {
 
     console.log("Query Params 11", params);
 
-    this.store.dispatch(PostOfficeActions.load({ queryParams: params }));
+    this.store.dispatch(PlanActions.load({ queryParams: params }));
   }
 
   // Search handler - receives debounced value from search-bar
@@ -250,67 +249,68 @@ export class PostOffice {
 
 
   // Delete confirmation using shared service
-  onDelete(item: PostOfficeModel) {
-    this.confirmationService.confirmDelete(item.postOfficeName)
+  onDelete(item: PlanModel) {
+    this.confirmationService.confirmDelete(item.planName)
       .pipe(takeUntil(this.destroy$))
       .subscribe(confirmed => {
         if (confirmed) {
-          this.postOfficeService.delete(item.postOfficeId).subscribe({
+          this.planService.delete(item.planId).subscribe({
             next: (res) => {
               console.log("response", res);
               if (res.statusCode === 200) {
-                this.toastService.success('Post Office deleted successfully', 'Success');
+                this.toastService.success('Plan deleted successfully', 'Success');
                 this.loadData();
               }
             },
             error: (error) => {
               console.log("error", error);
+              this.toastService.error(error.message);
             }
           })
         }
       });
   }
 
-  onRestore(item: PostOfficeModel) {
-    this.confirmationService.confirmRestore(item.postOfficeName)
+  onRestore(item: PlanModel) {
+    this.confirmationService.confirmRestore(item.planName)
       .pipe(takeUntil(this.destroy$))
       .subscribe(confirmed => {
         if (confirmed) {
-          this.postOfficeService.restore(item.postOfficeId).subscribe({
+          this.planService.restore(item.planId).subscribe({
             next: (res) => {
               console.log("response", res);
               if (res.statusCode === 200) {
-                this.toastService.success('Post Office restored successfully', 'Success');
+                this.toastService.success('Plan restored successfully', 'Success');
                 this.loadData();
               }
             },
             error: (error) => {
               console.log("error", error);
-
+              this.toastService.error(error.message);
             }
           })
         }
       });
   }
 
-  onSuspend(item: PostOfficeModel) {
+  onSuspend(item: PlanModel) {
     const status = item.active ? false : true;
-    this.confirmationService.confirmSuspend(item.postOfficeName, status)
+    this.confirmationService.confirmSuspend(item.planName, status)
       .pipe(takeUntil(this.destroy$))
       .subscribe(confirmed => {
         if (confirmed) {
-          const updatedPostOffice = {
+          const updatedPlanAction = {
             active: status,
           }
-          this.postOfficeService.update(item.postOfficeId, updatedPostOffice).subscribe({
+          this.planService.update(item.planId, updatedPlanAction).subscribe({
             next: (res) => {
               console.log("response", res);
               if (res.statusCode === 200) {
-                this.toastService.success(`Post Office ${item.active ? 'Suspended' : 'Reinstated'} Successfully`, 'Success');
-                this.store.dispatch(PostOfficeActions.update({
-                  postOffice: {
-                    id: item.postOfficeId,
-                    changes: updatedPostOffice
+                this.toastService.success(`Plan ${item.active ? 'Suspended' : 'Reinstated'} successfully`, 'Success');
+                this.store.dispatch(PlanActions.update({
+                  plan: {
+                    id: item.planId,
+                    changes: updatedPlanAction
                   }
                 }));
               }
@@ -324,65 +324,13 @@ export class PostOffice {
   }
 
   // Open add dialog
-  openAddDialog() {
-    const dialogRef = this.dialog.open(AddEditPostOffice, {
-      width: '500px',
-      disableClose: true,
-      data: null
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        console.log("result", result);
-
-        if (result.statusCode === 201) {
-          // Add new item
-          this.store.dispatch(PostOfficeActions.add({ postOffice: result.data }));
-        } else if (result.statusCode === 200) {
-          // Update existing item - use correct NgRx Entity format
-          this.store.dispatch(PostOfficeActions.update({
-            postOffice: {
-              id: result.data.postOfficeId,
-              changes: result.data
-            }
-          }));
-        }
-      }
-    });
+  navigateToAdd() {
+    this.router.navigate(['/plan/add']);
   }
 
   // Open edit dialog
-  openEditDialog(item: PostOfficeModel) {
-    const dialogRef = this.dialog.open(AddEditPostOffice, {
-      width: '500px',
-      disableClose: true,
-      data: item
-    });
+  navigateToEdit(item: PlanModel) {
+    this.router.navigate(['/plan/edit', item.planId]);
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        // Dispatch update action
-        this.store.dispatch(PostOfficeActions.update({
-          postOffice: {
-            id: result.data.postOfficeId,
-            changes: result.data
-          }
-        }));
-      }
-    });
-  }
-  // Sort zip codes: active first, then deleted
-  sortZipCodes(zips: any[]): any[] {
-    if (!zips) return [];
-    // structuredClone or spread to avoid mutation if needed, though sort makes a copy usually if we do it right
-    // actually array.sort mutates, so we must copy first
-    return [...zips].sort((a, b) => {
-      // deleted=true should be last.
-      // a.deleted vs b.deleted
-      const aDeleted = !!a.deleted;
-      const bDeleted = !!b.deleted;
-      if (aDeleted === bDeleted) return 0;
-      return aDeleted ? 1 : -1;
-    });
   }
 }

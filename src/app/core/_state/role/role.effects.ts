@@ -1,24 +1,24 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { PostOfficeActions } from './post-office.action';
+import { RoleActions } from './role.action';
 import { catchError, map, switchMap, of } from 'rxjs';
-import { PostOfficeService } from './post-office.service';
+import { RoleService } from './role.service';
 
 @Injectable()
-export class PostOfficeEffects {
+export class RoleEffects {
   load$;
 
   constructor(
     private actions$: Actions,
-    private service: PostOfficeService
+    private service: RoleService
   ) {
     this.load$ = createEffect(() =>
       this.actions$.pipe(
-        ofType(PostOfficeActions.load),
+        ofType(RoleActions.load),
         switchMap(({ queryParams }) =>
           this.service.getAll(queryParams).pipe(
-            map((paginatedData) => PostOfficeActions.loadSuccess({
-              postOffices: paginatedData.items,
+            map((paginatedData) => RoleActions.loadSuccess({
+              roles: paginatedData.items,
               totalCount: paginatedData.totalCount,
               pageNumber: paginatedData.pageNumber,
               pageSize: paginatedData.pageSize,
@@ -26,7 +26,7 @@ export class PostOfficeEffects {
             })),
             catchError((err) =>
               of(
-                PostOfficeActions.loadFailure({
+                RoleActions.loadFailure({
                   error: err?.message ?? 'Load failed',
                 })
               )

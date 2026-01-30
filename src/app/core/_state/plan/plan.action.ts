@@ -1,24 +1,24 @@
 import { createActionGroup, props } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
-import { ProgramActionModel } from './program-action.model';
+import { PlanModel } from './plan.model';
 import { QueryParameterModel } from '../../_models/query-parameter.model';
 
 
-export const ProgramActionActions = createActionGroup({
-  source: 'Program Action',
+export const PlanActions = createActionGroup({
+  source: 'Plan',
 
   events: {
     'Load': props<{ queryParams: QueryParameterModel }>(),
     'Load Success': props<{
-      programActions: ProgramActionModel[];
+      plans: PlanModel[];
       totalCount: number;
       pageNumber: number;
       pageSize: number;
       totalPages: number;
     }>(),
     'Load Failure': props<{ error: string }>(),
-    'Add': props<{ programAction: ProgramActionModel }>(),
-    'Update': props<{ programAction: Update<ProgramActionModel> }>(),
+    'Add': props<{ plan: PlanModel }>(),
+    'Update': props<{ plan: Update<PlanModel> }>(),
     'Delete': props<{ id: number }>(),
   },
 });

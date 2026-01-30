@@ -89,6 +89,6 @@ export class AuthService {
     clearSession() {
         this.tokenStore.clear();
         this.userSubject.next(null);
-        this.router.navigate(['/login']);
+        // this.router.navigate(['/login']);
     }
 }

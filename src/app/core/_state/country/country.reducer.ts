@@ -27,8 +27,8 @@ export const countryReducer = createReducer(
     loading: true,
   })),
 
-  on(CountryActions.loadSuccess, (state, { activities, totalCount, pageNumber, pageSize, totalPages }) =>
-    adapter.setAll(activities, {
+  on(CountryActions.loadSuccess, (state, { countries, totalCount, pageNumber, pageSize, totalPages }) =>
+    adapter.setAll(countries, {
       ...state,
       loading: false,
       error: null,
@@ -45,12 +45,12 @@ export const countryReducer = createReducer(
     error,
   })),
 
-  on(CountryActions.add, (state, { activity }) =>
-    adapter.addOne(activity, state)
+  on(CountryActions.add, (state, { country }) =>
+    adapter.addOne(country, state)
   ),
 
-  on(CountryActions.update, (state, { activity }) =>
-    adapter.updateOne(activity, state)
+  on(CountryActions.update, (state, { country }) =>
+    adapter.updateOne(country, state)
   ),
 
   on(CountryActions.delete, (state, { id }) =>

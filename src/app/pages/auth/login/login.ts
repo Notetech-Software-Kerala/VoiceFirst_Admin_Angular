@@ -18,7 +18,7 @@ export class Login {
   submitting = false;
   loginForm!: FormGroup;
 
-  username = 'athul@notetech.com';
+  username = 'anil.p@notetech.com';
   password = '123456';
   theme: any
 
@@ -57,49 +57,49 @@ export class Login {
     this.hidePassword = !this.hidePassword;
   }
 
-  // async onSubmit() {
-  //   if (this.loginForm.invalid) return;
-  //   this.submitting = true;
-  //   console.log('Login data:', this.loginForm.value);
-  //   if (this.username === this.loginForm.value.email && this.password === this.loginForm.value.password) {
-
-  //     const device = await this.deviceService.collect();
-  //     console.log('device', device);
-  //     setTimeout(() => {
-  //       this.submitting = false;
-  //       this.router.navigate(['/dashboard']);
-  //       this.toast.success(`Welcome to Voice First`, { title: 'Login Success' });
-  //     }, 1000);
-  //   }
-  //   else {
-  //     setTimeout(() => {
-  //       this.submitting = false;
-  //       alert('Invalid credentials');
-  //     }, 1000);
-  //   }
-  //   // simulate async login
-
-  // }
-
-  onSubmit() {
+  async onSubmit() {
     if (this.loginForm.invalid) return;
     this.submitting = true;
     console.log('Login data:', this.loginForm.value);
-    const payload = {
-      emailOrMobile: this.loginForm.value.email,
-      password: this.loginForm.value.password,
-      uniqueDeviceId: "e3ee5465-e103-4200-b882-50da1c700e42"
-    }
-    this.authService.login(payload).subscribe({
-      next: (res) => {
+    if (this.username === this.loginForm.value.email && this.password === this.loginForm.value.password) {
+
+      const device = await this.deviceService.collect();
+      console.log('device', device);
+      setTimeout(() => {
         this.submitting = false;
         this.router.navigate(['/dashboard']);
-        this.toast.success(`Welcome to Voice First`, 'Login Success');
-      },
-      error: (err) => {
+        this.toast.success(`Welcome to Voice First`, { title: 'Login Success' });
+      }, 1000);
+    }
+    else {
+      setTimeout(() => {
         this.submitting = false;
-        this.toast.error(`Login failed`, 'Login Failed');
-      }
-    });
+        alert('Invalid credentials');
+      }, 1000);
+    }
+    // simulate async login
+
   }
+
+  // onSubmit() {
+  //   if (this.loginForm.invalid) return;
+  //   this.submitting = true;
+  //   console.log('Login data:', this.loginForm.value);
+  //   const payload = {
+  //     emailOrMobile: this.loginForm.value.email,
+  //     password: this.loginForm.value.password,
+  //     uniqueDeviceId: "e3ee5465-e103-4200-b882-50da1c700e42"
+  //   }
+  //   this.authService.login(payload).subscribe({
+  //     next: (res) => {
+  //       this.submitting = false;
+  //       this.router.navigate(['/dashboard']);
+  //       this.toast.success(`Welcome to Voice First`, 'Login Success');
+  //     },
+  //     error: (err) => {
+  //       this.submitting = false;
+  //       this.toast.error(`Login failed`, 'Login Failed');
+  //     }
+  //   });
+  // }
 }
