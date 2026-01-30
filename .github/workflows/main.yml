@@ -42,8 +42,8 @@ jobs:
             New-Item -ItemType Directory -Path $env:IIS_PATH | Out-Null
           }
 
-          # Create or update App Pool
-          if (!(Get-WebAppPoolState -Name $env:APP_POOL_NAME -ErrorAction SilentlyContinue)) {
+          # Create App Pool if it doesn't exist
+          if (!(Test-Path IIS:\AppPools\$env:APP_POOL_NAME)) {
             New-WebAppPool -Name $env:APP_POOL_NAME
           }
           Set-ItemProperty IIS:\AppPools\$env:APP_POOL_NAME -Name managedRuntimeVersion -Value "v4.0"
@@ -79,7 +79,7 @@ jobs:
           } else {
             New-Item -ItemType Directory -Path $env:IIS_PATH
           }
-          Copy-Item -Path dist\* -Destination $env:IIS_PATH -Recurse
+          Copy-Item -Path dist\voicefirst_admin\browser\* -Destination $env:IIS_PATH -Recurse
         shell: powershell
 
       - name: Start IIS App Pool
