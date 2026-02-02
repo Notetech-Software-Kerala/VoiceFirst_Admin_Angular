@@ -87,7 +87,7 @@
                         @if (item.zipCodes.length) {
                         @let sortedZips = sortZipCodes(item.zipCodes);
                         <div class="zip-list">
-                            @for (zip of sortedZips.slice(0, 3); track zip.zipCodeId) {
+                            @for (zip of sortedZips.slice(0, 3); track zip.zipCode || $index) {
                             <span class="zip-chip" [class.zip-deleted]="zip.deleted">{{ zip.zipCode }}</span>
                             }
 
@@ -204,7 +204,7 @@
 <mat-menu #zipMenu="matMenu" class="zip-overview-menu">
     <ng-template matMenuContent let-zips="zips">
         <div class="zip-menu-container" (click)="$event.stopPropagation()">
-            @for (zip of zips; track zip.zipCodeId) {
+            @for (zip of zips; track zip.zipCode || $index) {
             <span class="zip-chip" [class.zip-deleted]="zip.deleted">{{ zip.zipCode }}</span>
             }
         </div>
