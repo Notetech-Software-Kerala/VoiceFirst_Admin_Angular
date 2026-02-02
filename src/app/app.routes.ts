@@ -44,6 +44,10 @@ export const routes: Routes = [
                 loadComponent: () => import('./pages/post-office/post-office').then(m => m.PostOffice)
             },
             {
+                path: 'country',
+                loadComponent: () => import('./pages/country/country').then(m => m.Country)
+            },
+            {
                 path: 'program',
                 loadComponent: () => import('./pages/program/program').then(m => m.Program),
                 children: [

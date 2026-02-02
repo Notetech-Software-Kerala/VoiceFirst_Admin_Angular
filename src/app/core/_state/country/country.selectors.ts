@@ -13,7 +13,7 @@ const {
   selectTotal,
 } = adapter.getSelectors(selectCountryState);
 
-export const selectAllCountryActions = selectAll;
+export const selectAllCountries = selectAll;
 
 export const selectCountryLoading = createSelector(
   selectCountryState,
