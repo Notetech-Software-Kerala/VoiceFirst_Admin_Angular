@@ -1,0 +1,140 @@
+<div class="card detail-card p-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div class="d-flex flex-column gap-2">
+            <div class="d-flex align-items-center gap-3">
+                <h2 class="page-title m-0">{{ plan?.planName || 'Plan Details' }}</h2>
+                @if(plan) {
+                <app-status-badge [item]="plan"></app-status-badge>
+                }
+            </div>
+            <!-- Meta Info Row -->
+            <!-- Meta Info Row -->
+            @if(plan) {
+            <div class="row g-3 mt-1">
+                @if(plan.createdDate) {
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2 text-muted">
+                        <mat-icon class="tiny-icon">calendar_today</mat-icon>
+                        <span class="small">Created: <strong class="text-dark">{{ plan.createdDate | date:'mediumDate'
+                                }}</strong> by <strong class="text-dark">{{ plan.createdUser }}</strong></span>
+                    </div>
+                </div>
+                }
+
+                @if(plan.modifiedUser) {
+                <div class="col-md-auto border-start ps-3 d-none d-md-block"></div>
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2 text-muted">
+                        <mat-icon class="tiny-icon">edit</mat-icon>
+                        <span class="small">Modified: <strong class="text-dark">{{ plan.modifiedDate | date:'mediumDate'
+                                }}</strong> by <strong class="text-dark">{{ plan.modifiedUser }}</strong></span>
+                    </div>
+                </div>
+                }
+
+                @if(plan.deleted) {
+                <div class="col-md-auto border-start ps-3 d-none d-md-block"></div>
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2 text-danger">
+                        <mat-icon class="tiny-icon">delete</mat-icon>
+                        <span class="small">Deleted: <strong>{{ plan.deletedDate | date:'mediumDate' }}</strong> by
+                            <strong>{{ plan.deletedUser }}</strong></span>
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2">
+            @if(plan) {
+            @if(!plan.deleted) {
+            <button type="button" class="btn-action btn-outline" (click)="onEdit()">
+                <mat-icon class="msr">edit</mat-icon>
+                <span class="btn-text">Edit</span>
+            </button>
+            <button type="button" class="btn-action"
+                [ngClass]="plan.active ? 'btn-outline-danger' : 'btn-outline-success'" (click)="onSuspend()">
+                <mat-icon class="msr">{{ plan.active ? 'block' : 'check_circle' }}</mat-icon>
+                <span class="btn-text">{{ plan.active ? 'Suspend' : 'Reinstate' }}</span>
+            </button>
+            }
+
+
+            @if(!plan.deleted) {
+            <button type="button" class="btn-action btn-outline-danger text-danger" (click)="onDelete()">
+                <mat-icon class="msr">delete</mat-icon>
+                <span class="btn-text">Delete</span>
+            </button>
+            }
+            @else {
+            <button type="button" class="btn-action btn-outline-danger" (click)="onRestore(1)">
+                <mat-icon class="msr">restore</mat-icon>
+                <span class="btn-text">Restore</span>
+            </button>
+            }
+
+            <button type="button" class="btn-action btn-outline" (click)="goBack()">
+                <mat-icon class="msr">arrow_back</mat-icon>
+                <span class="btn-text">Back</span>
+            </button>
+            }
+        </div>
+    </div>
+
+    @if(loading) {
+    <div class="d-flex justify-content-center p-5">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+    } @else if (plan) {
+
+    <!-- Content Section -->
+    <div class="row">
+        <!-- Programs & Actions -->
+        <div class="col-12">
+            <h5 class="section-title mb-4">Program Configuration</h5>
+
+            <div class="d-flex flex-column gap-3">
+                @for (program of plan.programPlanDetails; track program.programId) {
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="program-card p-3 border rounded">
+                            <div class="d-flex align-items-center mb-3">
+                                <h4 class="m-0 fw-bold text-dark">{{ program.programName }}</h4>
+                            </div>
+
+                            <div class="actions-container ps-5 mb-2">
+                                <label class="text-muted small fw-bold text-uppercase mb-2 d-block"
+                                    style="font-size: 0.75rem; letter-spacing: 0.5px;">Configured Actions</label>
+                                <div class="d-flex flex-wrap gap-2">
+                                    @for (action of program.actions; track action.actionId) {
+                                    <span class="action-chip" [class.deleted]="action.deleted">
+                                        {{ action.actionName }}
+                                    </span>
+                                    } @empty {
+                                    <span class="text-muted fst-italic small">No actions configured</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                } @empty {
+                <div class="alert alert-info d-flex align-items-center">
+                    <mat-icon class="me-2">info</mat-icon>
+                    No programs linked to this plan.
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    } @else {
+    <div class="alert alert-warning">
+        Plan not found.
+    </div>
+    }
+</div>

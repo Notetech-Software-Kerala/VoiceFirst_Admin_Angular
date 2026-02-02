@@ -98,6 +98,10 @@ export const routes: Routes = [
                     {
                         path: 'edit/:id',
                         loadComponent: () => import('./pages/plan/add-edit-plan/add-edit-plan').then(m => m.AddEditPlan)
+                    },
+                    {
+                        path: 'details/:id',
+                        loadComponent: () => import('./pages/plan/plan-details/plan-details').then(m => m.PlanDetails)
                     }
                 ]
             }

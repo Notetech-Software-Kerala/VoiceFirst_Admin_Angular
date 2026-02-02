@@ -333,4 +333,9 @@ export class PlanList {
     this.router.navigate(['/plan/edit', item.planId]);
 
   }
+
+  navigateToDetails(item: PlanModel) {
+    this.router.navigate(['/plan/details', item.planId]);
+
+  }
 }

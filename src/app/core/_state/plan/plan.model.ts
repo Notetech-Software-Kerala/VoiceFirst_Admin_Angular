@@ -1,8 +1,15 @@
+import { ProgramActionModel } from "../program-action/program-action.model";
 
+export interface ProgramPlanDetail {
+  programId: number;
+  programName: string;
+  actions: ProgramActionModel[];
+}
 
 export interface PlanModel {
-  planId: number,
-  planName: string,
+  planId: number;
+  planName: string;
+  programPlanDetails?: ProgramPlanDetail[];
 
   active: boolean;
   deleted: boolean;
@@ -14,5 +21,4 @@ export interface PlanModel {
 
   deletedUser: string;
   deletedDate: string | null;
-
 }
