@@ -85,10 +85,12 @@
                         </button>
 
                         <mat-menu #rowMenu="matMenu" class="row-menu" xPosition="before" yPosition="below">
+                            @if (!item.deleted) {
                             <button mat-menu-item (click)="navigateToEdit(item)">
                                 <mat-icon class="msr-edit">edit</mat-icon>
                                 <span>Edit</span>
                             </button>
+                            }
                             @if (!item.deleted) {
                             <button mat-menu-item (click)="onSuspend(item)">
                                 <mat-icon [ngClass]="item.active ? 'msr-delete' : 'msr-restore'">{{ item.active ?

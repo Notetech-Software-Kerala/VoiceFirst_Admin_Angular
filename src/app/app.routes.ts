@@ -102,5 +102,9 @@ export const routes: Routes = [
                 ]
             }
         ]
+    },
+    {
+        path: '**',
+        loadComponent: () => import('./partials/shared_modules/not-found/not-found').then(m => m.NotFound)
     }
 ];
