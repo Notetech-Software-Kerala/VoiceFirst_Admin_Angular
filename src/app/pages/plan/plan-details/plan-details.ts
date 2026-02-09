@@ -24,6 +24,7 @@ export class PlanDetails implements OnInit, OnDestroy {
   plan: PlanModel | null = null;
   loading = true;
   private destroy$ = new Subject<void>();
+  planId: number = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -39,9 +40,9 @@ export class PlanDetails implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
-      const id = params.get('id');
-      if (id) {
-        this.loadPlanDetails(+id);
+      this.planId = +params.get('id')!;
+      if (this.planId) {
+        this.loadPlanDetails(this.planId);
       }
     });
   }
@@ -91,10 +92,11 @@ export class PlanDetails implements OnInit, OnDestroy {
         if (confirmed) {
           this.planService.delete(this.plan!.planId).subscribe({
             next: (res) => {
+              console.log(res);
+
               if (res.statusCode === 200) {
                 this.toastService.success('Plan deleted successfully', 'Success');
-                this.store.dispatch(PlanActions.delete({ id: this.plan!.planId }));
-                this.goBack();
+                this.plan = res.data;
               }
             },
             error: (error) => {
@@ -142,14 +144,14 @@ export class PlanDetails implements OnInit, OnDestroy {
       });
   }
 
-  onRestore(id: number) {
+  onRestore() {
     if (!this.plan) return;
 
     this.confirmationService.confirmRestore(this.plan.planName)
       .pipe(takeUntil(this.destroy$))
       .subscribe(confirmed => {
         if (confirmed) {
-          this.planService.restore(id).subscribe({
+          this.planService.restore(this.planId).subscribe({
             next: (res) => {
               if (res.statusCode === 200) {
                 this.toastService.success('Plan restored successfully', 'Success');
@@ -159,7 +161,7 @@ export class PlanDetails implements OnInit, OnDestroy {
                     changes: { deleted: false }
                   }
                 }));
-                this.loadPlanDetails(id);
+                this.loadPlanDetails(this.planId);
               }
             },
             error: (error) => {

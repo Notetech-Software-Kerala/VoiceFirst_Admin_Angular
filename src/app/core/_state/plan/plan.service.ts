@@ -39,8 +39,8 @@ export class PlanService {
     )
   }
 
-  delete(id: number): Observable<ApiResponse<void>> {
-    return this.http.delete<ApiResponse<void>>(
+  delete(id: number): Observable<ApiResponse<PlanModel>> {
+    return this.http.delete<ApiResponse<PlanModel>>(
       `${this.base}${apiConfig.plan}/${id}`
     );
   }
