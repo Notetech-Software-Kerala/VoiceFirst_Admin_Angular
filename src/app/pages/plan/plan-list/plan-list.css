@@ -59,3 +59,9 @@
     /* Light blue track */
     border-radius: 4px;
 }
+
+.list-link {
+    color: var(--color-hover-primary) !important;
+    text-decoration: none;
+    cursor: pointer;
+}

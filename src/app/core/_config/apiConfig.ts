@@ -56,4 +56,11 @@ export const apiConfig = {
     getPlanLookup: '/plan/lookup',
     planRestore: '/plan/recover',
     getProgramDetailsByPlanId: '/plan/program-details',
+
+    //Menu
+    menu: '/menu',
+    menuMaster: '/menu/master',
+    menuWeb: '/menu/web',
+    menuApp: '/menu/app',
+    menuBulkUpdate: '/menu/web/bulk',
 };

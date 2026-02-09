@@ -75,7 +75,7 @@
             <tbody>
                 @for (item of plans; track item.planId) {
                 <tr>
-                    <td>{{ item.planName }}</td>
+                    <td><a (click)="navigateToDetails(item)" class="list-link">{{ item.planName }}</a></td>
                     <td><app-status-badge [item]="item"></app-status-badge></td>
 
                     <td class="action-cell">
