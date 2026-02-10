@@ -334,6 +334,9 @@ export class ProgramList {
   // Open edit dialog
   navigateToEdit(item: ProgramModel) {
     this.router.navigate(['/program/edit', item.programId]);
+  }
 
+  navigateToDetails(item: ProgramModel) {
+    this.router.navigate(['/program/details', item.programId]);
   }
 }

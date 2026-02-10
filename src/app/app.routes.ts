@@ -66,6 +66,10 @@ export const routes: Routes = [
                     {
                         path: 'edit/:id',
                         loadComponent: () => import('./pages/program/add-edit-program/add-edit-program').then(m => m.AddEditProgram)
+                    },
+                    {
+                        path: 'details/:id',
+                        loadComponent: () => import('./pages/program/program-details/program-details').then(m => m.ProgramDetails)
                     }
                 ]
             },
@@ -84,7 +88,8 @@ export const routes: Routes = [
                     {
                         path: 'edit/:id',
                         loadComponent: () => import('./pages/roles/add-edit-role/add-edit-role').then(m => m.AddEditRole)
-                    }
+                    },
+
                 ]
             },
             {

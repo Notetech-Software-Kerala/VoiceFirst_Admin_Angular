@@ -98,32 +98,3 @@
     font-size: 0.8rem;
     color: var(--color-text-placeholder);
 }
-
-.btn-bg-danger {
-    background-color: #e10000 !important;
-    color: white !important;
-}
-
-.btn-bg-danger:hover {
-    background-color: #c20000 !important;
-}
-
-.btn-outline-danger {
-    border: 1px solid #e10000 !important;
-    color: #e10000 !important;
-}
-
-.btn-outline-warning {
-    border: 1px solid #e1a500 !important;
-    color: #e1a500 !important;
-}
-
-.btn-outline-success {
-    border: 1px solid #2baf03 !important;
-    color: #2baf03 !important;
-}
-
-.btn-outline-info {
-    border: 1px solid #0369a1 !important;
-    color: #0369a1 !important;
-}

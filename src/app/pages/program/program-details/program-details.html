@@ -1,0 +1,179 @@
+<div class="card detail-card p-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div class="d-flex flex-column gap-2">
+            <div class="d-flex align-items-center gap-3">
+                <h2 class="page-title m-0">{{ program?.programName || 'Program Details' }}</h2>
+                @if(program) {
+                <app-status-badge [item]="program"></app-status-badge>
+                }
+            </div>
+
+            <!-- Meta Info Row -->
+            @if(program) {
+            <div class="row g-3 mt-1">
+                @if(program.createdDate) {
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2">
+                        <mat-icon class="tiny-icon">calendar_today</mat-icon>
+                        <span class="small">Created: <strong>{{ program.createdDate | date:'mediumDate'
+                                }}</strong> by <strong>{{ program.createdUser }}</strong></span>
+                    </div>
+                </div>
+                }
+
+                @if(program.modifiedUser) {
+                <div class="col-md-auto border-start ps-3 d-none d-md-block"></div>
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2">
+                        <mat-icon class="tiny-icon">edit</mat-icon>
+                        <span class="small">Modified: <strong>{{ program.modifiedDate | date:'mediumDate'
+                                }}</strong> by <strong>{{ program.modifiedUser }}</strong></span>
+                    </div>
+                </div>
+                }
+
+                @if(program.deleted) {
+                <div class="col-md-auto border-start ps-3 d-none d-md-block"></div>
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2 text-danger">
+                        <mat-icon class="tiny-icon">delete</mat-icon>
+                        <span class="small">Deleted: <strong>{{ program.deletedDate | date:'mediumDate' }}</strong> by
+                            <strong>{{ program.deletedUser }}</strong></span>
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2">
+            @if(program) {
+            @if(!program.deleted) {
+            <button type="button" class="btn-action btn-outline-info" (click)="onEdit()">
+                <mat-icon class="msr">edit</mat-icon>
+                <span class="btn-text">Edit</span>
+            </button>
+            <button type="button" class="btn-action"
+                [ngClass]="program.active ? 'btn-outline-warning' : 'btn-outline-success'" (click)="onSuspend()">
+                <mat-icon class="msr">{{ program.active ? 'block' : 'check_circle' }}</mat-icon>
+                <span class="btn-text">{{ program.active ? 'Suspend' : 'Reinstate' }}</span>
+            </button>
+            }
+
+            @if(!program.deleted) {
+            <button type="button" class="btn-action btn-outline-danger" (click)="onDelete()">
+                <mat-icon class="msr">delete</mat-icon>
+                <span class="btn-text">Delete</span>
+            </button>
+            }
+            @else {
+            <button type="button" class="btn-action btn-outline-success" (click)="onRestore()">
+                <mat-icon class="msr">restore</mat-icon>
+                <span class="btn-text">Restore</span>
+            </button>
+            }
+
+            <button type="button" class="btn-action btn-outline" (click)="goBack()">
+                <mat-icon class="msr">arrow_back</mat-icon>
+                <span class="btn-text">Back</span>
+            </button>
+            }
+        </div>
+    </div>
+
+    @if(loading) {
+    <div class="d-flex justify-content-center p-5">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+    } @else if (program) {
+
+    <!-- Program Info Grid -->
+    <div class="row mb-5">
+        <!-- <div class="col-12">
+            <h5 class="section-title">General Information</h5>
+        </div> -->
+
+        <div class="col-md-3 mb-3">
+            <div class="info-label">Platform</div>
+            <div class="info-value">{{ program.platformName }}</div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="info-label">Company</div>
+            <div class="info-value">{{ program.companyName || 'N/A' }}</div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="info-label">Route</div>
+            <div class="info-value"><code>{{ program.route }}</code></div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="info-label">Label</div>
+            <div class="info-value">{{ program.label }}</div>
+        </div>
+    </div>
+
+    <!-- Actions Table Section -->
+    <div class="row">
+        <div class="col-12">
+            <h5 class="section-title mb-3">Configured Actions</h5>
+
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Action Name</th>
+                            <th>Created By</th>
+                            <th>Modified By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (action of program.action; track action.actionId) {
+                        <tr>
+                            <td>
+                                <span class="fw-medium">{{ action.actionName }}</span>
+                            </td>
+
+                            <td>
+                                @if (action.createdUser || action.createdDate) {
+                                <div class="d-flex flex-column">
+                                    <small>{{ action.createdUser || '-' }}</small>
+                                    <small>{{ action.createdDate | date:'mediumDate' }}</small>
+                                </div>
+                                } @else {
+                                <span>-</span>
+                                }
+                            </td>
+                            <td>
+                                @if (action.modifiedUser || action.modifiedDate) {
+                                <div class="d-flex flex-column">
+                                    <small>{{ action.modifiedUser || '-' }}</small>
+                                    <small>{{ action.modifiedDate | date:'mediumDate' }}</small>
+                                </div>
+                                } @else {
+                                <span>-</span>
+                                }
+                            </td>
+                        </tr>
+                        } @empty {
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-muted">
+                                No actions configured for this program.
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    } @else {
+    <div class="alert alert-warning">
+        Program not found.
+    </div>
+    }
+</div>

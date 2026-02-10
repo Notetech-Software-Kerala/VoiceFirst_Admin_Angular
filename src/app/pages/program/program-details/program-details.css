@@ -1,0 +1,135 @@
+/* Main Card Container */
+.detail-card {
+    background-color: var(--color-bg-sidebar);
+    border: 1px solid var(--color-border-hr);
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px var(--color-shadow), 0 2px 4px -1px var(--color-shadow);
+}
+
+/* Page Title */
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+/* Meta Data Items */
+.meta-item {
+    color: var(--color-text-placeholder);
+    font-size: 0.85rem;
+}
+
+.meta-item strong {
+    color: var(--color-text-primary);
+    font-weight: 600;
+}
+
+.tiny-icon {
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
+    line-height: 16px;
+}
+
+/* Section Titles */
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    border-bottom: 2px solid var(--color-border-hr);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Info Items (Label-Value pairs) */
+.info-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-placeholder);
+    margin-bottom: 0.25rem;
+}
+
+.info-value {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+/* Action Chips (if used) */
+.action-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-chip-border);
+    border-radius: 16px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.action-chip:hover {
+    background-color: var(--color-hover-primary);
+    color: #fff;
+    border-color: var(--color-hover-primary);
+}
+
+.action-chip.deleted {
+    text-decoration: line-through;
+    opacity: 0.6;
+    background-color: #fee2e2;
+    color: var(--color-status-error-text);
+    border-color: #fecaca;
+}
+
+/* Icon Box */
+.icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background-color: var(--color-bg-secondary);
+    color: var(--color-hover-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.text-danger {
+    color: var(--color-status-error-text) !important;
+}
+
+.small {
+    font-size: 0.8rem;
+    color: var(--color-text-placeholder);
+}
+
+/* Table Specifics if needed beyond global table styles */
+.table td {
+    vertical-align: middle;
+}
+
+.table-responsive {
+    overflow: auto !important;
+    max-height: 478px !important;
+}
+
+/* Modern Scrollbar Styling */
+.table-responsive::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background-color: var(--color-border-hr, #e5e7eb);
+    border-radius: 3px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-text-placeholder, #9ca3af);
+}

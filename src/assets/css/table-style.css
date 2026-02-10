@@ -173,3 +173,9 @@ body.dark-theme .cdk-overlay-container .mat-mdc-menu-panel.row-menu .mdc-menu-su
   flex-wrap: wrap;
   gap: 6px;
 }
+
+.list-link {
+  color: var(--color-hover-primary) !important;
+  text-decoration: none;
+  cursor: pointer;
+}

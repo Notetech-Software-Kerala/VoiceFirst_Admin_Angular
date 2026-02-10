@@ -77,7 +77,7 @@
             <tbody>
                 @for (item of programs; track item.programId) {
                 <tr>
-                    <td>{{ item.programName }}</td>
+                    <td><a (click)="navigateToDetails(item)" class="list-link"> {{ item.programName }}</a></td>
                     <td>{{ item.route }}</td>
                     <td>{{ item.label }}</td>
                     <td><app-status-badge [item]="item"></app-status-badge></td>
