@@ -43,7 +43,7 @@
         </div>
 
         <div class="node-actions d-flex gap-2">
-            @if (node.children.length > 0) {
+            @if (node.children.length > 0 || !node.route) {
             <button mat-icon-button (click)="toggleExpand(node)">
                 <mat-icon>{{ node.isExpanded ? 'expand_less' : 'expand_more' }}</mat-icon>
             </button>
@@ -58,12 +58,12 @@
     </div>
 
     <!-- Nested Drop List -->
-    @if (node.isExpanded) {
+    @if (node.isExpanded && !node.route) {
     <div class="node-children" cdkDropList [cdkDropListData]="node.children" [id]="'list-' + node.webMenuId"
         [cdkDropListConnectedTo]="connectedDropLists" (cdkDropListDropped)="drop($event)"
         [cdkDropListSortingDisabled]="false">
 
-        @for (child of node.children; track child.webMenuId) {
+        @for (child of node.children; track child.menuId) {
         <div cdkDrag [cdkDragData]="child" class="menu-node-wrapper">
             <ng-container *ngTemplateOutlet="nodeTemplate; context: { $implicit: child }"></ng-container>
 

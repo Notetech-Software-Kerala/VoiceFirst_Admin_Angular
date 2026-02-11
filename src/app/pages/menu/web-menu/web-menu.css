@@ -1,13 +1,13 @@
 .menu-container {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
 }
 
 .tree-wrapper {
-    background: #fff;
+    background: var(--color-bg-sidebar);
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 16px;
+    box-shadow: 0 4px 6px -1px var(--color-shadow);
+    padding: 24px;
     min-height: 400px;
 }
 
@@ -15,7 +15,7 @@
     min-height: 60px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
 }
 
 .menu-node-wrapper {
@@ -26,74 +26,106 @@
 .menu-node-content {
     display: flex;
     align-items: center;
-    padding: 12px 16px;
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    transition: all 0.2s;
+    padding: 16px 20px;
+    background: var(--color-bg-sidebar);
+    border: 1px solid var(--color-border-hr);
+    border-radius: 8px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: grab;
+    position: relative;
+    /* For better stacking context */
 }
 
+/* Hover effect */
 .menu-node-content:hover {
-    background: #f5f5f5;
-    border-color: #bdbdbd;
+    background: var(--color-bg-secondary);
+    border-color: var(--color-border-hr);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px var(--color-shadow);
+}
+
+.menu-node-content:active {
+    cursor: grabbing;
 }
 
 .menu-node-content.has-children {
-    border-left: 3px solid #3f51b5;
+    border-left: 4px solid var(--color-hover-primary);
 }
 
 .node-handle {
     cursor: move;
-    color: #bdbdbd;
-    margin-right: 12px;
+    color: var(--color-text-placeholder);
+    margin-right: 16px;
     display: flex;
     align-items: center;
 }
 
 .node-handle:hover {
-    color: #757575;
+    color: var(--color-hover-primary);
 }
 
 .node-icon-wrapper {
-    width: 32px;
-    height: 32px;
-    border-radius: 4px;
-    background: #e8eaf6;
-    color: #3f51b5;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--color-bg-secondary);
+    color: var(--color-hover-primary);
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.2s;
+}
+
+.menu-node-content:hover .node-icon-wrapper {
+    background: var(--color-hover-primary);
+    color: #fff;
+}
+
+.node-details h6 {
+    color: var(--color-text-primary);
+    font-weight: 600;
+}
+
+.node-details small {
+    color: var(--color-text-placeholder);
 }
 
 .node-children {
     margin-left: 32px;
-    /* Indentation for chilren */
-    padding-top: 8px;
-    padding-left: 12px;
-    border-left: 1px dashed #e0e0e0;
-    min-height: 10px;
-    /* Allow dropping into empty lists */
+    padding-top: 12px;
+    padding-left: 16px;
+    border-left: 2px dashed var(--color-border-hr);
+    min-height: 120px;
+    /* Increased for easier dropping */
+    transition: min-height 0.2s;
 }
 
-/* Dragging Styles */
+/* Dragging Styles - Preview (what you see while dragging) */
 .cdk-drag-preview {
     box-sizing: border-box;
-    border-radius: 4px;
-    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
-        0 8px 10px 1px rgba(0, 0, 0, 0.14),
-        0 3px 14px 2px rgba(0, 0, 0, 0.12);
-    background: #fff;
-    border: 1px solid #3f51b5;
-    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    background: var(--color-bg-sidebar);
+    border: 1px solid var(--color-hover-primary);
+    padding: 16px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    z-index: 1000;
+    z-index: 9999 !important;
+    opacity: 0.95;
+    color: var(--color-text-primary);
 }
 
+/* Placeholder (the gap where it will drop) */
 .cdk-drag-placeholder {
-    opacity: 0;
+    opacity: 1;
+    background: var(--color-bg-secondary);
+    border: 2px dashed var(--color-hover-primary);
+    border-radius: 8px;
+    min-height: 70px;
+    margin-bottom: 12px;
+    transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
 }
 
 .cdk-drag-animating {
@@ -104,11 +136,40 @@
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-.menu-placeholder {
-    background: #e8eaf6;
-    border: 1px dashed #3f51b5;
-    min-height: 60px;
-    border-radius: 4px;
-    margin-bottom: 8px;
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+/* Empty Drop Zone Styling */
+.cdk-drop-list-dragging:not(.menu-list) .node-children:empty,
+.node-children:empty {
+    border: 2px dashed var(--color-border-hr);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-secondary);
+    transition: all 0.2s;
+}
+
+/* Highlight empty drop zone when dragging over it */
+.cdk-drop-list-dragging .node-children:empty:hover {
+    border-color: var(--color-hover-primary);
+    background: rgba(2, 125, 207, 0.05);
+    /* Light blue tint based on hover-primary */
+}
+
+.node-children:empty::after {
+    content: 'Drop valid menu item here';
+    color: var(--color-text-placeholder);
+    font-weight: 500;
+    font-size: 0.9rem;
+    pointer-events: none;
+}
+
+/* Modern buttons */
+.node-actions button {
+    color: var(--color-text-placeholder);
+}
+
+.node-actions button:hover {
+    color: var(--color-hover-primary);
+    background-color: var(--color-bg-secondary);
 }

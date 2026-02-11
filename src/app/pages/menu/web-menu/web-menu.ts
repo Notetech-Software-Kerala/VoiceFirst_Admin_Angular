@@ -78,7 +78,10 @@ export class WebMenu implements OnInit {
 
     const traverse = (nodes: MenuNode[]) => {
       nodes.forEach(node => {
-        ids.push(`list-${node.webMenuId}`);
+        // Only allow dropping into nodes with no route (containers)
+        if (!node.route) {
+          ids.push(`list-${node.webMenuId}`);
+        }
         if (node.children.length > 0) {
           traverse(node.children);
         }
@@ -134,12 +137,12 @@ export class WebMenu implements OnInit {
     const currentFlatList = this.flattenTree(this.menuNodes);
     const moveAndReorder: any[] = [];
     const reorders: any[] = [];
+    const statusUpdate: any[] = [];
 
-    // Identify Moves
+    // 1. Identify Moves: Items where parentId has changed
     currentFlatList.forEach(item => {
       const original = this.originalMenuItems.find(o => o.webMenuId === item.webMenuId);
       if (original && item.parentId !== original.parentId) {
-        // Logic for Move
         const siblings = currentFlatList
           .filter(n => n.parentId === item.parentId)
           .sort((a, b) => a.sortOrder - b.sortOrder)
@@ -147,19 +150,20 @@ export class WebMenu implements OnInit {
 
         moveAndReorder.push({
           webMenuId: item.webMenuId,
-          fromParentWebMenuId: original.parentId,
-          toParentWebMenuId: item.parentId,
+          parentWebMenuId: item.parentId, // Updated key
           newOrderUnderToParent: siblings
         });
       }
     });
 
-    // Identify Reorders
-    const movedToParents = new Set(moveAndReorder.map(m => m.toParentWebMenuId));
+    // 2. Identify Reorders
+    const movedToParents = new Set(moveAndReorder.map(m => m.parentWebMenuId)); // Updated key reference
+
+    // Check all parents currently in use
     const allParents = new Set(currentFlatList.map(i => i.parentId));
 
     allParents.forEach(parentId => {
-      if (movedToParents.has(parentId)) return; // Already handled by move payload
+      if (movedToParents.has(parentId)) return; // Skip if this parent is a move destination
 
       const currentChildrenIds = currentFlatList
         .filter(n => n.parentId === parentId)
@@ -168,6 +172,7 @@ export class WebMenu implements OnInit {
 
       const originalChildrenIds = this.originalMenuItems
         .filter(n => n.parentId === parentId)
+        .filter(n => currentChildrenIds.includes(n.webMenuId))
         .sort((a, b) => a.sortOrder - b.sortOrder)
         .map(n => n.webMenuId);
 
@@ -179,16 +184,21 @@ export class WebMenu implements OnInit {
       }
     });
 
-    const payload = {
-      moveAndReorder,
-      reorders,
-      activeUpdate: []
-    };
+    // Construct Payload
+    const payload: any = {};
+    if (moveAndReorder.length > 0) payload.moveAndReorder = moveAndReorder;
+    if (reorders.length > 0) payload.reorders = reorders;
+    if (statusUpdate.length > 0) payload.statusUpdate = statusUpdate;
+
+    if (Object.keys(payload).length === 0) {
+      console.log('No changes to save');
+      return;
+    }
 
     console.log('Save Payload:', payload);
     this.menuService.saveMenuOrder(payload).subscribe({
       next: (res) => {
-        console.log('Saved successfully');
+        console.log('Saved successfully', res);
         this.originalMenuItems = JSON.parse(JSON.stringify(currentFlatList));
       },
       error: (err) => console.error(err)
