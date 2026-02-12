@@ -58,8 +58,8 @@ export class ProgramService {
     );
   }
 
-  lookup(): Observable<ApiResponse<ProgramModel>> {
-    return this.http.get<ApiResponse<ProgramModel>>(
+  lookup(): Observable<ApiResponse<ProgramModel[]>> {
+    return this.http.get<ApiResponse<ProgramModel[]>>(
       `${this.base}${apiConfig.getProgramLookup}`
     )
   }

@@ -1,15 +1,16 @@
 <div class="menu-container p-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="page-title m-0">Web Menu Management</h2>
-        <button mat-raised-button color="primary" (click)="onSave()">
-            <mat-icon>save</mat-icon> Save Order
+        <h2 class="page-title m-0">Web Menu Configuration</h2>
+        <button type="button" class="btn-action btn-primary" (click)="onSave()">
+            <mat-icon class="msr">save</mat-icon>
+            <span class="btn-text">Save</span>
         </button>
     </div>
 
     <div class="tree-wrapper">
         <div cdkDropList [cdkDropListData]="menuNodes" [id]="'root-list'" [cdkDropListConnectedTo]="connectedDropLists"
             (cdkDropListDropped)="drop($event)" class="menu-list root-list" [cdkDropListSortingDisabled]="false">
-            @for (node of menuNodes; track node.menuId) {
+            @for (node of menuNodes; track node.webMenuId) {
             <div cdkDrag [cdkDragData]="node" class="menu-node-wrapper">
 
                 <!-- Use ng-container to pass node to template -->
@@ -48,11 +49,11 @@
                 <mat-icon>{{ node.isExpanded ? 'expand_less' : 'expand_more' }}</mat-icon>
             </button>
             }
-            <button mat-icon-button color="primary">
+            <!-- <button mat-icon-button color="primary">
                 <mat-icon>edit</mat-icon>
-            </button>
+            </button> -->
             <button mat-icon-button color="warn">
-                <mat-icon>delete</mat-icon>
+                <mat-icon class="msr-delete">delete</mat-icon>
             </button>
         </div>
     </div>
@@ -63,7 +64,7 @@
         [cdkDropListConnectedTo]="connectedDropLists" (cdkDropListDropped)="drop($event)"
         [cdkDropListSortingDisabled]="false">
 
-        @for (child of node.children; track child.menuId) {
+        @for (child of node.children; track child.webMenuId) {
         <div cdkDrag [cdkDragData]="child" class="menu-node-wrapper">
             <ng-container *ngTemplateOutlet="nodeTemplate; context: { $implicit: child }"></ng-container>
 

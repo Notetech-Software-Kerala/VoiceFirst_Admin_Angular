@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AppMenuModel } from '../../../../core/_state/menu/menu.model';
 import { MenuService } from '../../../../core/_state/menu/menu.service';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
@@ -16,7 +16,7 @@ export interface MenuNode extends AppMenuModel {
   templateUrl: './app-menu.html',
   styleUrl: './app-menu.css',
 })
-export class AppMenu {
+export class AppMenu implements OnInit {
   menuNodes: MenuNode[] = [];
   // Keep track of connected drop lists
   connectedDropLists: string[] = ['root-list'];
@@ -79,17 +79,28 @@ export class AppMenu {
     const traverse = (nodes: MenuNode[]) => {
       nodes.forEach(node => {
         // Only allow dropping into nodes with no route (containers)
-        if (!node.route) {
+        // AND only if they are expanded (visible in DOM)
+        if (!node.route && node.isExpanded) {
           ids.push(`list-${node.appMenuId}`);
         }
-        if (node.children.length > 0) {
+
+        // Continue traversal regardless of expansion, because if a parent is collapsed, 
+        // its children are not in DOM either (by virtue of parent being hidden? No, by virtue of *ngIf on parent's children container).
+        // Wait, if parent is collapsed, the child list is NOT in DOM. 
+        // So we only traverse if expanded? 
+        // Actually, if node is NOT expanded, its `node.children` are inside the `*if (node.isExpanded)` block?
+        // Let's check HTML. Yes: @if (node.isExpanded && !node.route)
+        // So if node is NOT expanded, its children drop list does not exist.
+
+        if (node.children.length > 0 && node.isExpanded) {
           traverse(node.children);
         }
       });
     };
 
     traverse(this.menuNodes);
-    this.connectedDropLists = ids;
+    this.connectedDropLists = [...ids]; // New reference to trigger change detection
+    console.log('Connected Drop Lists:', this.connectedDropLists);
   }
 
   drop(event: CdkDragDrop<MenuNode[]>) {

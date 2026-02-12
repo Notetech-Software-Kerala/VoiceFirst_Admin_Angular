@@ -1,1 +1,146 @@
-<p>add-edit-menu works!</p>
+<div class="main-container">
+    <div class="card">
+
+        <div class="actions ms-auto d-flex flex-wrap gap-2">
+            <button type="button" class="btn-action btn-outline" (click)="goBack()">
+                <mat-icon class="msr">arrow_back</mat-icon>
+                <span class="btn-text">Back</span>
+            </button>
+        </div>
+
+        <div class="card-body">
+            <h5 class="mb-4">{{title}}</h5>
+            <form [formGroup]="form" class="row g-3">
+
+                <!-- Menu Name -->
+                <div class="col-md-6">
+                    <label for="menuName" class="form-label">Menu Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="menuName" formControlName="menuName"
+                        placeholder="Enter menu name" />
+                    @if (form.get('menuName')?.touched && form.get('menuName')?.invalid) {
+                    <div class="text-danger small mt-1">
+                        @if (form.get('menuName')?.hasError('required')) {
+                        Menu Name is required.
+                        }
+                    </div>
+                    }
+                </div>
+
+                <!-- Icon -->
+                <div class="col-md-6">
+                    <label for="icon" class="form-label">Icon <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="icon" formControlName="icon"
+                        placeholder="Enter icon name (e.g. home)" />
+                    @if (form.get('icon')?.touched && form.get('icon')?.invalid) {
+                    <div class="text-danger small mt-1">
+                        @if (form.get('icon')?.hasError('required')) {
+                        Icon is required.
+                        }
+                    </div>
+                    }
+                </div>
+
+                <!-- Platform -->
+                <div class="col-md-6">
+                    <label for="plateFormId" class="form-label">Platform <span class="text-danger">*</span></label>
+                    <select class="form-control" id="plateFormId" formControlName="plateFormId">
+                        <option [ngValue]="null" disabled>Select Platform</option>
+                        @for (platform of platformList; track platform.platformId) {
+                        <option [value]="platform.platformId">{{ platform.platformName }}</option>
+                        }
+                    </select>
+                    @if (form.get('plateFormId')?.touched && form.get('plateFormId')?.invalid) {
+                    <div class="text-danger small mt-1">
+                        @if (form.get('plateFormId')?.hasError('required')) {
+                        Platform is required.
+                        }
+                    </div>
+                    }
+                </div>
+
+                <!-- Route -->
+                <div class="col-md-6">
+                    <label for="route" class="form-label">Route <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="route" formControlName="route"
+                        placeholder="Enter route" />
+                    @if (form.get('route')?.touched && form.get('route')?.invalid) {
+                    <div class="text-danger small mt-1">
+                        @if (form.get('route')?.hasError('required')) {
+                        Route is required.
+                        }
+                    </div>
+                    }
+                </div>
+
+                <!-- App/Web Checkboxes -->
+                <div class="col-md-6">
+                    <label class="form-label d-block">Visibility</label>
+                    <div class="d-flex gap-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="web" formControlName="web">
+                            <label class="form-check-label" for="web">Web</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="app" formControlName="app">
+                            <label class="form-check-label" for="app">App</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Programs -->
+                <div class="col-12">
+                    <label class="form-label fw-bold mb-2">Program Association</label>
+                    <div class="d-flex flex-wrap gap-3 p-3 rounded program-action-list">
+                        @for (program of programList; track program.programId) {
+                        <div class="program-item" [class.selected]="isChecked(program.programId)">
+                            <div class="form-check mb-0 d-flex align-items-center mx-3">
+                                <input class="form-check-input" type="checkbox" [value]="program.programId"
+                                    [id]="'prog-' + program.programId" [checked]="isChecked(program.programId)"
+                                    (change)="onProgramChange($event, program.programId)">
+                                <label class="form-check-label ms-2" [for]="'prog-' + program.programId">
+                                    {{ program.programName }}
+                                </label>
+                            </div>
+
+                            <div class="primary-select d-flex align-items-center">
+                                <div class="form-check mb-0 d-flex align-items-center">
+                                    <input class="form-check-input mt-0" type="radio" [name]="'primaryGroup'"
+                                        [id]="'primary-' + program.programId"
+                                        [checked]="primaryProgramId === program.programId"
+                                        [disabled]="!isChecked(program.programId)"
+                                        (change)="setPrimary(program.programId)">
+                                    <label class="form-check-label small"
+                                        [class.text-muted]="!isChecked(program.programId)"
+                                        [for]="'primary-' + program.programId">
+                                        Primary
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                        @if (programList.length === 0) {
+                        <div class="text-muted small">
+                            No programs available.
+                        </div>
+                        }
+                    </div>
+                </div>
+
+
+                <div class="col-12 mt-4 d-flex justify-content-end gap-2">
+                    <mat-dialog-actions class="mt-4">
+                        <button type="button" class="close-btn" (click)="goBack()">Cancel</button>
+                        <button class="submit-btn" type="submit" [disabled]="submitting" (click)="onSubmit()">
+                            @if (submitting) {
+                            <span class="btn-loader"></span>
+                            }
+                            Submit
+                        </button>
+                    </mat-dialog-actions>
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

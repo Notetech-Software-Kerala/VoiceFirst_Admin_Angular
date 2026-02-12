@@ -11,9 +11,9 @@ export const apiConfig = {
     programActionRestore: '/program-action/recover',
 
     // Business Activity Endpoints
-    businessActivity: '/business-activity',
-    getBusinessActivityLookup: '/business-activity/lookup',
-    businessActivityRestore: '/business-activity/recover',
+    businessActivity: '/activity',
+    getBusinessActivityLookup: '/activity/lookup',
+    businessActivityRestore: '/activity/recover',
 
     // Post Office Endpoints
     postOffice: '/post-office',

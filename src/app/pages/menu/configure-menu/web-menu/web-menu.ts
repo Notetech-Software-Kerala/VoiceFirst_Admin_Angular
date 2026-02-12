@@ -79,17 +79,17 @@ export class WebMenu implements OnInit {
     const traverse = (nodes: MenuNode[]) => {
       nodes.forEach(node => {
         // Only allow dropping into nodes with no route (containers)
-        if (!node.route) {
+        if (!node.route && node.isExpanded) {
           ids.push(`list-${node.webMenuId}`);
         }
-        if (node.children.length > 0) {
+        if (node.children.length > 0 && node.isExpanded) {
           traverse(node.children);
         }
       });
     };
 
     traverse(this.menuNodes);
-    this.connectedDropLists = ids;
+    this.connectedDropLists = [...ids];
   }
 
   drop(event: CdkDragDrop<MenuNode[]>) {

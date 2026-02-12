@@ -70,4 +70,23 @@ export class MenuService {
 
 
 
+    create(data: any): Observable<ApiResponse<void>> {
+        return this.http.post<ApiResponse<void>>(
+            `${this.base}${apiConfig.menu}`,
+            data
+        );
+    }
+
+    update(id: number, data: any): Observable<ApiResponse<void>> {
+        return this.http.patch<ApiResponse<void>>(
+            `${this.base}${apiConfig.menu}/${id}`,
+            data
+        );
+    }
+
+    getById(id: number): Observable<ApiResponse<MasterMenuModel>> {
+        return this.http.get<ApiResponse<MasterMenuModel>>(
+            `${this.base}${apiConfig.menuMaster}/${id}`
+        );
+    }
 }

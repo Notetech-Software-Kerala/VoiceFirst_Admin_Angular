@@ -1,0 +1,82 @@
+.program-action-list {
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-border-hr);
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 15px;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.program-item {
+    transition: all 0.2s ease-in-out;
+    border: 1px solid var(--color-border-hr);
+    background-color: var(--color-bg-sidebar);
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.program-item:hover {
+    border-color: var(--color-hover-secondary);
+    box-shadow: 0 4px 6px var(--color-shadow);
+    transform: translateY(-2px);
+}
+
+.program-item.selected {
+    border-color: var(--color-hover-primary);
+    background-color: var(--color-bg-secondary);
+    box-shadow: 0 2px 4px var(--color-shadow);
+}
+
+.program-item .form-check-label {
+    color: var(--color-text-primary);
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 0;
+    user-select: none;
+
+}
+
+.program-item .form-check-input {
+    cursor: pointer;
+    margin-top: 0;
+
+}
+
+.primary-select .form-check-label {
+    font-size: 0.8rem;
+    color: var(--color-text-placeholder);
+    transition: color 0.2s;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+}
+
+.primary-select .form-check-input:checked {
+    background-color: var(--color-status-success-text);
+    border-color: var(--color-status-success-text);
+}
+
+.primary-select .form-check-input:checked~label {
+    color: var(--color-status-success-text) !important;
+    font-weight: 600;
+}
+
+.primary-select .form-check-input:disabled {
+    opacity: 0.4;
+}
+
+.primary-select .form-check-input:disabled~label {
+    color: var(--color-text-placeholder) !important;
+    opacity: 0.5;
+}
+
+.program-item .form-check {
+    min-height: unset;
+}

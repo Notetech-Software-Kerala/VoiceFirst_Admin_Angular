@@ -173,3 +173,75 @@
     color: var(--color-hover-primary);
     background-color: var(--color-bg-secondary);
 }
+
+.msr-delete {
+    font-size: 1rem;
+    color: #da4b40 !important;
+    margin-top: 6px !important;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .menu-container {
+        padding: 12px;
+    }
+
+    .tree-wrapper {
+        padding: 16px;
+        min-height: auto;
+    }
+
+    .menu-node-content {
+        padding: 12px 16px;
+    }
+
+    .node-children {
+        margin-left: 16px;
+        /* Reduce indentation */
+        padding-left: 12px;
+    }
+
+    .node-icon-wrapper {
+        width: 32px;
+        height: 32px;
+    }
+
+    .node-icon-wrapper mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+    }
+
+    .node-details h6 {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .menu-node-content {
+        padding: 8px 12px;
+    }
+
+    .node-children {
+        margin-left: 8px;
+        /* Further reduce indentation */
+        padding-left: 8px;
+        border-left-width: 1px;
+    }
+
+    .node-handle {
+        margin-right: 8px;
+    }
+
+    .node-actions .mat-icon-button {
+        width: 28px;
+        height: 28px;
+        line-height: 28px;
+    }
+
+    .node-actions .mat-icon-button mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+    }
+}
