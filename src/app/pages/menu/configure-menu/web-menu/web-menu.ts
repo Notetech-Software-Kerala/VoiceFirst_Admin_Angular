@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { MenuService } from '../../../core/_state/menu/menu.service';
-import { MenuModel } from '../../../core/_state/menu/menu.model';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
-import { MaterialModule } from '../../../material.module';
+import { WebMenuModel } from '../../../../core/_state/menu/menu.model';
+import { MaterialModule } from '../../../../material.module';
+import { MenuService } from '../../../../core/_state/menu/menu.service';
 
-export interface MenuNode extends MenuModel {
+export interface MenuNode extends WebMenuModel {
   children: MenuNode[];
   isExpanded?: boolean;
 }
@@ -23,7 +23,7 @@ export class WebMenu implements OnInit {
 
   constructor(private menuService: MenuService) { }
 
-  originalMenuItems: MenuModel[] = [];
+  originalMenuItems: WebMenuModel[] = [];
 
   ngOnInit(): void {
     this.getWebmenu();
@@ -39,7 +39,7 @@ export class WebMenu implements OnInit {
   }
 
   // Convert flat list to tree
-  buildTree(items: MenuModel[]): MenuNode[] {
+  buildTree(items: WebMenuModel[]): MenuNode[] {
     const map = new Map<number, MenuNode>();
     const roots: MenuNode[] = [];
 
@@ -201,7 +201,7 @@ export class WebMenu implements OnInit {
         console.log('Saved successfully', res);
         this.originalMenuItems = JSON.parse(JSON.stringify(currentFlatList));
       },
-      error: (err) => console.error(err)
+      error: (err) => { console.error(err) }
     });
   }
 

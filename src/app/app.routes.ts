@@ -33,7 +33,39 @@ export const routes: Routes = [
             },
             {
                 path: 'menu',
-                loadComponent: () => import('./pages/menu/menu').then(m => m.Menu)
+                loadComponent: () => import('./pages/menu/menu').then(m => m.Menu),
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () => import('./pages/menu/menu-list/menu-list').then(m => m.MenuList)
+                    },
+                    {
+                        path: 'add',
+                        loadComponent: () => import('./pages/menu/add-edit-menu/add-edit-menu').then(m => m.AddEditMenu)
+                    },
+                    {
+                        path: 'edit/:id',
+                        loadComponent: () => import('./pages/menu/add-edit-menu/add-edit-menu').then(m => m.AddEditMenu)
+                    },
+                    {
+                        path: 'details/:id',
+                        loadComponent: () => import('./pages/menu/menu-details/menu-details').then(m => m.MenuDetails)
+                    },
+                    {
+                        path: 'configure',
+                        loadComponent: () => import('./pages/menu/configure-menu/configure-menu').then(m => m.ConfigureMenu),
+                        // children: [
+                        //     {
+                        //         path: 'web-menu',
+                        //         loadComponent: () => import('./pages/menu/configure-menu/web-menu/web-menu').then(m => m.WebMenu)
+                        //     },
+                        //     {
+                        //         path: 'app-menu',
+                        //         loadComponent: () => import('./pages/menu/configure-menu/app-menu/app-menu').then(m => m.AppMenu)
+                        //     }
+                        // ]
+                    },
+                ]
             },
             {
                 path: 'business-activity',

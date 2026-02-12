@@ -1,4 +1,4 @@
-export interface MenuModel {
+export interface WebMenuModel {
     webMenuId: number;
     parentId: number;
     menuId: number;
@@ -16,7 +16,25 @@ export interface MenuModel {
     deletedDate: string | null;
 }
 
-export interface MasterMenu {
+export interface AppMenuModel {
+    appMenuId: number;
+    parentId: number;
+    menuId: number;
+    menuName: string;
+    icon: string;
+    route: string;
+    sortOrder: number;
+    active: boolean;
+    deleted: boolean;
+    createdDate: string;
+    createdUser: string;
+    modifiedDate: string | null;
+    modifiedUser: string;
+    deletedUser: string;
+    deletedDate: string | null;
+}
+
+export interface MasterMenuModel {
     menuId: number;
     menuName: string;
     icon: string;

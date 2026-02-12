@@ -62,5 +62,6 @@ export const apiConfig = {
     menuMaster: '/menu/master',
     menuWeb: '/menu/web',
     menuApp: '/menu/app',
-    menuBulkUpdate: '/menu/web/bulk',
+    webMenuBulkUpdate: '/menu/web/bulk',
+    appMenuBulkUpdate: '/menu/app/bulk',
 };
