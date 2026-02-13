@@ -37,10 +37,10 @@ export class RoleList {
   // SearchBy dropdown options
   searchByOptions = [
     { label: 'Role Name', value: 'RoleName' },
-    { label: 'Purpose', value: 'RolePurpose' },
-    { label: 'Created By', value: 'CreatedUser' },
-    { label: 'Updated By', value: 'UpdatedUser' },
-    { label: 'Deleted By', value: 'DeletedUser' }
+    // { label: 'Purpose', value: 'RolePurpose' },
+    // { label: 'Created By', value: 'CreatedUser' },
+    // { label: 'Updated By', value: 'UpdatedUser' },
+    // { label: 'Deleted By', value: 'DeletedUser' }
   ];
 
   // Query parameters - start with empty, backend will use defaults

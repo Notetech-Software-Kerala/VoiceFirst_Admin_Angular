@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ProgramModel } from './program.model';
+import { ProgramModel, ProgramLookupModel } from './program.model';
 import { apiConfig } from '../../_config/apiConfig';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../environment/environment';
@@ -61,6 +61,12 @@ export class ProgramService {
   lookup(): Observable<ApiResponse<ProgramModel[]>> {
     return this.http.get<ApiResponse<ProgramModel[]>>(
       `${this.base}${apiConfig.getProgramLookup}`
+    )
+  }
+
+  lookupForPlan(): Observable<ApiResponse<ProgramLookupModel[]>> {
+    return this.http.get<ApiResponse<ProgramLookupModel[]>>(
+      `${this.base}${apiConfig.getProgramForPlan}`
     )
   }
 

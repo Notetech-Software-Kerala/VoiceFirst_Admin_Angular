@@ -25,3 +25,12 @@ export interface ProgramModel {
 
   action: ProgramActionModel[];
 }
+
+export interface ProgramLookupModel {
+  programId: number;
+  programName: string;
+  action: {
+    actionLinkId: number;
+    actionName: string;
+  }[];
+}

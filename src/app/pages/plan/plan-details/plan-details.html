@@ -1,9 +1,9 @@
 <div class="card detail-card p-4">
     <!-- Header Section -->
-    <div class="d-flex justify-content-between align-items-start mb-4">
+    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
         <div class="d-flex flex-column gap-2">
             <div class="d-flex align-items-center gap-3">
-                <h2 class="page-title m-0">{{ plan?.planName || 'Plan Details' }}</h2>
+                <h2 class="page-title m-0">{{ plan?.planName }}</h2>
                 @if(plan) {
                 <app-status-badge [item]="plan"></app-status-badge>
                 }
@@ -22,7 +22,7 @@
                 </div>
                 }
 
-                @if(plan.modifiedUser) {
+                @if(plan.modifiedDate ) {
                 <div class="col-md-auto border-start ps-3 d-none d-md-block"></div>
                 <div class="col-md-auto">
                     <div class="meta-item d-flex align-items-center gap-2">
@@ -48,7 +48,7 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 flex-wrap">
             @if(plan) {
             @if(!plan.deleted) {
             <button type="button" class="btn-action btn-outline-info" (click)="onEdit()">
@@ -85,9 +85,7 @@
     </div>
 
     @if(loading) {
-    <div class="d-flex justify-content-center p-5">
-        <mat-spinner diameter="40"></mat-spinner>
-    </div>
+    <app-details-loader [rows]="2"></app-details-loader>
     } @else if (plan) {
 
     <!-- Content Section -->

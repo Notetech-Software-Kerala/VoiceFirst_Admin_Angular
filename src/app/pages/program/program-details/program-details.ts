@@ -15,9 +15,12 @@ import { UtilityService } from '../../../partials/shared_services/utility.servic
 import { MaterialModule } from '../../../material.module';
 import { StatusBadge } from "../../../partials/shared_modules/status-badge/status-badge";
 
+import { DetailsLoaderComponent } from '../../../partials/shared_modules/details-loader/details-loader.component';
+
 @Component({
   selector: 'app-program-details',
-  imports: [CommonModule, MaterialModule, StatusBadge],
+  standalone: true,
+  imports: [CommonModule, MaterialModule, StatusBadge, DetailsLoaderComponent],
   templateUrl: './program-details.html',
   styleUrl: './program-details.css',
 })

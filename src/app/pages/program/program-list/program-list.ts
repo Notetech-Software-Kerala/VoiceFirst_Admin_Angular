@@ -37,11 +37,11 @@ export class ProgramList {
     { label: 'Program Name', value: 'ProgramName' },
     { label: 'Label', value: 'Label' },
     { label: 'Route', value: 'Route' },
-    { label: 'Platform', value: 'PlatformName' },
-    { label: 'Company', value: 'CompanyName' },
-    { label: 'Created By', value: 'CreatedUser' },
-    { label: 'Updated By', value: 'ModifiedUser' },
-    { label: 'Deleted By', value: 'DeletedUser' }
+    // { label: 'Platform', value: 'PlatformName' },
+    // { label: 'Company', value: 'CompanyName' },
+    // { label: 'Created By', value: 'CreatedUser' },
+    // { label: 'Updated By', value: 'ModifiedUser' },
+    // { label: 'Deleted By', value: 'DeletedUser' }
   ];
 
   // Query parameters - start with empty, backend will use defaults

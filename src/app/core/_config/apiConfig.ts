@@ -39,6 +39,7 @@ export const apiConfig = {
     program: '/program',
     getProgramLookup: '/program/lookup',
     programRestore: '/program/recover',
+    getProgramForPlan: '/program/for-plan',
 
     // Company
     getCompanyLookup: '/company/lookup',

@@ -52,6 +52,15 @@
     color: var(--color-text-placeholder);
 }
 
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    border-bottom: 2px solid var(--color-border-hr);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
 /* Action Chips */
 .action-chip {
     display: inline-flex;
@@ -91,6 +100,31 @@
         margin-top: 0.5rem;
         padding-top: 0.75rem;
         border-top: 1px dashed #e2e8f0;
+    }
+
+    /* Common responsive styles */
+    .detail-card {
+        padding: 1rem !important;
+    }
+
+    .page-title {
+        font-size: 1.25rem;
+    }
+
+    .meta-item {
+        flex-wrap: wrap;
+    }
+
+    .btn-action .btn-text {
+        display: none;
+    }
+
+    .btn-action {
+        padding: 0.5rem;
+    }
+
+    .btn-action mat-icon {
+        margin-right: 0;
     }
 }
 

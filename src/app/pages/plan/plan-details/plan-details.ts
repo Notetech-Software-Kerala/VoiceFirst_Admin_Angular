@@ -14,9 +14,13 @@ import { PlanActions } from '../../../core/_state/plan/plan.action';
 import { MaterialModule } from '../../../material.module';
 import { StatusBadge } from '../../../partials/shared_modules/status-badge/status-badge';
 import { Location } from '@angular/common';
+import { DetailsLoaderComponent } from '../../../partials/shared_modules/details-loader/details-loader.component';
+
+
 @Component({
   selector: 'app-plan-details',
-  imports: [CommonModule, MaterialModule, StatusBadge],
+  standalone: true,
+  imports: [CommonModule, MaterialModule, StatusBadge, DetailsLoaderComponent],
   templateUrl: './plan-details.html',
   styleUrl: './plan-details.css',
 })
@@ -60,6 +64,8 @@ export class PlanDetails implements OnInit, OnDestroy {
         next: (res) => {
           if (res.statusCode === 200) {
             this.plan = res.data;
+            console.log(this.plan);
+
           } else {
             this.toastService.error(res.message || 'Failed to load plan details');
           }

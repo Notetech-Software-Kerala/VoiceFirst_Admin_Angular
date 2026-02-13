@@ -65,11 +65,7 @@
                     </th>
                     <th>Icon</th>
                     <th>Route</th>
-                    <th>Platform ID</th>
-                    <th appSortableColumn="active" [sortBy]="queryParams.SortBy" [sortOrder]="queryParams.SortOrder"
-                        (sortChange)="onSortChange($event)">
-                        Status
-                    </th>
+                    <th>Status</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -86,7 +82,6 @@
                         }
                     </td>
                     <td>{{ item.route || '-' }}</td>
-                    <td>{{ item.plateFormId }}</td>
                     <td><app-status-badge [item]="item"></app-status-badge></td>
 
                     <td class="action-cell">

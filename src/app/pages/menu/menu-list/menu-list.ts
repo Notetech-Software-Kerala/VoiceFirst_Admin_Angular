@@ -34,11 +34,11 @@ export class MenuList {
   // SearchBy dropdown options
   searchByOptions = [
     { label: 'Menu Name', value: 'MenuName' },
-    { label: 'Route', value: 'Route' },
-    { label: 'Platform ID', value: 'PlateFormId' },
-    { label: 'Created By', value: 'CreatedUser' },
-    { label: 'Updated By', value: 'ModifiedUser' },
-    { label: 'Deleted By', value: 'DeletedUser' }
+    // { label: 'Route', value: 'Route' },
+    // { label: 'Platform ID', value: 'PlateFormId' },
+    // { label: 'Created By', value: 'CreatedUser' },
+    // { label: 'Updated By', value: 'ModifiedUser' },
+    // { label: 'Deleted By', value: 'DeletedUser' }
   ];
 
   // Query parameters
