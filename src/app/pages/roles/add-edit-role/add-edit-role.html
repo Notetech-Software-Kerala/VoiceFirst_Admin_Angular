@@ -1,1 +1,157 @@
-<p>add-edit-role works!</p>
+<div class="main-container">
+    <div class="card">
+
+        <div class="actions ms-auto d-flex flex-wrap gap-2">
+            <button type="button" class="btn-action btn-outline" (click)="goBack()">
+                <mat-icon class="msr">arrow_back</mat-icon>
+                <span class="btn-text">Back</span>
+            </button>
+        </div>
+
+        <div class="card-body">
+            <h5 class="mb-4">{{title}}</h5>
+            <form [formGroup]="form" class="row g-3">
+
+                <!-- Role Name -->
+                <div class="col-md-6">
+                    <label for="roleName" class="form-label">Role Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="roleName" formControlName="roleName"
+                        placeholder="Enter role name" />
+                    @if (form.get('roleName')?.touched && form.get('roleName')?.invalid) {
+                    <div class="text-danger small">
+                        @if (form.get('roleName')?.hasError('required')) {
+                        Role Name is required.
+                        }
+                    </div>
+                    }
+                </div>
+
+                <!-- Platform -->
+                <div class="col-md-6">
+                    <label for="platformId" class="form-label">Platform <span class="text-danger">*</span></label>
+                    <select class="form-control" id="platformId" formControlName="platformId">
+                        <option [ngValue]="null" disabled>Select Platform</option>
+                        @for (platform of platformList; track platform.platformId) {
+                        <option [value]="platform.platformId">{{ platform.platformName }}</option>
+                        }
+                    </select>
+                    @if (form.get('platformId')?.touched && form.get('platformId')?.invalid) {
+                    <div class="text-danger small">
+                        @if (form.get('platformId')?.hasError('required')) {
+                        Platform is required.
+                        }
+                    </div>
+                    }
+                </div>
+
+                <!-- Role Purpose -->
+                <div class="col-md-12">
+                    <label for="rolePurpose" class="form-label">Description</label>
+                    <textarea class="form-control" id="rolePurpose" formControlName="rolePurpose"
+                        placeholder="Enter description"></textarea>
+                </div>
+
+
+                <!-- Plan Selection -->
+                <div class="col-12 mt-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold m-0 text-secondary text-uppercase small ls-1">Permissions Configuration</h6>
+
+                        <div class="d-flex gap-2">
+                            <select class="form-select form-select-sm" style="width: 200px;"
+                                formControlName="selectedPlanId">
+                                <option [ngValue]="null" disabled>Select Plan to Add</option>
+                                @for (plan of planList; track plan.planId) {
+                                <option [value]="plan.planId">{{ plan.planName }}</option>
+                                }
+                            </select>
+                            <button type="button" class="btn btn-sm btn-primary d-flex align-items-center gap-1"
+                                (click)="onAddPlan()" [disabled]="!form.get('selectedPlanId')?.value">
+                                <mat-icon class="icon-sm">add</mat-icon>
+                                Add Plan
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Selected Plans List -->
+                    <div class="d-flex flex-column gap-4">
+                        @for (plan of selectedPlans; track plan.planId; let i = $index) {
+                        <div class="card border-0 shadow-sm plan-card">
+                            <div
+                                class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="icon-box-sm bg-light-primary text-primary rounded p-1">
+                                        <mat-icon class="icon-sm">verified_user</mat-icon>
+                                    </div>
+                                    <h6 class="m-0 fw-bold text-dark">{{ plan.planName }}</h6>
+                                </div>
+                                <button type="button"
+                                    class="btn btn-sm btn-outline-danger border-0 bg-light-danger text-danger"
+                                    (click)="removePlan(i)" matTooltip="Remove Plan">
+                                    <mat-icon class="icon-sm">delete</mat-icon>
+                                </button>
+                            </div>
+                            <div class="card-body p-0">
+                                <!-- Programs within the Plan -->
+                                @if (plan.programPlanDetails && plan.programPlanDetails.length > 0) {
+                                <div class="d-flex flex-column">
+                                    @for (program of plan.programPlanDetails; track program.programId) {
+                                    <div class="program-group p-3 border-bottom border-light-subtle">
+                                        <div class="d-flex align-items-center gap-2 mb-3">
+                                            <mat-icon class="text-secondary icon-xs">extension</mat-icon>
+                                            <span class="fw-semibold text-secondary small text-uppercase">{{
+                                                program.programName }}</span>
+                                        </div>
+
+                                        <div class="action-grid">
+                                            @for (action of program.actions; track action.actionLinkId ||
+                                            action.actionId) {
+                                            <div class="form-check action-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                    [id]="'action-' + plan.planId + '-' + (action.actionLinkId || action.actionId)"
+                                                    [checked]="isActionSelected(plan, action.actionLinkId || action.actionId)"
+                                                    (change)="toggleAction(plan, action.actionLinkId || action.actionId, $any($event.target).checked)">
+                                                <label class="form-check-label user-select-none"
+                                                    [for]="'action-' + plan.planId + '-' + (action.actionLinkId || action.actionId)">
+                                                    {{ action.actionName }}
+                                                </label>
+                                            </div>
+                                            }
+                                        </div>
+                                    </div>
+                                    }
+                                </div>
+                                } @else {
+                                <div class="p-4 text-center text-muted">
+                                    <mat-icon class="mb-2 text-secondary opacity-50">block</mat-icon>
+                                    <p class="small m-0">No actions configured for this plan.</p>
+                                </div>
+                                }
+                            </div>
+                        </div>
+                        } @empty {
+                        <div class="alert alert-light border border-dashed text-center p-5 text-muted">
+                            <mat-icon class="mb-2 opacity-50">playlist_add</mat-icon>
+                            <p class="m-0">No plans added yet. Select a plan above to configure permissions.</p>
+                        </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="col-12 mt-4 d-flex justify-content-end gap-2">
+                    <mat-dialog-actions class="mt-4">
+                        <button type="button" class="close-btn" (click)="goBack()">Cancel</button>
+                        <button class="submit-btn" type="submit" [disabled]="submitting" (click)="onSubmit()">
+                            @if (submitting) {
+                            <span class="btn-loader"></span>
+                            }
+                            Save Role
+                        </button>
+                    </mat-dialog-actions>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
