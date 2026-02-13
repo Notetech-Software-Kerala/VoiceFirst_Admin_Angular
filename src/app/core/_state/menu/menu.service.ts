@@ -31,6 +31,13 @@ export class MenuService {
         );
     }
 
+    restoreMasterMenu(id: number): Observable<ApiResponse<void>> {
+        return this.http.patch<ApiResponse<void>>(
+            `${this.base}${apiConfig.menuMasterRestore}/${id}`,
+            null
+        );
+    }
+
     getWebmenu(): Observable<WebMenuModel[]> {
         return this.http.get<ApiResponse<WebMenuModel[]>>(
             `${this.base}${apiConfig.menuWeb}`
@@ -64,7 +71,7 @@ export class MenuService {
 
     delete(id: number): Observable<ApiResponse<void>> {
         return this.http.delete<ApiResponse<void>>(
-            `${this.base}${apiConfig.menu}/${id}`
+            `${this.base}${apiConfig.menuMaster}/${id}`
         );
     }
 

@@ -73,7 +73,7 @@
             <tbody>
                 @for (item of menus; track item.menuId) {
                 <tr>
-                    <td>{{ item.menuName }}</td>
+                    <td><a class="list-link" (click)="navigateToDetails(item)">{{ item.menuName }}</a></td>
                     <td>
                         @if (item.icon) {
                         <mat-icon class="icon-preview">{{ item.icon }}</mat-icon>

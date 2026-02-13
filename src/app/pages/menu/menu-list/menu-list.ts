@@ -244,23 +244,23 @@ export class MenuList {
   }
 
   onRestore(item: MasterMenuModel) {
-    // this.confirmationService.confirmRestore(item.menuName)
-    //   .pipe(takeUntil(this.destroy$))
-    //   .subscribe(confirmed => {
-    //     if (confirmed) {
-    //       this.menuService.restore(item.menuId).subscribe({
-    //         next: (res) => {
-    //           if (res.statusCode === 200) {
-    //             this.toastService.success('Menu restored successfully', 'Success');
-    //             this.loadData();
-    //           }
-    //         },
-    //         error: (error) => {
-    //           this.toastService.error(error.message);
-    //         }
-    //       })
-    //     }
-    //   });
+    this.confirmationService.confirmRestore(item.menuName)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(confirmed => {
+        if (confirmed) {
+          this.menuService.restoreMasterMenu(item.menuId).subscribe({
+            next: (res) => {
+              if (res.statusCode === 200) {
+                this.toastService.success('Menu restored successfully', 'Success');
+                this.loadData();
+              }
+            },
+            error: (error) => {
+              this.toastService.error(error.message);
+            }
+          })
+        }
+      });
   }
 
   onSuspend(item: MasterMenuModel) {
@@ -303,5 +303,9 @@ export class MenuList {
 
   navigateToEdit(item: MasterMenuModel) {
     this.router.navigate(['/menu/edit', item.menuId]);
+  }
+
+  navigateToDetails(item: MasterMenuModel) {
+    this.router.navigate(['/menu/details', item.menuId]);
   }
 }

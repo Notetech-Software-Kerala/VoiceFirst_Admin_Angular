@@ -50,7 +50,7 @@ export class AddEditMenu implements OnInit {
     this.form = this.fb.group({
       menuName: ['', Validators.required],
       icon: ['', Validators.required],
-      route: ['', Validators.required],
+      route: [''],
       plateFormId: [null, Validators.required],
       web: [false],
       app: [false],
@@ -80,13 +80,13 @@ export class AddEditMenu implements OnInit {
       next: (response: any) => {
         if (response && response.data) {
           this.originalData = response.data;
+          console.log(this.originalData);
+
           this.patchForm(response.data);
         }
       },
       error: (err) => {
         console.error(err);
-        this.toastService.error('Failed to load data.');
-        this.toastService.error('Failed to load data.');
       }
     });
   }
@@ -211,7 +211,6 @@ export class AddEditMenu implements OnInit {
       },
       error: (err) => {
         this.submitting = false;
-        this.toastService.error(err.message || 'An error occurred');
       }
     });
   }
@@ -284,7 +283,6 @@ export class AddEditMenu implements OnInit {
       },
       error: (err) => {
         this.submitting = false;
-        this.toastService.error(err.message || 'An error occurred');
       }
     });
   }

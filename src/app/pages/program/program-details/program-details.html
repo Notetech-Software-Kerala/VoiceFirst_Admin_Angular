@@ -126,6 +126,7 @@
                             <th>Action Name</th>
                             <th>Created By</th>
                             <th>Modified By</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -155,6 +156,7 @@
                                 <span>-</span>
                                 }
                             </td>
+                            <td><app-status-badge [item]="action"></app-status-badge></td>
                         </tr>
                         } @empty {
                         <tr>

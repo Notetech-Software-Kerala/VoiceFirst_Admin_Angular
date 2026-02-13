@@ -60,16 +60,9 @@
 
                 <!-- Route -->
                 <div class="col-md-6">
-                    <label for="route" class="form-label">Route <span class="text-danger">*</span></label>
+                    <label for="route" class="form-label">Route</label>
                     <input type="text" class="form-control" id="route" formControlName="route"
                         placeholder="Enter route" />
-                    @if (form.get('route')?.touched && form.get('route')?.invalid) {
-                    <div class="text-danger small mt-1">
-                        @if (form.get('route')?.hasError('required')) {
-                        Route is required.
-                        }
-                    </div>
-                    }
                 </div>
 
                 <!-- App/Web Checkboxes -->
@@ -88,6 +81,7 @@
                 </div>
 
                 <!-- Programs -->
+                @if(form.get('route')?.value != null && form.get('route')?.value != ''){
                 <div class="col-12">
                     <label class="form-label fw-bold mb-2">Program Association</label>
                     <div class="d-flex flex-wrap gap-3 p-3 rounded program-action-list">
@@ -125,6 +119,8 @@
                         }
                     </div>
                 </div>
+                }
+
 
 
                 <div class="col-12 mt-4 d-flex justify-content-end gap-2">
