@@ -8,8 +8,7 @@ export interface RoleModel {
   rolePurpose: string;
 
   applicationId: number;
-  // platformId might be needed if it's part of the form/response
-  platformId?: number;
+  platformId: number;
 
   active: boolean;
   deleted: boolean;
@@ -23,31 +22,34 @@ export interface RoleModel {
   deletedUser: string;
   deletedDate: string | null;
 
-  // For Edit Mode details (assuming structure based on requirement)
-  rolePlanDetails?: RolePlanDetail[];
+  // New structure
+  planRoleActionLink?: PlanRoleActionLink[];
 }
 
-export interface RolePlanDetail {
-  rolePlanLinkId: number;
+export interface PlanRoleActionLink {
+  planRoleLinkId: number;
   planId: number;
-  planName: string;
-  // actions linked to this plan for this role
-  actions: RoleActionDetail[];
+  planActionLink: PlanActionLink[];
 }
 
-export interface RoleActionDetail {
-  rolePlanActionLinkId?: number; // helper ID if needed
+export interface PlanActionLink {
   actionLinkId: number;
+  actionName: string;
   active: boolean;
+  createdUser?: string;
+  createdDate?: string;
+  modifiedUser?: string;
+  modifiedDate?: string;
+  // any other fields from API if needed
 }
 
 // Payload Interfaces
-export interface PlanActionLinkCreateDto {
+export interface createPlanActionLink {
   planId: number;
   actionLinkIds: number[];
 }
 
-export interface UpdateActionLinkContainerDto {
+export interface updatePlanActionLinks {
   rolePlanLinkId: number;
   updateActionLinks: UpdateActionLinkDto[];
 }

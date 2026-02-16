@@ -335,4 +335,8 @@ export class RoleList {
     this.router.navigate(['/role/edit', item.roleId]);
 
   }
+
+  navigateToDetails(item: RoleModel) {
+    this.router.navigate(['/role/details', item.roleId]);
+  }
 }

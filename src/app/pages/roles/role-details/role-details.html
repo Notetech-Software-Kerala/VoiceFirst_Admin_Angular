@@ -1,0 +1,182 @@
+<div class="card detail-card p-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+        <div class="d-flex flex-column gap-2">
+            <div class="d-flex align-items-center gap-3">
+                <h2 class="page-title m-0">{{ role?.roleName }}</h2>
+                @if(role) {
+                <app-status-badge [item]="role"></app-status-badge>
+                }
+            </div>
+            <!-- Meta Info Row -->
+            @if(role) {
+            <div class="row g-3 mt-1">
+                @if(role.createdDate) {
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2">
+                        <mat-icon class="tiny-icon">calendar_today</mat-icon>
+                        <span class="small">Created: <strong>{{ role.createdDate | date:'mediumDate'
+                                }}</strong> by <strong>{{ role.createdUser }}</strong></span>
+                    </div>
+                </div>
+                }
+
+                @if(role.modifiedDate ) {
+                <div class="col-md-auto border-start ps-3 d-none d-md-block"></div>
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2">
+                        <mat-icon class="tiny-icon">edit</mat-icon>
+                        <span class="small">Modified: <strong>{{ role.modifiedDate | date:'mediumDate'
+                                }}</strong> by <strong>{{ role.modifiedUser }}</strong></span>
+                    </div>
+                </div>
+                }
+
+                @if(role.deleted) {
+                <div class="col-md-auto border-start ps-3 d-none d-md-block"></div>
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2 text-danger">
+                        <mat-icon class="tiny-icon">delete</mat-icon>
+                        <span class="small">Deleted: <strong>{{ role.deletedDate | date:'mediumDate' }}</strong> by
+                            <strong>{{ role.deletedUser }}</strong></span>
+                    </div>
+                </div>
+                }
+            </div>
+            @if(role.rolePurpose) {
+            <div class="col-md-12  mb-3">
+                <div class="info-label">Role Purpose</div>
+                <div class="info-value">{{ role.rolePurpose }}</div>
+            </div>
+            }
+            }
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2 flex-wrap">
+            @if(role) {
+            @if(!role.deleted) {
+            <button type="button" class="btn-action btn-outline-info" (click)="onEdit()">
+                <mat-icon class="msr">edit</mat-icon>
+                <span class="btn-text">Edit</span>
+            </button>
+            <button type="button" class="btn-action"
+                [ngClass]="role.active ? 'btn-outline-warning' : 'btn-outline-success'" (click)="onSuspend()">
+                <mat-icon class="msr">{{ role.active ? 'block' : 'check_circle' }}</mat-icon>
+                <span class="btn-text">{{ role.active ? 'Suspend' : 'Reinstate' }}</span>
+            </button>
+            }
+
+
+            @if(!role.deleted) {
+            <button type="button" class="btn-action btn-outline-danger" (click)="onDelete()">
+                <mat-icon class="msr">delete</mat-icon>
+                <span class="btn-text">Delete</span>
+            </button>
+            }
+            @else {
+            <button type="button" class="btn-action btn-outline-success" (click)="onRestore()">
+                <mat-icon class="msr">restore</mat-icon>
+                <span class="btn-text">Restore</span>
+            </button>
+            }
+
+            <button type="button" class="btn-action btn-outline" (click)="goBack()">
+                <mat-icon class="msr">arrow_back</mat-icon>
+                <span class="btn-text">Back</span>
+            </button>
+            }
+        </div>
+    </div>
+
+    @if(loading) {
+    <app-details-loader [rows]="2"></app-details-loader>
+    } @else if (role) {
+
+    <!-- Content Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <h5 class="section-title mb-4">Permissions Configuration</h5>
+
+            <div class="d-flex flex-column gap-3 detail-card">
+                @for (planLink of role.planRoleActionLink; track planLink.planRoleLinkId) {
+                <div class="plan-list-item d-block">
+                    <!-- Plan Info Header -->
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="icon-box">
+                            <mat-icon>assignment</mat-icon>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <h6 class="plan-name mb-0">Plan ID: {{ planLink.planId }}</h6>
+                            <span class="action-count">{{ planLink.planActionLink.length }} Action(s) Configured</span>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Action Table -->
+                    <div class="table-responsive border rounded-3 overflow-hidden bg-white">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-3">Action Name</th>
+                                    <th>Created By</th>
+                                    <th>Modified By</th>
+                                    <th class="text-end pe-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (action of planLink.planActionLink; track action.actionLinkId) {
+                                <tr>
+                                    <td class="ps-3 fw-medium">{{ action.actionName }}</td>
+                                    <td>
+                                        @if (action.createdUser || action.createdDate) {
+                                        <div class="d-flex flex-column">
+                                            <small>{{ action.createdUser || '-' }}</small>
+                                            <small>{{ action.createdDate | date:'mediumDate' }}</small>
+                                        </div>
+                                        } @else {
+                                        <span>-</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (action.modifiedUser || action.modifiedDate) {
+                                        <div class="d-flex flex-column">
+                                            <small>{{ action.modifiedUser || '-' }}</small>
+                                            <small>{{ action.modifiedDate | date:'mediumDate' }}</small>
+                                        </div>
+                                        } @else {
+                                        <span>-</span>
+                                        }
+                                    </td>
+                                    <td class="text-end pe-3">
+                                        <div class="d-flex justify-content-end">
+                                            <app-status-badge [item]="action"></app-status-badge>
+                                        </div>
+                                    </td>
+                                </tr>
+                                } @empty {
+                                <tr>
+                                    <td colspan="4" class="text-center py-3 text-muted fst-italic">
+                                        No actions configured for this plan.
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                } @empty {
+                <div class="alert alert-info d-flex align-items-center">
+                    <mat-icon class="me-2">info</mat-icon>
+                    No plans configured for this role.
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    } @else {
+    <div class="alert alert-warning">
+        Role not found.
+    </div>
+    }
+</div>

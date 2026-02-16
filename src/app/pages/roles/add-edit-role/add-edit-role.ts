@@ -10,7 +10,7 @@ import { CommonModule, Location } from '@angular/common';
 import { MaterialModule } from '../../../material.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { PlanModel } from '../../../core/_state/plan/plan.model';
-import { PlanActionLinkCreateDto, UpdateActionLinkContainerDto, RoleModel } from '../../../core/_state/role/role.model';
+import { createPlanActionLink, updatePlanActionLinks, RoleModel } from '../../../core/_state/role/role.model';
 
 @Component({
   selector: 'app-add-edit-role',
@@ -99,18 +99,11 @@ export class AddEditRole implements OnInit {
       platformId: data.platformId
     });
 
-    if (data.rolePlanDetails) {
-      // Load existing plans and their actions
-      // We need to transform rolePlanDetails into our ExtendedPlanModel structure
-      // But we also need the full program/action structure for the UI (names etc.)
-      // So for each existing plan, we might need to fetch its details OR rely on what's in rolePlanDetails.
-      // Issue: rolePlanDetails might only have the *linked* actions, not *all possible* actions to uncheck/check.
-      // Best approach: Fetch details for each plan to get full list of available actions.
-
-      const requests = data.rolePlanDetails.map(rp =>
-        this.planService.getById(rp.planId).pipe(switchMap(res => of({
+    if (data.planRoleActionLink) {
+      const requests = data.planRoleActionLink.map(link =>
+        this.planService.getById(link.planId).pipe(switchMap(res => of({
           planDetails: res.data,
-          roleLink: rp
+          roleLink: link
         })))
       );
 
@@ -124,13 +117,13 @@ export class AddEditRole implements OnInit {
               const extendedPlan: ExtendedPlanModel = {
                 ...plan,
                 isExisting: true,
-                rolePlanLinkId: roleLink.rolePlanLinkId,
+                rolePlanLinkId: roleLink.planRoleLinkId,
                 selectedActions: new Set<number>()
               };
 
               // Pre-select actions that are active in the role
-              if (roleLink.actions) {
-                roleLink.actions.forEach(a => {
+              if (roleLink.planActionLink) {
+                roleLink.planActionLink.forEach(a => {
                   if (a.active) extendedPlan.selectedActions.add(a.actionLinkId);
                 });
               }
@@ -171,12 +164,6 @@ export class AddEditRole implements OnInit {
   }
 
   removePlan(index: number) {
-    // If existing, we might need to mark it for deletion or handle via API?
-    // Requirement didn't specify removing plans, but usually possible.
-    // For now, allow removing new plans easily. 
-    // Existing plans: Removing them implies removing all permissions? 
-    // If we remove from UI, we won't send updateActionLinks for it.
-    // Let's assume remove is allowed. 
     this.selectedPlans.splice(index, 1);
   }
 
@@ -217,7 +204,7 @@ export class AddEditRole implements OnInit {
   addRole() {
     const formValue = this.form.value;
 
-    const planActionLinkCreateDto: PlanActionLinkCreateDto[] = this.selectedPlans.map(p => ({
+    const createPlanActionLink: createPlanActionLink[] = this.selectedPlans.map(p => ({
       planId: p.planId,
       actionLinkIds: Array.from(p.selectedActions)
     }));
@@ -226,41 +213,36 @@ export class AddEditRole implements OnInit {
       roleName: formValue.roleName,
       rolePurpose: formValue.rolePurpose,
       platformId: formValue.platformId,
-      planActionLinkCreateDto: planActionLinkCreateDto
+      createPlanActionLink: createPlanActionLink
     };
 
     console.log('Add Role Payload:', payload);
 
-    // this.roleService.create(payload).subscribe({
-    //   next: (res) => {
-    //     this.submitting = false;
-    //     if (res.statusCode === 200 || res.statusCode === 201) {
-    //       this.toastService.success('Role created successfully');
-    //       this.goBack();
-    //     } else {
-    //       this.toastService.error(res.message || 'Operation failed');
-    //     }
-    //   },
-    //   error: (err) => {
-    //     this.submitting = false;
-    //     this.toastService.error(err.message || 'An error occurred');
-    //   }
-    // });
+    this.roleService.create(payload).subscribe({
+      next: (res) => {
+        this.submitting = false;
+        if (res.statusCode === 200 || res.statusCode === 201) {
+          this.toastService.success('Role created successfully');
+          this.goBack();
+        } else {
+          this.toastService.error(res.message || 'Operation failed');
+        }
+      },
+      error: (err) => {
+        this.submitting = false;
+      }
+    });
   }
 
   editRole() {
     const formValue = this.form.value;
     const original = this.originalData;
-    const changes: any = {};
-
-    if (formValue.roleName !== original.roleName) changes.roleName = formValue.roleName;
-    if (formValue.rolePurpose !== original.rolePurpose) changes.rolePurpose = formValue.rolePurpose;
-    if (formValue.platformId !== original.platformId) changes.platformId = formValue.platformId;
+    const changes = this.getChangedValues(formValue, original);
 
     // Handle New Plans
     const newPlans = this.selectedPlans.filter(p => !p.isExisting);
     if (newPlans.length > 0) {
-      changes.planActionLinkCreateDto = newPlans.map(p => ({
+      changes.createPlanActionLink = newPlans.map(p => ({
         planId: p.planId,
         actionLinkIds: Array.from(p.selectedActions)
       }));
@@ -268,19 +250,13 @@ export class AddEditRole implements OnInit {
 
     // Handle Existing Plans Updates
     const existingPlans = this.selectedPlans.filter(p => p.isExisting);
-    const updateActionLinks: UpdateActionLinkContainerDto[] = [];
+    const updateActionLinks: updatePlanActionLinks[] = [];
 
     existingPlans.forEach(p => {
-      // Find original linkage info
-      const originalLink = original.rolePlanDetails?.find(d => d.planId === p.planId);
+      // Find original linkage info using planRoleActionLink
+      const originalLink = original.planRoleActionLink?.find(d => d.planId === p.planId);
       if (!originalLink) return;
 
-      // Compare actions
-      // We need to send updates for changed actions.
-      // "active": true if selected, false if unchecked.
-
-      // Get all possible actions for this plan from the plan details we fetched
-      // We need to key off the actions in p.programPlanDetails
       const allActions = new Set<number>();
       if (p.programPlanDetails) {
         p.programPlanDetails.forEach((ppd: any) => {
@@ -298,7 +274,7 @@ export class AddEditRole implements OnInit {
         const isSelected = p.selectedActions.has(actionId);
 
         // Check original state
-        const originalAction = originalLink.actions.find(oa => oa.actionLinkId === actionId);
+        const originalAction = originalLink.planActionLink.find(oa => oa.actionLinkId === actionId);
         const wasSelected = originalAction ? originalAction.active : false;
 
         if (isSelected !== wasSelected) {
@@ -341,9 +317,33 @@ export class AddEditRole implements OnInit {
       },
       error: (err) => {
         this.submitting = false;
-        this.toastService.error(err.message || 'An error occurred');
       }
     });
+  }
+
+  getChangedValues(formValue: any, original: any): any {
+    const changes: any = {};
+    Object.keys(formValue).forEach(key => {
+      if (key === 'selectedPlanId') return;
+
+      const currentValue = formValue[key];
+      const originalValue = original[key];
+
+      // Robust comparison
+      if (currentValue !== originalValue) {
+        // Treat null and undefined as equal
+        if ((currentValue === null || currentValue === undefined) && (originalValue === null || originalValue === undefined)) {
+          return;
+        }
+        // Treat empty string and null/undefined as equal (common in forms)
+        if (currentValue === '' && (originalValue === null || originalValue === undefined)) {
+          return;
+        }
+
+        changes[key] = currentValue;
+      }
+    });
+    return changes;
   }
 }
 

@@ -121,6 +121,10 @@ export const routes: Routes = [
                         path: 'edit/:id',
                         loadComponent: () => import('./pages/roles/add-edit-role/add-edit-role').then(m => m.AddEditRole)
                     },
+                    {
+                        path: 'details/:id',
+                        loadComponent: () => import('./pages/roles/role-details/role-details').then(m => m.RoleDetails)
+                    }
 
                 ]
             },

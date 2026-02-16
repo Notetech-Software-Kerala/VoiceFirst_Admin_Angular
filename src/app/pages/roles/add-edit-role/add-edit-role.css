@@ -1,65 +1,176 @@
-.ls-1 {
-    letter-spacing: 1px;
+/* Global variables from styles.css are used for theme support */
+:host {
+    display: block;
 }
 
+.ls-1 {
+    letter-spacing: 0.5px;
+}
+
+/* Compact headers */
+h6 {
+    font-size: 0.9rem;
+    color: var(--color-text-primary);
+}
+
+.text-secondary {
+    color: var(--color-text-placeholder) !important;
+}
+
+/* Icon box styling aligned with theme */
 .icon-box-sm {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 6px;
+    background-color: color-mix(in srgb, var(--color-hover-primary) 10%, transparent);
+    color: var(--color-hover-primary);
 }
 
-.bg-light-primary {
-    background-color: rgba(var(--color-primary-rgb), 0.1);
+.icon-sm {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
 }
 
-.bg-light-danger {
-    background-color: rgba(var(--color-danger-rgb), 0.1);
-}
-
+/* Plan Card - Compact & Themed */
 .plan-card {
     transition: transform 0.2s, box-shadow 0.2s;
-    border-radius: 12px;
+    border-radius: 8px;
     overflow: hidden;
+    background-color: var(--color-bg-sidebar);
+    /* Theme bg */
+    border: 1px solid var(--color-border-hr);
 }
 
 .plan-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 4px 12px var(--color-shadow) !important;
+    transform: translateY(-1px);
+}
+
+.card-header {
+    background-color: var(--color-bg-sidebar);
+    border-bottom: 1px solid var(--color-border-hr);
+    padding: 8px 12px;
+    /* Compact padding */
+}
+
+/* Program Group - Compact */
+.program-group {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--color-border-hr);
 }
 
 .program-group:last-child {
     border-bottom: none !important;
 }
 
-.action-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 12px 16px;
-    padding-left: 32px;
+.program-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
 }
 
+.icon-xs {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+    color: var(--color-text-placeholder);
+}
+
+.program-title {
+    font-weight: 600;
+    color: var(--color-text-placeholder);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Action Grid - Compact */
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 4px 12px;
+    padding-left: 22px;
+    /* Indent slightly under program icon */
+}
+
+/* Checkbox Styling */
 .action-check .form-check-input {
     cursor: pointer;
-    margin-top: 0.2rem;
+    margin-top: 0.15rem;
+    width: 0.9em;
+    height: 0.9em;
+    border-color: var(--color-border-hr);
+}
+
+.action-check .form-check-input:checked {
+    background-color: var(--color-hover-primary);
+    border-color: var(--color-hover-primary);
 }
 
 .action-check .form-check-label {
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    /* Smaller font */
     color: var(--color-text-primary);
+    line-height: 1.2;
+    padding-top: 1px;
 }
 
-.border-dashed {
-    border-style: dashed !important;
+.action-check:hover .form-check-label {
+    color: var(--color-hover-primary);
 }
 
-.text-muted p {
-    color: var(--color-text-secondary);
+/* Empty State Styling */
+.empty-state {
+    padding: 20px;
+    text-align: center;
+    color: var(--color-text-placeholder);
+    background-color: color-mix(in srgb, var(--color-bg-primary) 50%, transparent);
+    border-radius: 8px;
+    border: 1px dashed var(--color-border-hr);
 }
 
-.icon-xs {
-    width: 18px;
-    height: 18px;
-    font-size: 18px;
+.empty-state mat-icon {
+    opacity: 0.5;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+/* Scrollbar within card body if needed */
+.card-body {
+    padding: 0;
+}
+
+/* Buttons */
+.btn-outline-danger {
+    color: var(--color-status-error-text);
+    border-color: transparent !important;
+    background: transparent;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.btn-outline-danger:hover {
+    background-color: var(--color-status-error-bg);
+}
+
+.btn-sm {
+    font-size: 0.8rem;
+    padding: 4px 10px;
 }

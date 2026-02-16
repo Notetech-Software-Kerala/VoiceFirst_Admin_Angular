@@ -40,6 +40,7 @@ export interface MasterMenuModel {
     icon: string;
     route: string;
     plateFormId: number;
+    plateForm?: string; // from getById
     active: boolean;
     deleted: boolean;
     createdUser: string | null;
@@ -48,4 +49,20 @@ export interface MasterMenuModel {
     modifiedDate: string | null;
     deletedUser: string | null;
     deletedDate: string | null;
+    web?: boolean; // from getById
+    app?: boolean; // from getById
+    menuProgramLinks?: MenuProgramLink[]; // from getById
+}
+
+export interface MenuProgramLink {
+    menuProgramLinkId: number;
+    programId: number;
+    programName: string;
+    route: string;
+    primary: boolean;
+    active: boolean;
+    createdDate: string;
+    createdUser: string | null;
+    modifiedDate: string | null;
+    modifiedUser: string | null;
 }

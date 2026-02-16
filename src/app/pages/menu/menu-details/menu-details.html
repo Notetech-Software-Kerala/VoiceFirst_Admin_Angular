@@ -1,1 +1,179 @@
-<p>menu-details works!</p>
+<div class="card detail-card p-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+        <div class="d-flex flex-column gap-2">
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box-lg">
+                    <mat-icon>{{ menu?.icon || 'menu' }}</mat-icon>
+                </div>
+                <h2 class="page-title m-0">{{ menu?.menuName }}</h2>
+                @if(menu) {
+                <app-status-badge [item]="menu"></app-status-badge>
+                }
+            </div>
+
+            <!-- Meta Info Row -->
+            @if(menu) {
+            <div class="row g-3 mt-1">
+                @if(menu.createdDate) {
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2">
+                        <mat-icon class="tiny-icon">calendar_today</mat-icon>
+                        <span class="small">Created: <strong>{{ menu.createdDate | date:'mediumDate'
+                                }}</strong> by <strong>{{ menu.createdUser || 'System' }}</strong></span>
+                    </div>
+                </div>
+                }
+
+                @if(menu.modifiedDate) {
+                <div class="col-md-auto border-start ps-3 d-none d-md-block"></div>
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2">
+                        <mat-icon class="tiny-icon">edit</mat-icon>
+                        <span class="small">Modified: <strong>{{ menu.modifiedDate | date:'mediumDate'
+                                }}</strong> by <strong>{{ menu.modifiedUser || 'System' }}</strong></span>
+                    </div>
+                </div>
+                }
+
+                @if(menu.deleted) {
+                <div class="col-md-auto border-start ps-3 d-none d-md-block"></div>
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2 text-danger">
+                        <mat-icon class="tiny-icon">delete</mat-icon>
+                        <span class="small">Deleted: <strong>{{ menu.deletedDate | date:'mediumDate' }}</strong> by
+                            <strong>{{ menu.deletedUser || 'System' }}</strong></span>
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2 flex-wrap">
+            @if(menu) {
+            @if(!menu.deleted) {
+            <button type="button" class="btn-action btn-outline-info" (click)="onEdit()">
+                <mat-icon class="msr">edit</mat-icon>
+                <span class="btn-text">Edit</span>
+            </button>
+            <button type="button" class="btn-action"
+                [ngClass]="menu.active ? 'btn-outline-warning' : 'btn-outline-success'" (click)="onSuspend()">
+                <mat-icon class="msr">{{ menu.active ? 'block' : 'check_circle' }}</mat-icon>
+                <span class="btn-text">{{ menu.active ? 'Suspend' : 'Reinstate' }}</span>
+            </button>
+            }
+
+
+            @if(!menu.deleted) {
+            <button type="button" class="btn-action btn-outline-danger" (click)="onDelete()">
+                <mat-icon class="msr">delete</mat-icon>
+                <span class="btn-text">Delete</span>
+            </button>
+            }
+            @else {
+            <button type="button" class="btn-action btn-outline-success" (click)="onRestore()">
+                <mat-icon class="msr">restore</mat-icon>
+                <span class="btn-text">Restore</span>
+            </button>
+            }
+
+            <button type="button" class="btn-action btn-outline" (click)="goBack()">
+                <mat-icon class="msr">arrow_back</mat-icon>
+                <span class="btn-text">Back</span>
+            </button>
+            }
+        </div>
+    </div>
+
+    @if(loading) {
+    <app-details-loader [rows]="2"></app-details-loader>
+    } @else if (menu) {
+
+    <!-- Menu Info Grid -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="info-label">Platform</div>
+            <div class="info-value d-flex align-items-center gap-2">
+                {{ menu.plateForm || 'N/A' }}
+                <!-- <span class="badge bg-light text-dark border">{{ menu.plateFormId }}</span> -->
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="info-label">Visibility</div>
+            <div class="d-flex gap-2 mt-1">
+                <span class="platform-badge" [class.active]="menu.web">
+                    <mat-icon class="tiny-icon me-1" style="vertical-align: text-bottom;">language</mat-icon> Web
+                </span>
+                <span class="platform-badge" [class.active]="menu.app">
+                    <mat-icon class="tiny-icon me-1" style="vertical-align: text-bottom;">smartphone</mat-icon> App
+                </span>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="info-label">Route</div>
+            <div class="info-value"><code>{{ menu.route || '-' }}</code></div>
+        </div>
+    </div>
+
+    <!-- Associated Programs Table Section -->
+    <div class="row">
+        <div class="col-12">
+            <h5 class="section-title mb-3">Associated Programs</h5>
+
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Program Name</th>
+                            <th>Route</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (link of menu.menuProgramLinks; track link.menuProgramLinkId) {
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="icon-box">
+                                        <mat-icon>extension</mat-icon>
+                                    </div>
+                                    <span class="fw-medium">{{ link.programName }}</span>
+                                </div>
+                            </td>
+                            <td><code>{{ link.route }}</code></td>
+                            <td>
+                                @if(link.primary) {
+                                <span class="badge bg-info text-dark">Primary</span>
+                                }
+                            </td>
+                            <td>
+                                <app-status-badge [item]="link"></app-status-badge>
+                            </td>
+                        </tr>
+                        } @empty {
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-muted">
+                                <div class="d-flex flex-column align-items-center justify-content-center gap-2">
+                                    <mat-icon class="text-secondary">info</mat-icon>
+                                    <span>No programs linked to this menu.</span>
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    } @else {
+    <div class="alert alert-warning">
+        Menu not found.
+    </div>
+    }
+</div>
