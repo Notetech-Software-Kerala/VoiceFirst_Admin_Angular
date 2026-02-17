@@ -101,9 +101,8 @@ export class AddEditProgram {
           this.patchForm(response.data);
         }
       },
-      error: (err) => {
-        console.error(err);
-        this.toastService.error('Failed to load data.');
+      error: (error) => {
+        console.error(error);
       }
     });
   }
@@ -201,15 +200,14 @@ export class AddEditProgram {
           this.submitting = false;
           // Backend returns 200 or 201 for functionality success
           if (res.statusCode === 200 || res.statusCode === 201) {
-            this.toastService.success('Program created successfully');
+            this.toastService.success('Program created successfully', 'Success');
             this.goBack();
           } else {
-            this.toastService.error(res.message || 'Operation failed');
+            this.toastService.error(res.message || 'Operation failed', 'Error');
           }
         },
-        error: (err) => {
+        error: (error) => {
           this.submitting = false;
-          this.toastService.error(err.message || 'An error occurred');
         }
       });
     }
@@ -220,7 +218,7 @@ export class AddEditProgram {
       const changes = this.getChangedValues(this.form.value, this.originalData);
 
       if (Object.keys(changes).length === 0) {
-        this.toastService.info('No changes detected');
+        this.toastService.info('No changes detected', 'Info');
         this.submitting = false;
         return;
       }
@@ -231,15 +229,14 @@ export class AddEditProgram {
         next: (res) => {
           this.submitting = false;
           if (res.statusCode === 200) {
-            this.toastService.success('Program updated successfully');
+            this.toastService.success('Program updated successfully', 'Success');
             this.goBack();
           } else {
-            this.toastService.error(res.message || 'Operation failed');
+            this.toastService.error(res.message || 'Operation failed', 'Error');
           }
         },
-        error: (err) => {
+        error: (error) => {
           this.submitting = false;
-          this.toastService.error(err.message || 'An error occurred');
         }
       });
     }

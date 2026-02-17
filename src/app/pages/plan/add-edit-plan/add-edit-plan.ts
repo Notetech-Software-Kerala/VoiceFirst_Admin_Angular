@@ -61,8 +61,7 @@ export class AddEditPlan implements OnInit {
           this.loadPlanData();
         }
       },
-      error: (err) => {
-        this.toastService.error('Failed to load actions');
+      error: (error) => {
       }
     });
   }
@@ -75,8 +74,7 @@ export class AddEditPlan implements OnInit {
           this.patchForm(res.data);
         }
       },
-      error: (err) => {
-        this.toastService.error('Failed to load plan details');
+      error: (error) => {
         this.goBack();
       }
     });
@@ -171,15 +169,14 @@ export class AddEditPlan implements OnInit {
       next: (res) => {
         this.submitting = false;
         if (res.statusCode === 201) {
-          this.toastService.success('Plan created successfully');
+          this.toastService.success('Plan created successfully', 'Success');
           this.goBack();
         } else {
-          this.toastService.error(res.message || 'Operation failed');
+          this.toastService.error(res.message || 'Operation failed', 'Error');
         }
       },
-      error: (err) => {
+      error: (error) => {
         this.submitting = false;
-        this.toastService.error(err.message || 'An error occurred');
       }
     });
   }
@@ -188,7 +185,7 @@ export class AddEditPlan implements OnInit {
     const changes = this.getChangedValues(this.form.value, this.originalData);
 
     if (Object.keys(changes).length === 0) {
-      this.toastService.info('No changes detected');
+      this.toastService.info('No changes detected', 'Info');
       this.submitting = false;
       return;
     }
@@ -197,15 +194,14 @@ export class AddEditPlan implements OnInit {
       next: (res) => {
         this.submitting = false;
         if (res.statusCode === 200) {
-          this.toastService.success('Plan updated successfully');
+          this.toastService.success('Plan updated successfully', 'Success');
           this.goBack();
         } else {
-          this.toastService.error(res.message || 'Operation failed');
+          this.toastService.error(res.message || 'Operation failed', 'Error');
         }
       },
-      error: (err) => {
+      error: (error) => {
         this.submitting = false;
-        this.toastService.error(err.message || 'An error occurred');
       }
     });
   }

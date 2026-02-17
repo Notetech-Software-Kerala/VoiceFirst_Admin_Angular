@@ -65,13 +65,12 @@ export class RoleDetails implements OnInit, OnDestroy {
           if (res.statusCode === 200 && res.data) {
             this.role = res.data;
           } else {
-            this.toastService.error(res.message || 'Failed to load role details');
+            this.toastService.error(res.message || 'Failed to load role details', 'Error');
           }
           this.loading = false;
         },
-        error: (err) => {
-          console.error('Error loading role details', err);
-          this.toastService.error('Error loading role details');
+        error: (error) => {
+          console.error('Error loading role details', error);
           this.loading = false;
         }
       });
@@ -83,7 +82,7 @@ export class RoleDetails implements OnInit, OnDestroy {
 
   onEdit() {
     if (this.role) {
-      this.router.navigate(['/roles/edit', this.role.roleId]);
+      this.router.navigate(['/role/edit', this.role.roleId]);
     }
   }
 
@@ -104,7 +103,6 @@ export class RoleDetails implements OnInit, OnDestroy {
               }
             },
             error: (error) => {
-              this.toastService.error(error.message || 'Failed to delete role');
             }
           })
         }
@@ -141,7 +139,6 @@ export class RoleDetails implements OnInit, OnDestroy {
               }
             },
             error: (error) => {
-              this.toastService.error(error.message || `Failed to ${action} role`);
             }
           })
         }
@@ -169,7 +166,6 @@ export class RoleDetails implements OnInit, OnDestroy {
               }
             },
             error: (error) => {
-              this.toastService.error(error.message || 'Failed to restore role');
             }
           })
         }

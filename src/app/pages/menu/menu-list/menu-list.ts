@@ -236,7 +236,7 @@ export class MenuList {
               }
             },
             error: (error) => {
-              this.toastService.error(error.message);
+              this.toastService.error(error.message, 'Error');
             }
           })
         }
@@ -256,7 +256,6 @@ export class MenuList {
               }
             },
             error: (error) => {
-              this.toastService.error(error.message);
             }
           })
         }

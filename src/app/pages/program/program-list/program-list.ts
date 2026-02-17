@@ -267,7 +267,6 @@ export class ProgramList {
             },
             error: (error) => {
               console.log("error", error);
-              this.toastService.error(error.message);
             }
           })
         }
@@ -289,7 +288,6 @@ export class ProgramList {
             },
             error: (error) => {
               console.log("error", error);
-              this.toastService.error(error.message);
             }
           })
         }

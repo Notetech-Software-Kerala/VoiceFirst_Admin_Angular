@@ -274,7 +274,6 @@ export class ProgramAction implements OnInit, OnDestroy {
             },
             error: (error) => {
               console.log("error", error);
-              this.toastService.error(error.message);
             }
           })
         }
@@ -296,7 +295,6 @@ export class ProgramAction implements OnInit, OnDestroy {
             },
             error: (error) => {
               console.log("error", error);
-              this.toastService.error(error.message);
             }
           })
         }

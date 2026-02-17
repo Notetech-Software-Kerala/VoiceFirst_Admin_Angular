@@ -67,13 +67,12 @@ export class PlanDetails implements OnInit, OnDestroy {
             console.log(this.plan);
 
           } else {
-            this.toastService.error(res.message || 'Failed to load plan details');
+            this.toastService.error(res.message || 'Failed to load plan details', 'Error');
           }
           this.loading = false;
         },
-        error: (err) => {
-          console.error('Error loading plan details', err);
-          this.toastService.error('Error loading plan details');
+        error: (error) => {
+          console.error('Error loading plan details', error);
           this.loading = false;
         }
       });
@@ -106,7 +105,6 @@ export class PlanDetails implements OnInit, OnDestroy {
               }
             },
             error: (error) => {
-              this.toastService.error(error.message || 'Failed to delete plan');
             }
           })
         }
@@ -143,7 +141,6 @@ export class PlanDetails implements OnInit, OnDestroy {
               }
             },
             error: (error) => {
-              this.toastService.error(error.message || `Failed to ${action} plan`);
             }
           })
         }
@@ -171,7 +168,6 @@ export class PlanDetails implements OnInit, OnDestroy {
               }
             },
             error: (error) => {
-              this.toastService.error(error.message || 'Failed to restore plan');
             }
           })
         }

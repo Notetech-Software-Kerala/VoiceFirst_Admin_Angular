@@ -68,7 +68,7 @@ export class Login {
       setTimeout(() => {
         this.submitting = false;
         this.router.navigate(['/dashboard']);
-        this.toast.success(`Welcome to Voice First`, { title: 'Login Success' });
+        this.toast.success(`Welcome to Voice First`, 'Login Success');
       }, 1000);
     }
     else {

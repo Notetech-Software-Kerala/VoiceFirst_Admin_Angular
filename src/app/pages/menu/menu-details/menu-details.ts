@@ -59,13 +59,12 @@ export class MenuDetails implements OnInit, OnDestroy {
           if (res.statusCode === 200) {
             this.menu = res.data;
           } else {
-            this.toastService.error(res.message || 'Failed to load menu details');
+            this.toastService.error(res.message || 'Failed to load menu details', 'Error');
           }
           this.loading = false;
         },
-        error: (err) => {
-          console.error('Error loading menu details', err);
-          this.toastService.error('Error loading menu details');
+        error: (error) => {
+          console.error('Error loading menu details', error);
           this.loading = false;
         }
       });
@@ -91,12 +90,11 @@ export class MenuDetails implements OnInit, OnDestroy {
           this.menuService.delete(this.menu!.menuId).subscribe({
             next: (res) => {
               if (res.statusCode === 200) {
-                this.toastService.success('Menu deleted successfully');
+                this.toastService.success('Menu deleted successfully', 'Success');
                 this.goBack();
               }
             },
             error: (error) => {
-              this.toastService.error(error.message || 'Failed to delete menu');
             }
           })
         }
@@ -117,14 +115,13 @@ export class MenuDetails implements OnInit, OnDestroy {
           this.menuService.updateMasterMenu(this.menu!.menuId, changes).subscribe({
             next: (res) => {
               if (res.statusCode === 200) {
-                this.toastService.success(`Menu ${action}ed successfully`);
+                this.toastService.success(`Menu ${action}ed successfully`, 'Success');
                 if (this.menu) {
                   this.menu = { ...this.menu, active: status };
                 }
               }
             },
             error: (error) => {
-              this.toastService.error(error.message || `Failed to ${action} menu`);
             }
           })
         }
@@ -141,12 +138,11 @@ export class MenuDetails implements OnInit, OnDestroy {
           this.menuService.restoreMasterMenu(this.menuId).subscribe({
             next: (res) => {
               if (res.statusCode === 200) {
-                this.toastService.success('Menu restored successfully');
+                this.toastService.success('Menu restored successfully', 'Success');
                 this.loadMenuDetails(this.menuId);
               }
             },
             error: (error) => {
-              this.toastService.error(error.message || 'Failed to restore menu');
             }
           })
         }

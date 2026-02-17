@@ -65,13 +65,12 @@ export class ProgramDetails implements OnInit, OnDestroy {
           if (res.statusCode === 200) {
             this.program = res.data;
           } else {
-            this.toastService.error(res.message || 'Failed to load program details');
+            this.toastService.error(res.message || 'Failed to load program details', 'Error');
           }
           this.loading = false;
         },
-        error: (err) => {
-          console.error('Error loading program details', err);
-          this.toastService.error('Error loading program details');
+        error: (error) => {
+          console.error('Error loading program details', error);
           this.loading = false;
         }
       });

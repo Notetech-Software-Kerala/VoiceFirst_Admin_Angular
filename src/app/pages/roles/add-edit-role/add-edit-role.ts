@@ -85,9 +85,8 @@ export class AddEditRole implements OnInit {
           this.patchForm(response.data);
         }
       },
-      error: (err) => {
-        console.error(err);
-        this.toastService.error('Failed to load initial data');
+      error: (error) => {
+        console.error(error);
       }
     });
   }
@@ -142,7 +141,7 @@ export class AddEditRole implements OnInit {
 
     // Check if already added
     if (this.selectedPlans.some(p => p.planId == planId)) {
-      this.toastService.warning('Plan already added');
+      this.toastService.warning('Plan already added', 'Warning');
       return;
     }
 
@@ -159,7 +158,7 @@ export class AddEditRole implements OnInit {
           this.form.get('selectedPlanId')?.setValue(null);
         }
       },
-      error: (err) => this.toastService.error('Failed to load plan details')
+      error: (error) => this.toastService.error('Failed to load plan details', 'Error')
     });
   }
 
@@ -222,13 +221,13 @@ export class AddEditRole implements OnInit {
       next: (res) => {
         this.submitting = false;
         if (res.statusCode === 200 || res.statusCode === 201) {
-          this.toastService.success('Role created successfully');
+          this.toastService.success('Role created successfully', 'Success');
           this.goBack();
         } else {
-          this.toastService.error(res.message || 'Operation failed');
+          this.toastService.error(res.message || 'Operation failed', 'Error');
         }
       },
-      error: (err) => {
+      error: (error) => {
         this.submitting = false;
       }
     });
@@ -239,18 +238,18 @@ export class AddEditRole implements OnInit {
     const original = this.originalData;
     const changes = this.getChangedValues(formValue, original);
 
-    // Handle New Plans
+    // List of new plans
     const newPlans = this.selectedPlans.filter(p => !p.isExisting);
-    if (newPlans.length > 0) {
-      changes.createPlanActionLink = newPlans.map(p => ({
-        planId: p.planId,
-        actionLinkIds: Array.from(p.selectedActions)
-      }));
-    }
+    const newPlanPayloads: createPlanActionLink[] = newPlans.map(p => ({
+      planId: p.planId,
+      actionLinkIds: Array.from(p.selectedActions)
+    }));
 
-    // Handle Existing Plans Updates
-    const existingPlans = this.selectedPlans.filter(p => p.isExisting);
+    // Existing Plans Payload Arrays
+    const existingPlanNewActions: createPlanActionLink[] = [];
     const updateActionLinks: updatePlanActionLinks[] = [];
+
+    const existingPlans = this.selectedPlans.filter(p => p.isExisting);
 
     existingPlans.forEach(p => {
       // Find original linkage info using planRoleActionLink
@@ -269,21 +268,39 @@ export class AddEditRole implements OnInit {
         });
       }
 
+      const newActionsForPlan: number[] = [];
       const updates: any[] = [];
+
       allActions.forEach(actionId => {
         const isSelected = p.selectedActions.has(actionId);
 
         // Check original state
         const originalAction = originalLink.planActionLink.find(oa => oa.actionLinkId === actionId);
-        const wasSelected = originalAction ? originalAction.active : false;
 
-        if (isSelected !== wasSelected) {
-          updates.push({
-            actionLinkId: actionId,
-            active: isSelected
-          });
+        if (!originalAction) {
+          // Action was NOT in original role definition -> NEW ACTION for Existing Plan
+          if (isSelected) {
+            newActionsForPlan.push(actionId);
+          }
+        } else {
+          // Action was in original role definition -> UPDATE Existing Action
+          const wasSelected = originalAction.active;
+          if (isSelected !== wasSelected) {
+            updates.push({
+              actionLinkId: actionId,
+              active: isSelected
+            });
+          }
         }
       });
+
+      // Add to respective payloads
+      if (newActionsForPlan.length > 0) {
+        existingPlanNewActions.push({
+          planId: p.planId,
+          actionLinkIds: newActionsForPlan
+        });
+      }
 
       if (updates.length > 0) {
         updateActionLinks.push({
@@ -293,12 +310,17 @@ export class AddEditRole implements OnInit {
       }
     });
 
+    // Merge New Plan Payloads + Existing Plan New Actions
+    if (newPlanPayloads.length > 0 || existingPlanNewActions.length > 0) {
+      changes.createPlanActionLink = [...newPlanPayloads, ...existingPlanNewActions];
+    }
+
     if (updateActionLinks.length > 0) {
-      changes.updateActionLinks = updateActionLinks;
+      changes.updatePlanActionLinks = updateActionLinks;
     }
 
     if (Object.keys(changes).length === 0) {
-      this.toastService.info('No changes detected');
+      this.toastService.info('No changes detected', 'Info');
       this.submitting = false;
       return;
     }
@@ -309,13 +331,13 @@ export class AddEditRole implements OnInit {
       next: (res) => {
         this.submitting = false;
         if (res.statusCode === 200) {
-          this.toastService.success('Role updated successfully');
+          this.toastService.success('Role updated successfully', 'Success');
           this.goBack();
         } else {
-          this.toastService.error(res.message || 'Operation failed');
+          this.toastService.error(res.message || 'Operation failed', 'Error');
         }
       },
-      error: (err) => {
+      error: (error) => {
         this.submitting = false;
       }
     });
