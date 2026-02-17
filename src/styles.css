@@ -167,3 +167,21 @@ label {
 ::view-transition-new(root) {
   animation: .7s fade-in;
 }
+
+/* Global Info Box Style */
+.info-box {
+  background-color: var(--color-chip-more-bg);
+  color: var(--color-chip-more-text);
+  border: 1px solid var(--color-chip-more-border);
+  border-radius: 6px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.info-box mat-icon {
+  color: var(--color-chip-more-text);
+  margin-right: 8px;
+  /* equivalent to me-2 */
+}

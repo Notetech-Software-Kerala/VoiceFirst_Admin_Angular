@@ -111,6 +111,12 @@ export class MenuList {
   }
 
   loadData() {
+    if (!this.queryParams.SortBy) {
+      this.queryParams.SortBy = "createdAt";
+    }
+    if (!this.queryParams.SortOrder) {
+      this.queryParams.SortOrder = "Desc";
+    }
     const params = {
       ...this.queryParams,
       ...this.statusFilters

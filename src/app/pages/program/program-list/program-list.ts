@@ -118,6 +118,7 @@ export class ProgramList {
 
   // Load data with current query parameters
   loadData() {
+    this.utilityService.applyDefaultSorting(this.queryParams);
     // Merge queryParams with statusFilters (Active/Delete)
     const params = {
       ...this.queryParams,

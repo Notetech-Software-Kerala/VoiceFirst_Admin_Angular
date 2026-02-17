@@ -115,6 +115,12 @@ export class PlanList {
 
   // Load data with current query parameters
   loadData() {
+    if (!this.queryParams.SortBy) {
+      this.queryParams.SortBy = "createdAt";
+    }
+    if (!this.queryParams.SortOrder) {
+      this.queryParams.SortOrder = "Desc";
+    }
     // Merge queryParams with statusFilters (Active/Delete)
     const params = {
       ...this.queryParams,
