@@ -1,0 +1,79 @@
+.skeleton-container {
+    background-color: var(--color-bg-sidebar);
+    /* border: 1px solid var(--color-border-hr); */
+    border-radius: 12px;
+    border: none;
+    box-shadow: none;
+}
+
+.shimmer {
+    background: #f6f7f8;
+    background-image: linear-gradient(to right,
+            #f6f7f8 0%,
+            #edeef1 20%,
+            #f6f7f8 40%,
+            #f6f7f8 100%);
+    background-repeat: no-repeat;
+    background-size: 800px 100%;
+    animation-duration: 1.5s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: infinite;
+    animation-name: placeholderShimmer;
+    animation-timing-function: linear;
+    border-radius: 4px;
+}
+
+/* Dark mode adjustment if needed, assuming variables are handled globally or we stick to neutral grays */
+/* If the app has dark mode, we might need darker base colors */
+[data-theme='dark'] .shimmer {
+    background: #2d2d2d;
+    background-image: linear-gradient(to right,
+            #2d2d2d 0%,
+            #3d3d3d 20%,
+            #2d2d2d 40%,
+            #2d2d2d 100%);
+}
+
+@keyframes placeholderShimmer {
+    0% {
+        background-position: -468px 0;
+    }
+
+    100% {
+        background-position: 468px 0;
+    }
+}
+
+.skeleton-title {
+    height: 32px;
+    width: 60%;
+    margin-bottom: 8px;
+}
+
+.skeleton-badge {
+    height: 20px;
+    width: 120px;
+    border-radius: 10px;
+}
+
+.skeleton-button {
+    height: 36px;
+    width: 90px;
+    border-radius: 6px;
+}
+
+.skeleton-label {
+    height: 12px;
+    width: 80px;
+}
+
+.skeleton-text {
+    height: 18px;
+    width: 80%;
+}
+
+.skeleton-block {
+    height: 150px;
+    width: 100%;
+    border-radius: 8px;
+}

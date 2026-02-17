@@ -1,0 +1,247 @@
+.menu-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.tree-wrapper {
+    background: var(--color-bg-sidebar);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px var(--color-shadow);
+    padding: 24px;
+    min-height: 400px;
+}
+
+.menu-list {
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.menu-node-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.menu-node-content {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    background: var(--color-bg-sidebar);
+    border: 1px solid var(--color-border-hr);
+    border-radius: 8px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: grab;
+    position: relative;
+    /* For better stacking context */
+}
+
+/* Hover effect */
+.menu-node-content:hover {
+    background: var(--color-bg-secondary);
+    border-color: var(--color-border-hr);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px var(--color-shadow);
+}
+
+.menu-node-content:active {
+    cursor: grabbing;
+}
+
+.menu-node-content.has-children {
+    border-left: 4px solid var(--color-hover-primary);
+}
+
+.node-handle {
+    cursor: move;
+    color: var(--color-text-placeholder);
+    margin-right: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.node-handle:hover {
+    color: var(--color-hover-primary);
+}
+
+.node-icon-wrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--color-bg-secondary);
+    color: var(--color-hover-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.menu-node-content:hover .node-icon-wrapper {
+    background: var(--color-hover-primary);
+    color: #fff;
+}
+
+.node-details h6 {
+    color: var(--color-text-primary);
+    font-weight: 600;
+}
+
+.node-details small {
+    color: var(--color-text-placeholder);
+}
+
+.node-children {
+    margin-left: 32px;
+    padding-top: 12px;
+    padding-left: 16px;
+    border-left: 2px dashed var(--color-border-hr);
+    min-height: 120px;
+    /* Increased for easier dropping */
+    transition: min-height 0.2s;
+}
+
+/* Dragging Styles - Preview (what you see while dragging) */
+.cdk-drag-preview {
+    box-sizing: border-box;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    background: var(--color-bg-sidebar);
+    border: 1px solid var(--color-hover-primary);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    z-index: 9999 !important;
+    opacity: 0.95;
+    color: var(--color-text-primary);
+}
+
+/* Placeholder (the gap where it will drop) */
+.cdk-drag-placeholder {
+    opacity: 1;
+    background: var(--color-bg-secondary);
+    border: 2px dashed var(--color-hover-primary);
+    border-radius: 8px;
+    min-height: 70px;
+    margin-bottom: 12px;
+    transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.menu-list.cdk-drop-list-dragging .menu-node-wrapper:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* Empty Drop Zone Styling */
+.cdk-drop-list-dragging:not(.menu-list) .node-children:empty,
+.node-children:empty {
+    border: 2px dashed var(--color-border-hr);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-secondary);
+    transition: all 0.2s;
+}
+
+/* Highlight empty drop zone when dragging over it */
+.cdk-drop-list-dragging .node-children:empty:hover {
+    border-color: var(--color-hover-primary);
+    background: rgba(2, 125, 207, 0.05);
+    /* Light blue tint based on hover-primary */
+}
+
+.node-children:empty::after {
+    content: 'Drop valid menu item here';
+    color: var(--color-text-placeholder);
+    font-weight: 500;
+    font-size: 0.9rem;
+    pointer-events: none;
+}
+
+/* Modern buttons */
+.node-actions button {
+    color: var(--color-text-placeholder);
+}
+
+.node-actions button:hover {
+    color: var(--color-hover-primary);
+    background-color: var(--color-bg-secondary);
+}
+
+.msr-delete {
+    font-size: 1rem;
+    color: #da4b40 !important;
+    margin-top: 6px !important;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .menu-container {
+        padding: 12px;
+    }
+
+    .tree-wrapper {
+        padding: 16px;
+        min-height: auto;
+    }
+
+    .menu-node-content {
+        padding: 12px 16px;
+    }
+
+    .node-children {
+        margin-left: 16px;
+        /* Reduce indentation */
+        padding-left: 12px;
+    }
+
+    .node-icon-wrapper {
+        width: 32px;
+        height: 32px;
+    }
+
+    .node-icon-wrapper mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+    }
+
+    .node-details h6 {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .menu-node-content {
+        padding: 8px 12px;
+    }
+
+    .node-children {
+        margin-left: 8px;
+        /* Further reduce indentation */
+        padding-left: 8px;
+        border-left-width: 1px;
+    }
+
+    .node-handle {
+        margin-right: 8px;
+    }
+
+    .node-actions .mat-icon-button {
+        width: 28px;
+        height: 28px;
+        line-height: 28px;
+    }
+
+    .node-actions .mat-icon-button mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+    }
+}

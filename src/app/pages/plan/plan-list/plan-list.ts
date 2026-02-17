@@ -115,6 +115,12 @@ export class PlanList {
 
   // Load data with current query parameters
   loadData() {
+    if (!this.queryParams.SortBy) {
+      this.queryParams.SortBy = "createdAt";
+    }
+    if (!this.queryParams.SortOrder) {
+      this.queryParams.SortOrder = "Desc";
+    }
     // Merge queryParams with statusFilters (Active/Delete)
     const params = {
       ...this.queryParams,
@@ -264,7 +270,6 @@ export class PlanList {
             },
             error: (error) => {
               console.log("error", error);
-              this.toastService.error(error.message);
             }
           })
         }
@@ -286,7 +291,6 @@ export class PlanList {
             },
             error: (error) => {
               console.log("error", error);
-              this.toastService.error(error.message);
             }
           })
         }
@@ -331,6 +335,11 @@ export class PlanList {
   // Open edit dialog
   navigateToEdit(item: PlanModel) {
     this.router.navigate(['/plan/edit', item.planId]);
+
+  }
+
+  navigateToDetails(item: PlanModel) {
+    this.router.navigate(['/plan/details', item.planId]);
 
   }
 }

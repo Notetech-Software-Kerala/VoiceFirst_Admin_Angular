@@ -1,0 +1,15 @@
+.program-action-list {
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-border-hr);
+    color: var(--color-text-primary);
+}
+
+.custom-switch .form-check-input {
+    width: 3em;
+    height: 1.5em;
+    cursor: pointer;
+}
+
+.custom-switch .form-check-label {
+    cursor: pointer;
+}

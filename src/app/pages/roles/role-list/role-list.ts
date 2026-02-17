@@ -37,10 +37,10 @@ export class RoleList {
   // SearchBy dropdown options
   searchByOptions = [
     { label: 'Role Name', value: 'RoleName' },
-    { label: 'Purpose', value: 'RolePurpose' },
-    { label: 'Created By', value: 'CreatedUser' },
-    { label: 'Updated By', value: 'UpdatedUser' },
-    { label: 'Deleted By', value: 'DeletedUser' }
+    // { label: 'Purpose', value: 'RolePurpose' },
+    // { label: 'Created By', value: 'CreatedUser' },
+    // { label: 'Updated By', value: 'UpdatedUser' },
+    // { label: 'Deleted By', value: 'DeletedUser' }
   ];
 
   // Query parameters - start with empty, backend will use defaults
@@ -117,6 +117,9 @@ export class RoleList {
 
   // Load data with current query parameters
   loadData() {
+
+    this.utilityService.applyDefaultSorting(this.queryParams);
+
     // Merge queryParams with statusFilters (Active/Delete)
     const params = {
       ...this.queryParams,
@@ -266,7 +269,6 @@ export class RoleList {
             },
             error: (error) => {
               console.log("error", error);
-              this.toastService.error(error.message);
             }
           })
         }
@@ -288,7 +290,6 @@ export class RoleList {
             },
             error: (error) => {
               console.log("error", error);
-              this.toastService.error(error.message);
             }
           })
         }
@@ -334,5 +335,9 @@ export class RoleList {
   navigateToEdit(item: RoleModel) {
     this.router.navigate(['/role/edit', item.roleId]);
 
+  }
+
+  navigateToDetails(item: RoleModel) {
+    this.router.navigate(['/role/details', item.roleId]);
   }
 }

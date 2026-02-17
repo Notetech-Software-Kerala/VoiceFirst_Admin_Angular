@@ -125,6 +125,12 @@ export class ProgramAction implements OnInit, OnDestroy {
 
   // Load data with current query parameters
   loadData() {
+    if (!this.queryParams.SortBy) {
+      this.queryParams.SortBy = "createdAt";
+    }
+    if (!this.queryParams.SortOrder) {
+      this.queryParams.SortOrder = "Desc";
+    }
     // Merge queryParams with statusFilters (Active/Delete)
     const params = {
       ...this.queryParams,
@@ -274,7 +280,6 @@ export class ProgramAction implements OnInit, OnDestroy {
             },
             error: (error) => {
               console.log("error", error);
-              this.toastService.error(error.message);
             }
           })
         }
@@ -296,7 +301,6 @@ export class ProgramAction implements OnInit, OnDestroy {
             },
             error: (error) => {
               console.log("error", error);
-              this.toastService.error(error.message);
             }
           })
         }

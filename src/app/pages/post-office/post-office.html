@@ -87,7 +87,7 @@
                         @if (item.zipCodes.length) {
                         @let sortedZips = sortZipCodes(item.zipCodes);
                         <div class="zip-list">
-                            @for (zip of sortedZips.slice(0, 3); track zip.zipCodeId) {
+                            @for (zip of sortedZips.slice(0, 3); track zip.zipCode || $index) {
                             <span class="zip-chip" [class.zip-deleted]="zip.deleted">{{ zip.zipCode }}</span>
                             }
 
@@ -150,10 +150,12 @@
                         </button>
 
                         <mat-menu #rowMenu="matMenu" class="row-menu" xPosition="before" yPosition="below">
+                            @if (!item.deleted) {
                             <button mat-menu-item (click)="openEditDialog(item)">
                                 <mat-icon class="msr-edit">edit</mat-icon>
                                 <span>Edit</span>
                             </button>
+                            }
                             @if (!item.deleted) {
                             <button mat-menu-item (click)="onSuspend(item)">
                                 <mat-icon [ngClass]="item.active ? 'msr-delete' : 'msr-restore'">{{ item.active ?
@@ -202,7 +204,7 @@
 <mat-menu #zipMenu="matMenu" class="zip-overview-menu">
     <ng-template matMenuContent let-zips="zips">
         <div class="zip-menu-container" (click)="$event.stopPropagation()">
-            @for (zip of zips; track zip.zipCodeId) {
+            @for (zip of zips; track zip.zipCode || $index) {
             <span class="zip-chip" [class.zip-deleted]="zip.deleted">{{ zip.zipCode }}</span>
             }
         </div>

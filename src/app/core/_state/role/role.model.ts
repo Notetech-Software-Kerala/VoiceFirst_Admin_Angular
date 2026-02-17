@@ -1,5 +1,6 @@
 
 
+
 export interface RoleModel {
   roleId: number;
   roleName: string;
@@ -7,16 +8,53 @@ export interface RoleModel {
   rolePurpose: string;
 
   applicationId: number;
+  platformId: number;
 
   active: boolean;
   deleted: boolean;
 
-  createdDate: string;          // ISO string (or Date if you convert)
+  createdDate: string;
   createdUser: string;
 
-  modifiedDate: string | null;  // can be null
+  modifiedDate: string | null;
   modifiedUser: string;
 
   deletedUser: string;
   deletedDate: string | null;
+
+  // New structure
+  planRoleActionLink?: PlanRoleActionLink[];
+}
+
+export interface PlanRoleActionLink {
+  planRoleLinkId: number;
+  planId: number;
+  planActionLink: PlanActionLink[];
+}
+
+export interface PlanActionLink {
+  actionLinkId: number;
+  actionName: string;
+  active: boolean;
+  createdUser?: string;
+  createdDate?: string;
+  modifiedUser?: string;
+  modifiedDate?: string;
+  // any other fields from API if needed
+}
+
+// Payload Interfaces
+export interface createPlanActionLink {
+  planId: number;
+  actionLinkIds: number[];
+}
+
+export interface updatePlanActionLinks {
+  rolePlanLinkId: number;
+  updateActionLinks: UpdateActionLinkDto[];
+}
+
+export interface UpdateActionLinkDto {
+  actionLinkId: number;
+  active: boolean;
 }

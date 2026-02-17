@@ -12,4 +12,5 @@ export interface ProgramActionModel {
 
   deletedUser: string;      // can be empty/space
   deletedDate: string | null;
+  actionLinkId?: number; // Optional linkage ID
 }

@@ -1,0 +1,35 @@
+<div class="card skeleton-container" [ngClass]="cardClass">
+    <!-- Header Skeleton -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div class="d-flex flex-column gap-2 w-50">
+            @if(title) {
+            <div class="skeleton-title shimmer"></div>
+            }
+            <div class="d-flex gap-3 mt-2">
+                <div class="skeleton-badge shimmer"></div>
+                <div class="skeleton-badge shimmer" style="width: 80px;"></div>
+            </div>
+        </div>
+        <!-- Action Buttons Skeleton -->
+        <div class="d-flex gap-2">
+            <div class="skeleton-button shimmer"></div>
+            <div class="skeleton-button shimmer"></div>
+        </div>
+    </div>
+
+    <!-- Content Skeleton -->
+    <div class="row g-4">
+        @for (item of [].constructor(rows); track $index) {
+        <div class="col-md-3">
+            <div class="skeleton-label shimmer mb-2"></div>
+            <div class="skeleton-text shimmer"></div>
+        </div>
+        }
+    </div>
+
+    <!-- Table/List Skeleton (optional extra rows) -->
+    <div class="mt-5">
+        <div class="skeleton-title shimmer mb-3" style="width: 200px; height: 24px;"></div>
+        <div class="skeleton-block shimmer"></div>
+    </div>
+</div>

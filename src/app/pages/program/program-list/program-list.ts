@@ -37,11 +37,11 @@ export class ProgramList {
     { label: 'Program Name', value: 'ProgramName' },
     { label: 'Label', value: 'Label' },
     { label: 'Route', value: 'Route' },
-    { label: 'Platform', value: 'PlatformName' },
-    { label: 'Company', value: 'CompanyName' },
-    { label: 'Created By', value: 'CreatedUser' },
-    { label: 'Updated By', value: 'ModifiedUser' },
-    { label: 'Deleted By', value: 'DeletedUser' }
+    // { label: 'Platform', value: 'PlatformName' },
+    // { label: 'Company', value: 'CompanyName' },
+    // { label: 'Created By', value: 'CreatedUser' },
+    // { label: 'Updated By', value: 'ModifiedUser' },
+    // { label: 'Deleted By', value: 'DeletedUser' }
   ];
 
   // Query parameters - start with empty, backend will use defaults
@@ -118,6 +118,7 @@ export class ProgramList {
 
   // Load data with current query parameters
   loadData() {
+    this.utilityService.applyDefaultSorting(this.queryParams);
     // Merge queryParams with statusFilters (Active/Delete)
     const params = {
       ...this.queryParams,
@@ -267,7 +268,6 @@ export class ProgramList {
             },
             error: (error) => {
               console.log("error", error);
-              this.toastService.error(error.message);
             }
           })
         }
@@ -289,7 +289,6 @@ export class ProgramList {
             },
             error: (error) => {
               console.log("error", error);
-              this.toastService.error(error.message);
             }
           })
         }
@@ -334,6 +333,9 @@ export class ProgramList {
   // Open edit dialog
   navigateToEdit(item: ProgramModel) {
     this.router.navigate(['/program/edit', item.programId]);
+  }
 
+  navigateToDetails(item: ProgramModel) {
+    this.router.navigate(['/program/details', item.programId]);
   }
 }

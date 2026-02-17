@@ -116,7 +116,7 @@ export class PostOffice {
 
   // Load data with current query parameters
   loadData() {
-    // Merge queryParams with statusFilters (Active/Delete)
+    this.utilityService.applyDefaultSorting(this.queryParams);
     const params = {
       ...this.queryParams,
       ...this.statusFilters

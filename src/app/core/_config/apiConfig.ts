@@ -11,9 +11,9 @@ export const apiConfig = {
     programActionRestore: '/program-action/recover',
 
     // Business Activity Endpoints
-    businessActivity: '/business-activity',
-    getBusinessActivityLookup: '/business-activity/lookup',
-    businessActivityRestore: '/business-activity/recover',
+    businessActivity: '/activity',
+    getBusinessActivityLookup: '/activity/lookup',
+    businessActivityRestore: '/activity/recover',
 
     // Post Office Endpoints
     postOffice: '/post-office',
@@ -26,12 +26,20 @@ export const apiConfig = {
 
     //Country
     country: '/country',
+    divisionOne: '/division-one',
+    divisionTwo: '/division-two',
+    divisionThree: '/division-three',
+
     getCountryLookup: '/country/lookup',
+    getDivisionOneLookup: '/division-one/lookup',
+    getDivisionTwoLookup: '/division-two/lookup',
+    getDivisionThreeLookup: '/division-three/lookup',
 
     //Program
     program: '/program',
     getProgramLookup: '/program/lookup',
     programRestore: '/program/recover',
+    getProgramForPlan: '/program/for-plan',
 
     // Company
     getCompanyLookup: '/company/lookup',
@@ -49,4 +57,14 @@ export const apiConfig = {
     getPlanLookup: '/plan/lookup',
     planRestore: '/plan/recover',
     getProgramDetailsByPlanId: '/plan/program-details',
+
+    //Menu
+    menu: '/menu',
+    menuMaster: '/menu/master',
+    menuMasterRestore: '/menu/master/recover',
+    menuWeb: '/menu/web',
+    menuApp: '/menu/app',
+    webMenuBulkUpdate: '/menu/web/bulk',
+    appMenuBulkUpdate: '/menu/app/bulk',
+
 };

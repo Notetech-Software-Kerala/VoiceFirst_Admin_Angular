@@ -75,7 +75,7 @@
             <tbody>
                 @for (item of plans; track item.planId) {
                 <tr>
-                    <td>{{ item.planName }}</td>
+                    <td><a (click)="navigateToDetails(item)" class="list-link">{{ item.planName }}</a></td>
                     <td><app-status-badge [item]="item"></app-status-badge></td>
 
                     <td class="action-cell">
@@ -85,10 +85,12 @@
                         </button>
 
                         <mat-menu #rowMenu="matMenu" class="row-menu" xPosition="before" yPosition="below">
-                            <button mat-menu-item (click)="navigateToEdit(item)">
-                                <mat-icon class="msr-edit">edit</mat-icon>
-                                <span>Edit</span>
+
+                            <button mat-menu-item (click)="navigateToDetails(item)">
+                                <mat-icon class="msr-edit">visibility</mat-icon>
+                                <span>View</span>
                             </button>
+
                             @if (!item.deleted) {
                             <button mat-menu-item (click)="onSuspend(item)">
                                 <mat-icon [ngClass]="item.active ? 'msr-delete' : 'msr-restore'">{{ item.active ?

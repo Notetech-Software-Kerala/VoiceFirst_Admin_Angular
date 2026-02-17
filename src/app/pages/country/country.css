@@ -1,0 +1,66 @@
+.msr.ok-icon {
+    color: #72b674 !important;
+    /* green for OK */
+}
+
+.msr.cancel-icon {
+    color: #fa574b;
+}
+
+.msr-edit {
+    font-size: 1rem;
+    color: #027dcf !important;
+    margin-top: 6px !important;
+}
+
+.msr-delete {
+    font-size: 1rem;
+    color: #fa574b !important;
+    margin-top: 6px !important;
+}
+
+.msr-restore {
+    font-size: 1rem;
+    color: #72b674 !important;
+    margin-top: 6px !important;
+}
+
+.mat-mdc-menu-item {
+    display: flex;
+    position: relative;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: hidden;
+    padding: 0;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    box-sizing: border-box;
+    color: inherit;
+    font-size: inherit;
+    background: var(--color-bg-primary);
+    text-decoration: none;
+    margin: 0;
+    min-height: 30px;
+    padding-left: var(--mat-menu-item-leading-spacing, 12px);
+    padding-right: var(--mat-menu-item-trailing-spacing, 12px);
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: pointer;
+    outline: none;
+    border: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+/* Custom Progress Bar */
+.mat-mdc-progress-bar {
+    --mdc-linear-progress-active-indicator-color: var(--color-hover-primary) !important;
+    --mdc-linear-progress-track-color: #e6f3fa !important;
+    /* Light blue track */
+    border-radius: 4px;
+}
+
+tr td {
+    padding-top: 15px !important;
+    padding-bottom: 15px !important;
+}

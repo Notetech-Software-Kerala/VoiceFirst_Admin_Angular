@@ -35,4 +35,13 @@ export class UtilityService {
     return `${dd}-${mm}-${yyyy} ${hours}:${minutes} ${ampm}`;
   }
 
+  applyDefaultSorting(queryParams: any, defaultSortBy = 'createdAt', defaultSortOrder = 'Desc'): void {
+    if (!queryParams.SortBy) {
+      queryParams.SortBy = defaultSortBy;
+    }
+    if (!queryParams.SortOrder) {
+      queryParams.SortOrder = defaultSortOrder;
+    }
+  }
+
 }

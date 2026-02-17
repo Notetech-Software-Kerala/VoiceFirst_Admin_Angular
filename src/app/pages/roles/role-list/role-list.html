@@ -75,7 +75,7 @@
             <tbody>
                 @for (item of roles; track item.roleId) {
                 <tr>
-                    <td>{{ item.roleName }}</td>
+                    <td (click)="navigateToDetails(item)" class="list-link">{{ item.roleName }}</td>
                     <td><app-status-badge [item]="item"></app-status-badge></td>
 
                     <td class="action-cell">
@@ -85,10 +85,12 @@
                         </button>
 
                         <mat-menu #rowMenu="matMenu" class="row-menu" xPosition="before" yPosition="below">
+                            @if (!item.deleted) {
                             <button mat-menu-item (click)="navigateToEdit(item)">
                                 <mat-icon class="msr-edit">edit</mat-icon>
                                 <span>Edit</span>
                             </button>
+                            }
                             @if (!item.deleted) {
                             <button mat-menu-item (click)="onSuspend(item)">
                                 <mat-icon [ngClass]="item.active ? 'msr-delete' : 'msr-restore'">{{ item.active ?

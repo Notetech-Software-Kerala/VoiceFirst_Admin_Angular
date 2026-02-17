@@ -1,0 +1,68 @@
+export interface WebMenuModel {
+    webMenuId: number;
+    parentId: number;
+    menuId: number;
+    menuName: string;
+    icon: string;
+    route: string;
+    sortOrder: number;
+    active: boolean;
+    deleted: boolean;
+    createdDate: string;
+    createdUser: string;
+    modifiedDate: string | null;
+    modifiedUser: string;
+    deletedUser: string;
+    deletedDate: string | null;
+}
+
+export interface AppMenuModel {
+    appMenuId: number;
+    parentId: number;
+    menuId: number;
+    menuName: string;
+    icon: string;
+    route: string;
+    sortOrder: number;
+    active: boolean;
+    deleted: boolean;
+    createdDate: string;
+    createdUser: string;
+    modifiedDate: string | null;
+    modifiedUser: string;
+    deletedUser: string;
+    deletedDate: string | null;
+}
+
+export interface MasterMenuModel {
+    menuId: number;
+    menuName: string;
+    icon: string;
+    route: string;
+    plateFormId: number;
+    plateForm?: string; // from getById
+    active: boolean;
+    deleted: boolean;
+    createdUser: string | null;
+    createdDate: string;
+    modifiedUser: string | null;
+    modifiedDate: string | null;
+    deletedUser: string | null;
+    deletedDate: string | null;
+    web?: boolean; // from getById
+    app?: boolean; // from getById
+    menuProgramLinks?: MenuProgramLink[]; // from getById
+}
+
+export interface MenuProgramLink {
+    menuProgramLinkId: number;
+    programId: number;
+    programName: string;
+    route: string;
+    primary: boolean;
+    active: boolean;
+    createdDate: string;
+    createdUser: string | null;
+    modifiedDate: string | null;
+    modifiedUser: string | null;
+}
