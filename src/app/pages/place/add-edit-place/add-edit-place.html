@@ -1,1 +1,44 @@
-<p>add-edit-place works!</p>
+<div class="main-container">
+    <div class="card">
+
+        <div class="actions ms-auto d-flex flex-wrap gap-2">
+            <button type="button" class="btn-action btn-outline" (click)="goBack()">
+                <mat-icon class="msr">arrow_back</mat-icon>
+                <span class="btn-text">Back</span>
+            </button>
+        </div>
+
+        <div class="card-body">
+            <h5 class="mb-4">{{title}}</h5>
+            <form [formGroup]="form" class="row g-3">
+
+                <div class="col-md-6">
+                    <label for="placeName" class="form-label">Place Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="placeName" formControlName="placeName"
+                        placeholder="Enter place name" />
+                    @if (form.get('placeName')?.touched && form.get('placeName')?.invalid) {
+                    <div class="text-danger small mt-1">
+                        @if (form.get('placeName')?.hasError('required')) {
+                        Place Name is required.
+                        }
+                    </div>
+                    }
+                </div>
+
+                <div class="col-12 mt-4 d-flex justify-content-end gap-2">
+                    <mat-dialog-actions class="mt-4">
+                        <button type="button" class="close-btn" (click)="goBack()">Cancel</button>
+                        <button class="submit-btn" type="submit" [disabled]="submitting" (click)="onSubmit()">
+                            @if (submitting) {
+                            <span class="btn-loader"></span>
+                            }
+                            Submit
+                        </button>
+                    </mat-dialog-actions>
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

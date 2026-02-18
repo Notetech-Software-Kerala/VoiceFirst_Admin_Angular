@@ -1,1 +1,149 @@
-<p>place-details works!</p>
+<div class="card detail-card p-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+        <div class="d-flex flex-column gap-2">
+            <div class="d-flex align-items-center gap-3">
+                <h2 class="page-title m-0">{{ place?.placeName }}</h2>
+                @if(place) {
+                <app-status-badge [item]="place"></app-status-badge>
+                }
+            </div>
+
+            <!-- Meta Info Row -->
+            @if(place) {
+            <div class="row g-3 mt-1">
+                @if(place.createdDate) {
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2">
+                        <mat-icon class="tiny-icon">calendar_today</mat-icon>
+                        <span class="small">Created: <strong>{{ place.createdDate | date:'mediumDate'
+                                }}</strong> by <strong>{{ place.createdUser }}</strong></span>
+                    </div>
+                </div>
+                }
+
+                @if(place.modifiedDate ) {
+                <div class="col-md-auto border-start ps-3 d-none d-md-block"></div>
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2">
+                        <mat-icon class="tiny-icon">edit</mat-icon>
+                        <span class="small">Modified: <strong>{{ place.modifiedDate | date:'mediumDate'
+                                }}</strong> by <strong>{{ place.modifiedUser }}</strong></span>
+                    </div>
+                </div>
+                }
+
+                @if(place.deleted) {
+                <div class="col-md-auto border-start ps-3 d-none d-md-block"></div>
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2 text-danger">
+                        <mat-icon class="tiny-icon">delete</mat-icon>
+                        <span class="small">Deleted: <strong>{{ place.deletedDate | date:'mediumDate' }}</strong> by
+                            <strong>{{ place.deletedUser }}</strong></span>
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2 flex-wrap">
+            @if(place) {
+            @if(!place.deleted) {
+            <button type="button" class="btn-action btn-outline-info" (click)="onEdit()">
+                <mat-icon class="msr">edit</mat-icon>
+                <span class="btn-text">Edit</span>
+            </button>
+            <button type="button" class="btn-action"
+                [ngClass]="place.active ? 'btn-outline-warning' : 'btn-outline-success'" (click)="onSuspend()">
+                <mat-icon class="msr">{{ place.active ? 'block' : 'check_circle' }}</mat-icon>
+                <span class="btn-text">{{ place.active ? 'Suspend' : 'Reinstate' }}</span>
+            </button>
+            }
+
+            @if(!place.deleted) {
+            <button type="button" class="btn-action btn-outline-danger" (click)="onDelete()">
+                <mat-icon class="msr">delete</mat-icon>
+                <span class="btn-text">Delete</span>
+            </button>
+            }
+            @else {
+            <button type="button" class="btn-action btn-outline-success" (click)="onRestore()">
+                <mat-icon class="msr">restore</mat-icon>
+                <span class="btn-text">Restore</span>
+            </button>
+            }
+
+            <button type="button" class="btn-action btn-outline" (click)="goBack()">
+                <mat-icon class="msr">arrow_back</mat-icon>
+                <span class="btn-text">Back</span>
+            </button>
+            }
+        </div>
+    </div>
+
+    @if(loading) {
+    <app-details-loader [rows]="2"></app-details-loader>
+    } @else if (place) {
+
+    <!-- Post Offices Table Section -->
+    <div class="row">
+        <div class="col-12">
+            <h5 class="section-title mb-3">Associated Post Offices</h5>
+
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Post Office Name</th>
+                            <th>Division 1</th>
+                            <th>Division 2</th>
+                            <th>Division 3</th>
+                            <th>Zip Codes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (po of place.postOffices; track po.postOfficeId) {
+                        <tr>
+                            <td>
+                                <span class="fw-medium">{{ po.postOfficeName }}</span>
+                            </td>
+                            <td>{{ po.divisionOneName || '-' }} <small class="text-muted d-block">{{ po.divisionOneLabel
+                                    }}</small></td>
+                            <td>{{ po.divisionTwoName || '-' }} <small class="text-muted d-block">{{ po.divisionTwoLabel
+                                    }}</small></td>
+                            <td>{{ po.divisionThreeName || '-' }} <small class="text-muted d-block">{{
+                                    po.divisionThreeLabel }}</small></td>
+
+                            <td>
+                                @if (po.zipCodes.length) {
+                                <div class="d-flex flex-wrap gap-1">
+                                    @for (zip of po.zipCodes; track zip.zipCodeLinkId) {
+                                    <span class="badge bg-light text-dark border">{{ zip.zipCode }}</span>
+                                    }
+                                </div>
+                                } @else {
+                                <span>-</span>
+                                }
+                            </td>
+                        </tr>
+                        } @empty {
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">
+                                No Post Offices associated with this place.
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    } @else {
+    <div class="alert alert-warning">
+        Place not found.
+    </div>
+    }
+</div>
