@@ -11,6 +11,8 @@ import { ProgramService } from '../../../core/_state/program/program.service';
 import { ProgramLookupModel } from '../../../core/_state/program/program.model';
 
 
+import { EncryptionService } from '../../../partials/shared_services/encryption.service';
+
 @Component({
   selector: 'app-add-edit-plan',
   standalone: true,
@@ -34,7 +36,8 @@ export class AddEditPlan implements OnInit {
     private location: Location,
     private toastService: ToastService,
     private planService: PlanService,
-    private programService: ProgramService
+    private programService: ProgramService,
+    private encryptionService: EncryptionService
   ) {
     this.form = this.fb.group({
       planName: ['', [Validators.required]],
@@ -44,10 +47,16 @@ export class AddEditPlan implements OnInit {
   }
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.isEditMode = true;
-      this.planId = +id;
+    const encryptedId = this.route.snapshot.paramMap.get('id');
+    if (encryptedId) {
+      const decryptedId = this.encryptionService.decryptFromRoute(encryptedId);
+      if (decryptedId) {
+        this.isEditMode = true;
+        this.planId = +decryptedId;
+      } else {
+        this.toastService.error('Invalid Plan ID', 'Error');
+        this.goBack();
+      }
     }
 
     this.loadActions();

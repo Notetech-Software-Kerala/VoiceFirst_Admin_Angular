@@ -1,22 +1,23 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { StatusBadge } from '../../../partials/shared_modules/status-badge/status-badge';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../../../material.module';
-import { SortableColumnDirective, SortEvent } from '../../../partials/shared_directives/sortable-column';
+import { SortableColumnDirective } from '../../../partials/shared_directives/sortable-column';
 import { FilterBy, FilterOption } from '../../../partials/shared_modules/filter-by/filter-by';
 import { Pagination } from '../../../partials/shared_modules/pagination/pagination';
 import { SearchBar } from '../../../partials/shared_modules/search-bar/search-bar';
 import { MasterMenuModel } from '../../../core/_state/menu/menu.model';
 import { MenuActions } from '../../../core/_state/menu/menu.action';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, takeUntil } from 'rxjs';
 import { selectAllMenus, selectMenuLoading, selectMenuTotalCount, selectMenuTotalPages } from '../../../core/_state/menu/menu.selectors';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { QueryParameterModel } from '../../../core/_models/query-parameter.model';
 import { MenuService } from '../../../core/_state/menu/menu.service';
 import { ConfirmationService } from '../../../partials/shared_directives/confirmation';
 import { ToastService } from '../../../partials/shared_services/toast.service';
 import { UtilityService } from '../../../partials/shared_services/utility.service';
+import { BaseListComponent } from '../../../core/base/base-list.component';
+import { EncryptionService } from '../../../partials/shared_services/encryption.service';
 
 @Component({
   selector: 'app-menu-list',
@@ -24,58 +25,44 @@ import { UtilityService } from '../../../partials/shared_services/utility.servic
   templateUrl: './menu-list.html',
   styleUrl: './menu-list.css',
 })
-export class MenuList {
+export class MenuList extends BaseListComponent implements OnInit, OnDestroy {
   menus: MasterMenuModel[] = [];
   loading$!: Observable<boolean>;
   totalCount$!: Observable<number>;
-  private destroy$ = new Subject<void>();
-  isSearching = false;
-
-  // SearchBy dropdown options
-  searchByOptions = [
-    { label: 'Menu Name', value: 'MenuName' },
-    // { label: 'Route', value: 'Route' },
-    // { label: 'Platform ID', value: 'PlateFormId' },
-    // { label: 'Created By', value: 'CreatedUser' },
-    // { label: 'Updated By', value: 'ModifiedUser' },
-    // { label: 'Deleted By', value: 'DeletedUser' }
-  ];
-
-  // Query parameters
-  queryParams: QueryParameterModel = {};
-
-  // Pagination state
-  pageSize = 10;
-  currentPage = 1;
-  totalCount = 0;
-  totalPages = 0;
-  pageSizes = [5, 10, 20, 50];
-
-  statusFilters: { Active?: boolean; Deleted?: boolean } = {};
-
-  filterOptions: FilterOption[] = [
-    {
-      label: 'Status',
-      key: 'status',
-      options: ['Active', 'Inactive', 'Deleted'],
-      single: true
-    }
-  ];
-
-  activeFilters: Record<string, string[]> = {};
-  clearSignal = 0;
 
   constructor(
     private store: Store,
-    private cdr: ChangeDetectorRef,
+    protected override cdr: ChangeDetectorRef,
     private confirmationService: ConfirmationService,
     public utilityService: UtilityService,
     private menuService: MenuService,
     private toastService: ToastService,
-    private router: Router
-  ) { }
+    protected override router: Router,
+    protected override route: ActivatedRoute,
+    protected override encryptionService: EncryptionService
+  ) {
+    super(router, route, encryptionService, cdr);
 
-  ngOnInit() {
+    this.searchByOptions = [
+      { label: 'Menu Name', value: 'MenuName' },
+      // { label: 'Route', value: 'Route' },
+      // { label: 'Platform ID', value: 'PlateFormId' },
+      // { label: 'Created By', value: 'CreatedUser' },
+      // { label: 'Updated By', value: 'ModifiedUser' },
+      // { label: 'Deleted By', value: 'DeletedUser' }
+    ];
+
+    this.filterOptions = [
+      {
+        label: 'Status',
+        key: 'status',
+        options: ['Active', 'Inactive', 'Deleted'],
+        single: true
+      }
+    ];
+  }
+
+  override ngOnInit() {
     this.loading$ = this.store.select(selectMenuLoading);
     this.totalCount$ = this.store.select(selectMenuTotalCount);
 
@@ -98,16 +85,10 @@ export class MenuList {
       .subscribe(data => {
         this.menus = data;
         console.log(this.menus);
-
         this.cdr.markForCheck();
       });
 
-    this.loadData();
-  }
-
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
+    super.ngOnInit();
   }
 
   loadData() {
@@ -119,114 +100,13 @@ export class MenuList {
     }
     const params = {
       ...this.queryParams,
-      ...this.statusFilters
+      ...this.statusFilters,
+      Limit: this.pageSize,
+      PageNumber: this.currentPage
     };
 
     console.log("Query Params", params);
     this.store.dispatch(MenuActions.load({ queryParams: params }));
-  }
-
-  onSearch(searchText: string) {
-    this.queryParams = {
-      ...this.queryParams,
-      SearchText: searchText,
-      PageNumber: 1
-    };
-    this.currentPage = 1;
-    this.isSearching = false;
-    this.loadData();
-  }
-
-  onTypingChange(isTyping: boolean) {
-    this.isSearching = isTyping;
-    this.cdr.markForCheck();
-  }
-
-  onSearchByChange(searchBy: string) {
-    this.queryParams = {
-      ...this.queryParams,
-      SearchBy: searchBy || undefined,
-      PageNumber: 1
-    };
-    this.currentPage = 1;
-    if (this.queryParams.SearchText) {
-      this.loadData();
-    }
-  }
-
-  onSortChange(event: SortEvent) {
-    this.queryParams = {
-      ...this.queryParams,
-      SortBy: event.column,
-      SortOrder: event.direction
-    };
-    this.loadData();
-  }
-
-  onPaginationChange(event: { page: number; size: number }) {
-    this.currentPage = event.page;
-    this.pageSize = event.size;
-    this.queryParams = {
-      ...this.queryParams,
-      PageNumber: event.page,
-      Limit: event.size
-    };
-    this.loadData();
-  }
-
-  onFilterChange(filters: Record<string, string[]>) {
-    this.activeFilters = filters;
-    this.statusFilters = {};
-
-    const status = filters['status']?.[0];
-    if (status === 'Active') {
-      this.statusFilters.Active = true;
-      this.statusFilters.Deleted = false;
-    } else if (status === 'Inactive') {
-      this.statusFilters.Active = false;
-      this.statusFilters.Deleted = false;
-    } else if (status === 'Deleted') {
-      this.statusFilters.Deleted = true;
-    }
-
-    const otherFilters: Record<string, any> = {};
-    Object.keys(filters).forEach(key => {
-      if (key !== 'status' && filters[key]?.length > 0) {
-        const values = filters[key];
-        otherFilters[key] = values.length === 1 ? values[0] : values.join(',');
-      }
-    });
-
-    this.queryParams = {
-      ...this.queryParams,
-      ...otherFilters,
-      PageNumber: 1
-    };
-
-    this.currentPage = 1;
-    this.loadData();
-  }
-
-  removeFilter(key: string, value: string) {
-    if (!this.activeFilters[key]) return;
-
-    this.activeFilters[key] = this.activeFilters[key].filter(v => v !== value);
-    if (this.activeFilters[key].length === 0) delete this.activeFilters[key];
-
-    this.onFilterChange({ ...this.activeFilters });
-  }
-
-  clearAllFilters() {
-    const filterKeys = this.filterOptions.map(f => f.key);
-    filterKeys.forEach(key => {
-      if (key !== 'status') {
-        delete (this.queryParams as any)[key];
-      }
-    });
-
-    this.activeFilters = {};
-    this.clearSignal++;
-    this.onFilterChange({});
   }
 
   onDelete(item: MasterMenuModel) {
@@ -307,10 +187,12 @@ export class MenuList {
   }
 
   navigateToEdit(item: MasterMenuModel) {
-    this.router.navigate(['/menu/edit', item.menuId]);
+    const encryptedId = this.encryptionService.encryptForRoute(item.menuId);
+    this.router.navigate(['/menu/edit', encryptedId]);
   }
 
   navigateToDetails(item: MasterMenuModel) {
-    this.router.navigate(['/menu/details', item.menuId]);
+    const encryptedId = this.encryptionService.encryptForRoute(item.menuId);
+    this.router.navigate(['/menu/details', encryptedId]);
   }
 }

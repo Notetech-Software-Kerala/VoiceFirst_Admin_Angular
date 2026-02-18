@@ -11,6 +11,7 @@ import { ConfirmationService } from '../../../partials/shared_directives/confirm
 import { ToastService } from '../../../partials/shared_services/toast.service';
 import { MaterialModule } from '../../../material.module';
 import { StatusBadge } from '../../../partials/shared_modules/status-badge/status-badge';
+import { EncryptionService } from '../../../partials/shared_services/encryption.service';
 import { DetailsLoaderComponent } from '../../../partials/shared_modules/details-loader/details-loader.component';
 
 @Component({
@@ -33,14 +34,22 @@ export class MenuDetails implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private confirmationService: ConfirmationService,
     private toastService: ToastService,
-    private location: Location
+    private location: Location,
+    private encryptionService: EncryptionService
   ) { }
 
   ngOnInit(): void {
     this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
-      this.menuId = +params.get('id')!;
-      if (this.menuId) {
-        this.loadMenuDetails(this.menuId);
+      const encryptedId = params.get('id');
+      if (encryptedId) {
+        const decryptedId = this.encryptionService.decryptFromRoute(encryptedId);
+        if (decryptedId) {
+          this.menuId = +decryptedId;
+          this.loadMenuDetails(this.menuId);
+        } else {
+          this.toastService.error('Invalid Menu ID', 'Error');
+          this.goBack();
+        }
       }
     });
   }
@@ -76,7 +85,8 @@ export class MenuDetails implements OnInit, OnDestroy {
 
   onEdit() {
     if (this.menu) {
-      this.router.navigate(['/menus/edit', this.menu.menuId]);
+      const encryptedId = this.encryptionService.encryptForRoute(this.menu.menuId);
+      this.router.navigate(['/menu/edit', encryptedId]);
     }
   }
 

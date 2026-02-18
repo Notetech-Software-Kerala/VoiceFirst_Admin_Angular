@@ -16,6 +16,7 @@ import { MaterialModule } from '../../../material.module';
 import { StatusBadge } from "../../../partials/shared_modules/status-badge/status-badge";
 
 import { DetailsLoaderComponent } from '../../../partials/shared_modules/details-loader/details-loader.component';
+import { EncryptionService } from '../../../partials/shared_services/encryption.service';
 
 @Component({
   selector: 'app-program-details',
@@ -39,14 +40,22 @@ export class ProgramDetails implements OnInit, OnDestroy {
     private utilityService: UtilityService,
     private store: Store,
     private location: Location,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private encryptionService: EncryptionService
   ) { }
 
   ngOnInit(): void {
     this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
-      this.programId = +params.get('id')!;
-      if (this.programId) {
-        this.loadProgramDetails(this.programId);
+      const encryptedId = params.get('id');
+      if (encryptedId) {
+        const decryptedId = this.encryptionService.decryptFromRoute(encryptedId);
+        if (decryptedId) {
+          this.programId = +decryptedId;
+          this.loadProgramDetails(this.programId);
+        } else {
+          this.toastService.error('Invalid Program ID', 'Error');
+          this.goBack();
+        }
       }
     });
   }
@@ -82,7 +91,8 @@ export class ProgramDetails implements OnInit, OnDestroy {
 
   onEdit() {
     if (this.program) {
-      this.router.navigate(['/program/edit', this.program.programId]);
+      const encryptedId = this.encryptionService.encryptForRoute(this.program.programId);
+      this.router.navigate(['/program/edit', encryptedId]);
     }
   }
 

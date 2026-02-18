@@ -13,6 +13,8 @@ import { ProgramActionService } from '../../../core/_state/program-action/progra
 import { ProgramModel } from '../../../core/_state/program/program.model';
 import { PlatformModel, PlatformService } from '../../../core/_state/platform/platform.service';
 
+import { EncryptionService } from '../../../partials/shared_services/encryption.service';
+
 @Component({
   selector: 'app-add-edit-program',
   imports: [MaterialModule, CommonModule],
@@ -41,7 +43,8 @@ export class AddEditProgram {
     private programActionService: ProgramActionService,
     private platformService: PlatformService,
     private toastService: ToastService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private encryptionService: EncryptionService
   ) { }
 
   ngOnInit(): void {
@@ -75,9 +78,16 @@ export class AddEditProgram {
       }),
       switchMap(params => {
         if (params['id']) {
-          this.isEditMode = true;
-          this.programId = +params['id'];
-          return this.programService.getById(this.programId);
+          const decryptedId = this.encryptionService.decryptFromRoute(params['id']);
+          if (decryptedId) {
+            this.isEditMode = true;
+            this.programId = +decryptedId;
+            return this.programService.getById(this.programId);
+          } else {
+            this.toastService.error('Invalid Program ID', 'Error');
+            this.goBack();
+            return of(null);
+          }
         }
         return of(null);
       })
