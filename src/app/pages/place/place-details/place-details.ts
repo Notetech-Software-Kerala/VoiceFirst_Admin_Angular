@@ -61,6 +61,8 @@ export class PlaceDetails implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  groupedPostOffices: { country: string, postOffices: any[] }[] = [];
+
   loadPlaceDetails(id: number) {
     this.loading = true;
     this.placeService.getById(id)
@@ -69,6 +71,7 @@ export class PlaceDetails implements OnInit, OnDestroy {
         next: (res) => {
           if (res.statusCode === 200) {
             this.place = res.data;
+            this.groupPostOffices();
           } else {
             this.toastService.error(res.message || 'Failed to load place details', 'Error');
           }
@@ -79,6 +82,28 @@ export class PlaceDetails implements OnInit, OnDestroy {
           this.loading = false;
         }
       });
+  }
+
+  private groupPostOffices() {
+    if (!this.place || !this.place.postOffices) {
+      this.groupedPostOffices = [];
+      return;
+    }
+
+    const groups: { [key: string]: any[] } = {};
+
+    this.place.postOffices.forEach(po => {
+      const country = po.countryName || 'Unknown Country';
+      if (!groups[country]) {
+        groups[country] = [];
+      }
+      groups[country].push(po);
+    });
+
+    this.groupedPostOffices = Object.keys(groups).map(country => ({
+      country,
+      postOffices: groups[country]
+    }));
   }
 
   goBack() {

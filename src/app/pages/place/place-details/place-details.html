@@ -92,51 +92,51 @@
         <div class="col-12">
             <h5 class="section-title mb-3">Associated Post Offices</h5>
 
-            <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Post Office Name</th>
-                            <th>Division 1</th>
-                            <th>Division 2</th>
-                            <th>Division 3</th>
-                            <th>Zip Codes</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (po of place.postOffices; track po.postOfficeId) {
-                        <tr>
-                            <td>
-                                <span class="fw-medium">{{ po.postOfficeName }}</span>
-                            </td>
-                            <td>{{ po.divisionOneName || '-' }} <small class="text-muted d-block">{{ po.divisionOneLabel
-                                    }}</small></td>
-                            <td>{{ po.divisionTwoName || '-' }} <small class="text-muted d-block">{{ po.divisionTwoLabel
-                                    }}</small></td>
-                            <td>{{ po.divisionThreeName || '-' }} <small class="text-muted d-block">{{
-                                    po.divisionThreeLabel }}</small></td>
-
-                            <td>
-                                @if (po.zipCodes.length) {
-                                <div class="d-flex flex-wrap gap-1">
-                                    @for (zip of po.zipCodes; track zip.zipCodeLinkId) {
-                                    <span class="badge bg-light text-dark border">{{ zip.zipCode }}</span>
-                                    }
+            <div class="d-flex flex-column gap-4 detail-card">
+                @for (group of groupedPostOffices; track group.country) {
+                <div>
+                    <h6 class="text-muted text-uppercase small fw-bold mb-3 ps-1">{{ group.country }}</h6>
+                    <div class="d-flex flex-column gap-3">
+                        @for (po of group.postOffices; track po.postOfficeId) {
+                        <div class="program-list-item">
+                            <!-- PO Info -->
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="icon-box">
+                                    <mat-icon>local_post_office</mat-icon>
                                 </div>
-                                } @else {
-                                <span>-</span>
+                                <div class="d-flex flex-column">
+                                    <h6 class="program-name mb-0">{{ po.postOfficeName }}</h6>
+                                    <div class="d-flex flex-wrap gap-2 small text-muted">
+                                        @if(po.divisionOneName) { <span>{{po.divisionOneLabel}}:
+                                            {{po.divisionOneName}}</span> }
+                                        @if(po.divisionTwoName) { <span>• {{po.divisionTwoLabel}}:
+                                            {{po.divisionTwoName}}</span> }
+                                        @if(po.divisionThreeName) { <span>• {{po.divisionThreeLabel}}:
+                                            {{po.divisionThreeName}}</span> }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Zip Codes -->
+                            <div class="d-flex flex-wrap gap-2 justify-content-end action-list">
+                                @for (zip of po.zipCodes; track zip.zipCodeLinkId) {
+                                <span class="action-chip">
+                                    {{ zip.zipCode }}
+                                </span>
+                                } @empty {
+                                <span class="fst-italic small">No Zip Codes</span>
                                 }
-                            </td>
-                        </tr>
-                        } @empty {
-                        <tr>
-                            <td colspan="5" class="text-center py-4 text-muted">
-                                No Post Offices associated with this place.
-                            </td>
-                        </tr>
+                            </div>
+                        </div>
                         }
-                    </tbody>
-                </table>
+                    </div>
+                </div>
+                } @empty {
+                <div class="info-box">
+                    <mat-icon>info</mat-icon>
+                    <span>No Post Offices associated with this place.</span>
+                </div>
+                }
             </div>
         </div>
     </div>
