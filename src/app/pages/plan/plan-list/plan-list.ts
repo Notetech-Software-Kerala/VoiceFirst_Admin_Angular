@@ -193,12 +193,12 @@ export class PlanList extends BaseListComponent implements OnInit, OnDestroy {
 
   // Open edit dialog
   navigateToEdit(item: PlanModel) {
-    this.router.navigate(['/plan/edit', item.planId]);
-
+    const encryptedId = this.encryptionService.encryptForRoute(item.planId);
+    this.router.navigate(['/plan/edit', encryptedId]);
   }
 
   navigateToDetails(item: PlanModel) {
-    this.router.navigate(['/plan/details', item.planId]);
-
+    const encryptedId = this.encryptionService.encryptForRoute(item.planId);
+    this.router.navigate(['/plan/details', encryptedId]);
   }
 }

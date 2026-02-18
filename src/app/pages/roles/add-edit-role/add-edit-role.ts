@@ -12,6 +12,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { PlanModel } from '../../../core/_state/plan/plan.model';
 import { createPlanActionLink, updatePlanActionLinks, RoleModel } from '../../../core/_state/role/role.model';
 
+import { EncryptionService } from '../../../partials/shared_services/encryption.service';
+
 @Component({
   selector: 'app-add-edit-role',
   standalone: true,
@@ -41,7 +43,8 @@ export class AddEditRole implements OnInit {
     private platformService: PlatformService,
     private planService: PlanService,
     private toastService: ToastService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private encryptionService: EncryptionService
   ) { }
 
   ngOnInit(): void {
@@ -70,11 +73,18 @@ export class AddEditRole implements OnInit {
       }),
       switchMap(params => {
         if (params['id']) {
-          this.isEditMode = true;
-          this.roleId = +params['id'];
-          // We need to fetch FULL role details with plans/actions if getById provides it.
-          // Assuming getById returns the structure with rolePlanDetails
-          return this.roleService.getById(this.roleId);
+          const decryptedId = this.encryptionService.decryptFromRoute(params['id']);
+          if (decryptedId) {
+            this.isEditMode = true;
+            this.roleId = +decryptedId;
+            // We need to fetch FULL role details with plans/actions if getById provides it.
+            // Assuming getById returns the structure with rolePlanDetails
+            return this.roleService.getById(this.roleId);
+          } else {
+            this.toastService.error('Invalid Role ID', 'Error');
+            this.goBack();
+            return of(null);
+          }
         }
         return of(null);
       })

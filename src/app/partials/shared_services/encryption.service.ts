@@ -36,4 +36,28 @@ export class EncryptionService {
             return null;
         }
     }
+
+    encryptForRoute(id: string | number): string {
+        if (!id) return '';
+        const encrypted = CryptoJS.AES.encrypt(id.toString(), this.SECRET_KEY).toString();
+        // Make URL safe: replace + with -, / with _, and remove =
+        return encrypted.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    decryptFromRoute(encryptedId: string | null): string | null {
+        if (!encryptedId) return null;
+        // Restore from URL safe: replace - with +, _ with /, and pad with =
+        let restored = encryptedId.replace(/-/g, '+').replace(/_/g, '/');
+        while (restored.length % 4) {
+            restored += '=';
+        }
+
+        try {
+            const bytes = CryptoJS.AES.decrypt(restored, this.SECRET_KEY);
+            return bytes.toString(CryptoJS.enc.Utf8);
+        } catch (e) {
+            console.error('Route decryption failed', e);
+            return null;
+        }
+    }
 }

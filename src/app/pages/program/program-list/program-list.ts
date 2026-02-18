@@ -192,10 +192,12 @@ export class ProgramList extends BaseListComponent implements OnInit, OnDestroy 
 
   // Open edit dialog
   navigateToEdit(item: ProgramModel) {
-    this.router.navigate(['/program/edit', item.programId]);
+    const encryptedId = this.encryptionService.encryptForRoute(item.programId);
+    this.router.navigate(['/program/edit', encryptedId]);
   }
 
   navigateToDetails(item: ProgramModel) {
-    this.router.navigate(['/program/details', item.programId]);
+    const encryptedId = this.encryptionService.encryptForRoute(item.programId);
+    this.router.navigate(['/program/details', encryptedId]);
   }
 }

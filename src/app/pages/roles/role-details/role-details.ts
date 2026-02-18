@@ -13,6 +13,7 @@ import { ConfirmationService } from '../../../partials/shared_directives/confirm
 import { ToastService } from '../../../partials/shared_services/toast.service';
 import { MaterialModule } from '../../../material.module';
 import { StatusBadge } from '../../../partials/shared_modules/status-badge/status-badge';
+import { EncryptionService } from '../../../partials/shared_services/encryption.service';
 import { DetailsLoaderComponent } from '../../../partials/shared_modules/details-loader/details-loader.component';
 
 
@@ -39,14 +40,22 @@ export class RoleDetails implements OnInit, OnDestroy {
     private confirmationService: ConfirmationService,
     private toastService: ToastService,
     private store: Store,
-    private location: Location
+    private location: Location,
+    private encryptionService: EncryptionService
   ) { }
 
   ngOnInit(): void {
     this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
-      this.roleId = +params.get('id')!;
-      if (this.roleId) {
-        this.loadRoleDetails(this.roleId);
+      const encryptedId = params.get('id');
+      if (encryptedId) {
+        const decryptedId = this.encryptionService.decryptFromRoute(encryptedId);
+        if (decryptedId) {
+          this.roleId = +decryptedId;
+          this.loadRoleDetails(this.roleId);
+        } else {
+          this.toastService.error('Invalid Role ID', 'Error');
+          this.goBack();
+        }
       }
     });
   }
@@ -82,7 +91,8 @@ export class RoleDetails implements OnInit, OnDestroy {
 
   onEdit() {
     if (this.role) {
-      this.router.navigate(['/role/edit', this.role.roleId]);
+      const encryptedId = this.encryptionService.encryptForRoute(this.role.roleId);
+      this.router.navigate(['/role/edit', encryptedId]);
     }
   }
 

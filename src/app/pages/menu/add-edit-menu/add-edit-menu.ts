@@ -12,6 +12,8 @@ import { forkJoin, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { MasterMenuModel } from '../../../core/_state/menu/menu.model';
 
+import { EncryptionService } from '../../../partials/shared_services/encryption.service';
+
 @Component({
   selector: 'app-add-edit-menu',
   imports: [MaterialModule, CommonModule],
@@ -38,7 +40,8 @@ export class AddEditMenu implements OnInit {
     private platformService: PlatformService,
     private programService: ProgramService,
     private toastService: ToastService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private encryptionService: EncryptionService
   ) { }
 
   ngOnInit(): void {
@@ -70,9 +73,16 @@ export class AddEditMenu implements OnInit {
       }),
       switchMap(params => {
         if (params['id']) {
-          this.isEditMode = true;
-          this.menuId = +params['id'];
-          return this.menuService.getById(this.menuId);
+          const decryptedId = this.encryptionService.decryptFromRoute(params['id']);
+          if (decryptedId) {
+            this.isEditMode = true;
+            this.menuId = +decryptedId;
+            return this.menuService.getById(this.menuId);
+          } else {
+            this.toastService.error('Invalid Menu ID', 'Error');
+            this.goBack();
+            return of(null);
+          }
         }
         return of(null);
       })

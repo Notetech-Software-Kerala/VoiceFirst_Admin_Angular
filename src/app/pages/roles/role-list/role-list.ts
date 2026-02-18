@@ -188,11 +188,12 @@ export class RoleList extends BaseListComponent {
 
   // Open edit dialog
   navigateToEdit(item: RoleModel) {
-    this.router.navigate(['/role/edit', item.roleId]);
-
+    const encryptedId = this.encryptionService.encryptForRoute(item.roleId);
+    this.router.navigate(['/role/edit', encryptedId]);
   }
 
   navigateToDetails(item: RoleModel) {
-    this.router.navigate(['/role/details', item.roleId]);
+    const encryptedId = this.encryptionService.encryptForRoute(item.roleId);
+    this.router.navigate(['/role/details', encryptedId]);
   }
 }

@@ -187,10 +187,12 @@ export class MenuList extends BaseListComponent implements OnInit, OnDestroy {
   }
 
   navigateToEdit(item: MasterMenuModel) {
-    this.router.navigate(['/menu/edit', item.menuId]);
+    const encryptedId = this.encryptionService.encryptForRoute(item.menuId);
+    this.router.navigate(['/menu/edit', encryptedId]);
   }
 
   navigateToDetails(item: MasterMenuModel) {
-    this.router.navigate(['/menu/details', item.menuId]);
+    const encryptedId = this.encryptionService.encryptForRoute(item.menuId);
+    this.router.navigate(['/menu/details', encryptedId]);
   }
 }

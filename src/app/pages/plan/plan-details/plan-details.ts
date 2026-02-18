@@ -14,6 +14,7 @@ import { PlanActions } from '../../../core/_state/plan/plan.action';
 import { MaterialModule } from '../../../material.module';
 import { StatusBadge } from '../../../partials/shared_modules/status-badge/status-badge';
 import { Location } from '@angular/common';
+import { EncryptionService } from '../../../partials/shared_services/encryption.service';
 import { DetailsLoaderComponent } from '../../../partials/shared_modules/details-loader/details-loader.component';
 
 
@@ -39,14 +40,22 @@ export class PlanDetails implements OnInit, OnDestroy {
     private toastService: ToastService,
     private utilityService: UtilityService,
     private store: Store,
-    private location: Location
+    private location: Location,
+    private encryptionService: EncryptionService
   ) { }
 
   ngOnInit(): void {
     this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
-      this.planId = +params.get('id')!;
-      if (this.planId) {
-        this.loadPlanDetails(this.planId);
+      const encryptedId = params.get('id');
+      if (encryptedId) {
+        const decryptedId = this.encryptionService.decryptFromRoute(encryptedId);
+        if (decryptedId) {
+          this.planId = +decryptedId;
+          this.loadPlanDetails(this.planId);
+        } else {
+          this.toastService.error('Invalid Plan ID', 'Error');
+          this.goBack();
+        }
       }
     });
   }
@@ -84,7 +93,8 @@ export class PlanDetails implements OnInit, OnDestroy {
 
   onEdit() {
     if (this.plan) {
-      this.router.navigate(['/plan/edit', this.plan.planId]);
+      const encryptedId = this.encryptionService.encryptForRoute(this.plan.planId);
+      this.router.navigate(['/plan/edit', encryptedId]);
     }
   }
 
