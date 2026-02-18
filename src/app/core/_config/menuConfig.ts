@@ -30,9 +30,10 @@ export const MENU_CONFIG: MenuItem[] = [
     label: 'Master Data',
     icon: 'settings',
     children: [
-      { id: 91, label: 'Country', route: '/country', icon: 'globe' },
-      { id: 92, label: 'Post Office', route: '/post-office', icon: 'post' },
-      { id: 93, label: 'Program Action', route: '/program-action', icon: 'directions' },
+      { id: 91, label: 'Program Action', route: '/program-action', icon: 'directions' },
+      { id: 92, label: 'Country', route: '/country', icon: 'globe' },
+      { id: 93, label: 'Post Office', route: '/post-office', icon: 'post' },
+      { id: 94, label: 'Place', route: '/place', icon: 'place' },
     ],
   },
 ];

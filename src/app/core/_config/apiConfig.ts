@@ -67,4 +67,9 @@ export const apiConfig = {
     webMenuBulkUpdate: '/menu/web/bulk',
     appMenuBulkUpdate: '/menu/app/bulk',
 
+    //Place
+    place: '/place',
+    getPlaceLookup: '/place/lookup',
+    placeRestore: '/place/recover',
+
 };
