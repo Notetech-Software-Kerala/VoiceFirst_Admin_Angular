@@ -1,17 +1,19 @@
 <div class="main-container">
     <div class="card">
 
-        <div class="actions ms-auto d-flex flex-wrap gap-2">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="page-title mb-0">{{title}}</h5>
             <button type="button" class="btn-action btn-outline" (click)="goBack()">
-                <mat-icon class="msr">arrow_back</mat-icon>
-                <span class="btn-text">Back</span>
+                <div class="d-flex align-items-center gap-2">
+                    <mat-icon class="msr">arrow_back</mat-icon>
+                    <span class="btn-text">Back</span>
+                </div>
             </button>
         </div>
 
-        <div class="card-body">
-            <h5 class="mb-4">{{title}}</h5>
+        <div class="card-body p-0">
             <form [formGroup]="form" class="row g-3">
-                <div class="col-md-12">
+                <div class="col-md-6">
                     <label for="placeName" class="form-label">Place Name <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="placeName" formControlName="placeName"
                         placeholder="Enter place name" />
@@ -25,95 +27,70 @@
                 </div>
             </form>
 
+            <hr class="my-4" style="border-color: var(--color-border-hr); opacity: 0.5;">
 
-            <div class="row mt-3">
-                <div class="col-md-6">
-                    <label class="form-label fw-bold mb-4">Locations / Zip Codes</label>
-                    <form [formGroup]="filterForm" class="row g-3 p-2 me-2 border">
+            <div class="row">
+                <div class="col-12 mb-2">
+                    <label class="form-label fw-bold">Add Locations / Zip Codes</label>
+                </div>
 
-
+                <div class="col-lg-6 col-md-12 mt-4">
+                    <form [formGroup]="filterForm" class="row g-3 p-3 rounded h-100 mb-5"
+                        style="border: 1px solid var(--color-border-hr);">
 
                         <div class="col-md-6">
                             <label for="countryId" class="form-label">Country <span class="text-danger">*</span></label>
-                            <select class="form-control" id="countryId" formControlName="countryId" required
+                            <select class="form-select" id="countryId" formControlName="countryId" required
                                 (change)="onCountryChange($event)">
                                 <option [ngValue]="null" disabled>Select Country</option>
                                 @for (country of countryList; track country.countryId) {
                                 <option [value]="country.countryId">{{ country.countryName }}</option>
                                 }
                             </select>
-                            @if (form.get('countryId')?.touched && form.get('countryId')?.invalid) {
-                            <div class="text-danger small mt-1">
-                                @if (form.get('countryId')?.hasError('required')) {
-                                Country is required.
-                                }
-                            </div>
-                            }
                         </div>
 
                         @if (divOneLabel) {
                         <div class="col-md-6">
                             <label for="divOneId" class="form-label">{{divOneLabel | titlecase}}</label>
-                            <select class="form-control" id="divOneId" formControlName="divOneId"
+                            <select class="form-select" id="divOneId" formControlName="divOneId"
                                 (change)="onDivisionOneChange($event)">
                                 <option [ngValue]="null" disabled>Select {{divOneLabel}}</option>
                                 @for (divisionOne of divisionOneList; track divisionOne.divOneId) {
                                 <option [value]="divisionOne.divOneId">{{ divisionOne.divOneName }}</option>
                                 }
                             </select>
-                            <!-- @if (form.get('divOneId')?.touched && form.get('divOneId')?.invalid) {
-                    <div class="text-danger small mt-1">
-                        @if (form.get('divOneId')?.hasError('required')) {
-                        {{divOneLabel}} is required.
-                        }
-                    </div>
-                    } -->
                         </div>
                         }
 
                         @if (divTwoLabel) {
                         <div class="col-md-6">
                             <label for="divTwoId" class="form-label">{{divTwoLabel | titlecase}}</label>
-                            <select class="form-control" id="divTwoId" formControlName="divTwoId"
+                            <select class="form-select" id="divTwoId" formControlName="divTwoId"
                                 (change)="onDivisionTwoChange($event)">
                                 <option [ngValue]="null" disabled>Select {{divTwoLabel}}</option>
                                 @for (divisionTwo of divisionTwoList; track divisionTwo.divTwoId) {
                                 <option [value]="divisionTwo.divTwoId">{{ divisionTwo.divTwoName }}</option>
                                 }
                             </select>
-                            <!-- @if (form.get('divTwoId')?.touched && form.get('divTwoId')?.invalid) {
-                    <div class="text-danger small mt-1">
-                        @if (form.get('divTwoId')?.hasError('required')) {
-                        {{divTwoLabel}} is required.
-                        }
-                    </div>
-                    } -->
                         </div>
                         }
 
                         @if (divThreeLabel) {
                         <div class="col-md-6">
                             <label for="divThreeId" class="form-label">{{divThreeLabel | titlecase}}</label>
-                            <select class="form-control" id="divThreeId" formControlName="divThreeId"
+                            <select class="form-select" id="divThreeId" formControlName="divThreeId"
                                 (change)="onDivisionThreeChange($event)">
                                 <option [ngValue]="null" disabled>Select {{divThreeLabel}}</option>
                                 @for (divisionThree of divisionThreeList; track divisionThree.divThreeId) {
                                 <option [value]="divisionThree.divThreeId">{{ divisionThree.divThreeName }}</option>
                                 }
                             </select>
-                            <!-- @if (form.get('divThreeId')?.touched && form.get('divThreeId')?.invalid) {
-                    <div class="text-danger small mt-1">
-                        @if (form.get('divThreeId')?.hasError('required')) {
-                        {{divThreeLabel}} is required.
-                        }
-                    </div>
-                    } -->
                         </div>
                         }
 
                         <div class="col-md-6">
                             <label for="postOfficeId" class="form-label">Post Office</label>
-                            <select class="form-control" id="postOfficeId" formControlName="postOfficeId"
+                            <select class="form-select" id="postOfficeId" formControlName="postOfficeId"
                                 (change)="onPostOfficeChange($event)">
                                 <option [ngValue]="null" disabled>Select Post Office</option>
                                 @for (postOffice of postOfficeList; track postOffice.postOfficeId) {
@@ -125,8 +102,9 @@
                         @if (filterForm.get('postOfficeId')?.value) {
                         @if (zipCodeList.length > 0) {
                         <div class="col-md-6">
-                            <label class="form-label d-block mb-2">Select Zip Codes</label>
-                            <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
+                            <label class="form-label d-block">Select Zip Codes</label>
+                            <div class="rounded p-2"
+                                style="max-height: 200px; overflow-y: auto; border: 1px solid var(--color-border-hr);">
                                 @for (zip of zipCodeList; track zip.zipCodeId) {
                                 <div class="form-check">
                                     <input class="form-check-input zip-checkbox" type="checkbox" [value]="zip.zipCodeId"
@@ -134,10 +112,10 @@
                                         [disabled]="isZipSelected(zip.zipCodeId) && !filterForm.get('selectedZipCodeIds')?.value?.includes(zip.zipCodeId)"
                                         (change)="toggleZipSelection($event, zip.zipCodeId)">
                                     <label class="form-check-label" [for]="'zip-' + zip.zipCodeId">
-                                        {{ zip.zipCode }} - {{ zip.location }}
+                                        {{ zip.zipCode }}
                                         @if(isZipSelected(zip.zipCodeId) &&
                                         !filterForm.get('selectedZipCodeIds')?.value?.includes(zip.zipCodeId)) {
-                                        <small class="text-success">(Selected)</small>
+                                        <small class="text-success ms-2">(Added)</small>
                                         }
                                     </label>
                                 </div>
@@ -145,8 +123,8 @@
                             </div>
                         </div>
 
-                        <div class="col-12 d-flex justify-content-end mt-3">
-                            <button type="button" class="btn btn-primary" (click)="addZipCodes()"
+                        <div class="col-12 d-flex justify-content-end mt-2">
+                            <button type="button" class="button-primary w-auto" (click)="addZipCodes()"
                                 [disabled]="!filterForm.get('selectedZipCodeIds')?.value?.length">
                                 Add Selected Zip Codes
                             </button>
@@ -159,25 +137,35 @@
                         }
                     </form>
                 </div>
-                <div class="col-md-6">
+
+                <div class="col-lg-6 col-md-12 mb-4">
                     @if (selectedZipCodes.length > 0) {
-                    <div class="mt-4">
-                        <h6>Selected Zip Codes</h6>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped">
-                                <thead>
+                    <div class="h-100 d-flex flex-column">
+                        <div class="table-responsive border rounded flex-grow-1"
+                            style="border-color: var(--color-border-hr) !important; max-height: 400px; overflow-y: auto;">
+                            <!-- Added max-height to scroll if table gets too long, matching form height roughly -->
+                            <table class="table mb-0">
+                                <thead
+                                    style="background-color: var(--color-bg-secondary); position: sticky; top: 0; z-index: 1;">
                                     <tr>
-                                        <th>Zip Code</th>
-                                        <th>Action</th>
+                                        <th class="border-bottom-0 text-secondary" style="font-weight: 500;">Zip Code
+                                        </th>
+                                        <th class="border-bottom-0 text-secondary" style="font-weight: 500;">Location
+                                        </th>
+                                        <th class="border-bottom-0 text-secondary text-end" style="font-weight: 500;">
+                                            Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @for (zip of selectedZipCodes; track zip.zipCodeId; let i = $index) {
                                     <tr>
                                         <td>{{ zip.zipCode }}</td>
-                                        <td>
-                                            <button type="button" class="btn btn-sm" (click)="removeZipCode(i)">
-                                                <mat-icon>delete</mat-icon>
+                                        <td>{{ zip.location }}</td>
+                                        <td class="text-end">
+                                            <button type="button"
+                                                class="btn-action btn-outline-danger p-1 border-0 bg-transparent"
+                                                (click)="removeZipCode(i)">
+                                                <mat-icon class="msr text-danger">delete</mat-icon>
                                             </button>
                                         </td>
                                     </tr>
@@ -186,27 +174,32 @@
                             </table>
                         </div>
                     </div>
+                    } @else {
+                    <div class="h-100 d-flex align-items-center justify-content-center text-muted border rounded mt-2"
+                        style="border-color: var(--color-border-hr) !important; min-height: 200px; background-color: var(--color-bg-primary);">
+                        <div class="text-center">
+                            <mat-icon class="msr"
+                                style="font-size: 3rem; width: 3rem; height: 3rem; opacity: 0.5;">map</mat-icon>
+                            <p class="mb-0 mt-2">No Zip Codes selected</p>
+                        </div>
+                    </div>
                     }
                 </div>
             </div>
 
-
-
-
-
-            <div class="col-12 mt-4 d-flex justify-content-end gap-2">
-                <mat-dialog-actions class="mt-4">
-                    <button type="button" class="close-btn" (click)="goBack()">Cancel</button>
-                    <button class="submit-btn" type="button" [disabled]="submitting" (click)="onSubmit()">
-                        @if (submitting) {
-                        <span class="btn-loader"></span>
-                        }
-                        Submit
-                    </button>
-                </mat-dialog-actions>
-
+            <div class="row mt-4">
+                <div class="col-12 mt-4 d-flex justify-content-end gap-2">
+                    <mat-dialog-actions class="mt-4">
+                        <button type="button" class="close-btn" (click)="goBack()">Cancel</button>
+                        <button class="submit-btn" type="submit" [disabled]="submitting" (click)="onSubmit()">
+                            @if (submitting) {
+                            <span class="btn-loader"></span>
+                            }
+                            Save
+                        </button>
+                    </mat-dialog-actions>
+                </div>
             </div>
-
 
         </div>
     </div>
