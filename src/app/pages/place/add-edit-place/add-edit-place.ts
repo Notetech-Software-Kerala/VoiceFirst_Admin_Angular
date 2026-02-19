@@ -137,15 +137,17 @@ export class AddEditPlace implements OnInit {
     this.updateDivisionLabels(countryId);
 
     // Reset downstream fields
-    this.form.patchValue({
+    this.filterForm.patchValue({
       divOneId: '',
       divTwoId: '',
       divThreeId: '',
-      postOfficeId: ''
+      postOfficeId: '',
+      selectedZipCodeIds: []
     });
     this.divisionOneList = [];
     this.divisionTwoList = [];
     this.divisionThreeList = [];
+    this.zipCodeList = [];
 
     this.getPostOffices();
 
@@ -168,10 +170,12 @@ export class AddEditPlace implements OnInit {
     this.filterForm.patchValue({
       divTwoId: '',
       divThreeId: '',
-      postOfficeId: ''
+      postOfficeId: '',
+      selectedZipCodeIds: []
     });
     this.divisionTwoList = [];
     this.divisionThreeList = [];
+    this.zipCodeList = [];
 
     this.getPostOffices();
 
@@ -193,9 +197,11 @@ export class AddEditPlace implements OnInit {
     // Reset downstream fields
     this.filterForm.patchValue({
       divThreeId: '',
-      postOfficeId: ''
+      postOfficeId: '',
+      selectedZipCodeIds: []
     });
     this.divisionThreeList = [];
+    this.zipCodeList = [];
 
     this.getPostOffices();
 
@@ -213,8 +219,10 @@ export class AddEditPlace implements OnInit {
 
   onDivisionThreeChange(event: any) {
     this.filterForm.patchValue({
-      postOfficeId: ''
+      postOfficeId: '',
+      selectedZipCodeIds: []
     });
+    this.zipCodeList = [];
     this.getPostOffices();
   }
 
@@ -283,6 +291,15 @@ export class AddEditPlace implements OnInit {
 
     console.log('Toggling Zip:', zipCodeId, 'New Selection:', newSelectedIds);
     this.filterForm.patchValue({ selectedZipCodeIds: newSelectedIds });
+  }
+
+  isZipSelected(zipCodeId: number): boolean {
+    // Check if it's in the temporary selection
+    const selectedIds = this.filterForm.get('selectedZipCodeIds')?.value || [];
+    if (selectedIds.some((id: any) => id == zipCodeId)) return true;
+
+    // Check if it's already added to the main list
+    return this.selectedZipCodes.some(z => z.zipCodeId == zipCodeId);
   }
 
   addZipCodes() {

@@ -122,68 +122,77 @@
                             </select>
                         </div>
 
+                        @if (filterForm.get('postOfficeId')?.value) {
                         @if (zipCodeList.length > 0) {
                         <div class="col-md-6">
-                            <label class="form-label d-block mb-1">Select Zip Codes</label>
+                            <label class="form-label d-block mb-2">Select Zip Codes</label>
                             <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
                                 @for (zip of zipCodeList; track zip.zipCodeId) {
                                 <div class="form-check">
                                     <input class="form-check-input zip-checkbox" type="checkbox" [value]="zip.zipCodeId"
-                                        [id]="'zip-' + zip.zipCodeId"
+                                        [id]="'zip-' + zip.zipCodeId" [checked]="isZipSelected(zip.zipCodeId)"
+                                        [disabled]="isZipSelected(zip.zipCodeId) && !filterForm.get('selectedZipCodeIds')?.value?.includes(zip.zipCodeId)"
                                         (change)="toggleZipSelection($event, zip.zipCodeId)">
                                     <label class="form-check-label" [for]="'zip-' + zip.zipCodeId">
-                                        {{ zip.zipCode }}
+                                        {{ zip.zipCode }} - {{ zip.location }}
+                                        @if(isZipSelected(zip.zipCodeId) &&
+                                        !filterForm.get('selectedZipCodeIds')?.value?.includes(zip.zipCodeId)) {
+                                        <small class="text-success">(Selected)</small>
+                                        }
                                     </label>
                                 </div>
                                 }
                             </div>
                         </div>
-                        }
 
-                        <div class="col-12 d-flex justify-content-end">
+                        <div class="col-12 d-flex justify-content-end mt-3">
                             <button type="button" class="btn btn-primary" (click)="addZipCodes()"
                                 [disabled]="!filterForm.get('selectedZipCodeIds')?.value?.length">
                                 Add Selected Zip Codes
                             </button>
                         </div>
+                        } @else {
+                        <div class="col-12 text-center text-muted mt-3">
+                            <small>No Zip Codes available for this Post Office</small>
+                        </div>
+                        }
+                        }
                     </form>
                 </div>
                 <div class="col-md-6">
-
+                    @if (selectedZipCodes.length > 0) {
+                    <div class="mt-4">
+                        <h6>Selected Zip Codes</h6>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Zip Code</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (zip of selectedZipCodes; track zip.zipCodeId; let i = $index) {
+                                    <tr>
+                                        <td>{{ zip.zipCode }}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm" (click)="removeZipCode(i)">
+                                                <mat-icon>delete</mat-icon>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    }
                 </div>
             </div>
 
 
 
-            @if (selectedZipCodes.length > 0) {
-            <div class="mt-4">
-                <h6>Selected Zip Codes</h6>
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped">
-                        <thead>
-                            <tr>
-                                <th>Zip Code</th>
-                                <th>Location</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (zip of selectedZipCodes; track zip.zipCodeId; let i = $index) {
-                            <tr>
-                                <td>{{ zip.zipCode }}</td>
-                                <td>{{ zip.location }}</td>
-                                <td>
-                                    <button type="button" class="btn btn-sm btn-danger" (click)="removeZipCode(i)">
-                                        <mat-icon>delete</mat-icon>
-                                    </button>
-                                </td>
-                            </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            }
+
 
             <div class="col-12 mt-4 d-flex justify-content-end gap-2">
                 <mat-dialog-actions class="mt-4">

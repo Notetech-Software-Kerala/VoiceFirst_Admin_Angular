@@ -61,7 +61,6 @@ export class PostOffice extends BaseListComponent implements OnInit, OnDestroy {
         options: ['Active', 'Inactive', 'Deleted'],
         single: true
       }
-
     ];
   }
 
@@ -100,9 +99,7 @@ export class PostOffice extends BaseListComponent implements OnInit, OnDestroy {
     this.utilityService.applyDefaultSorting(this.queryParams);
     const params = {
       ...this.queryParams,
-      ...this.statusFilters,
-      Limit: this.pageSize,
-      PageNumber: this.currentPage
+      ...this.statusFilters
     };
 
     console.log("Query Params PostOffice", params);
