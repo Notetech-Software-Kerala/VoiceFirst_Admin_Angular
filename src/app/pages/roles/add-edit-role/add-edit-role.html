@@ -77,7 +77,7 @@
                     <!-- Selected Plans List -->
                     <div class="d-flex flex-column gap-3">
                         @for (plan of selectedPlans; track plan.planId; let i = $index) {
-                        <div class="plan-card">
+                        <div class="plan-card" [class.removed-plan]="plan.isRemoved">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="icon-box-sm">
@@ -85,15 +85,26 @@
                                     </div>
                                     <h6 class="m-0 fw-bold">{{ plan.planName }}</h6>
                                 </div>
+                                @if (plan.isRemoved) {
+                                <button type="button" class="btn btn-sm btn-outline-primary" (click)="restorePlan(i)">
+                                    Add Again
+                                </button>
+                                } @else {
                                 <button type="button" class="btn btn-sm btn-outline-danger" (click)="removePlan(i)"
                                     matTooltip="Remove Plan">
                                     <mat-icon class="icon-sm">delete</mat-icon>
                                 </button>
+                                }
                             </div>
                             <div class="card-body">
+                                @if (plan.isRemoved) {
+                                <div class="removed-overlay">
+                                    <span>Plan marked for removal</span>
+                                </div>
+                                }
                                 <!-- Programs within the Plan -->
                                 @if (plan.programPlanDetails && plan.programPlanDetails.length > 0) {
-                                <div class="d-flex flex-column">
+                                <div class="d-flex flex-column" [class.opacity-50]="plan.isRemoved">
                                     @for (program of plan.programPlanDetails; track program.programId) {
                                     <div class="program-group">
                                         <div class="program-header">
@@ -106,6 +117,7 @@
                                             action.actionId) {
                                             <div class="form-check action-check">
                                                 <input class="form-check-input" type="checkbox"
+                                                    [disabled]="plan.isRemoved"
                                                     [id]="'action-' + plan.planId + '-' + (action.actionLinkId || action.actionId)"
                                                     [checked]="isActionSelected(plan, action.actionLinkId || action.actionId)"
                                                     (change)="toggleAction(plan, action.actionLinkId || action.actionId, $any($event.target).checked)">

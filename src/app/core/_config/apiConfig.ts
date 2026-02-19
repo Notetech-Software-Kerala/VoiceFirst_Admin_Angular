@@ -23,17 +23,18 @@ export const apiConfig = {
     // Zipcode
     zipcode: '/zipcode',
     zipcodeRestore: '/zipcode/recover',
+    getZipcodeLookupByPostOfficeId: '/zipcodes/lookup/post-office-ids',
 
     //Country
     country: '/country',
-    divisionOne: '/division-one',
-    divisionTwo: '/division-two',
-    divisionThree: '/division-three',
+    divisionOne: '/division/one',
+    divisionTwo: '/division/two',
+    divisionThree: '/division/three',
 
     getCountryLookup: '/country/lookup',
-    getDivisionOneLookup: '/division-one/lookup',
-    getDivisionTwoLookup: '/division-two/lookup',
-    getDivisionThreeLookup: '/division-three/lookup',
+    getDivisionOneLookup: '/division/one/lookup',
+    getDivisionTwoLookup: '/division/two/lookup',
+    getDivisionThreeLookup: '/division/three/lookup',
 
     //Program
     program: '/program',

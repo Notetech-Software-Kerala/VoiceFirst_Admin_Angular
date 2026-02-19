@@ -39,7 +39,7 @@ import { StatusBadge } from '../../../partials/shared_modules/status-badge/statu
 export class PlaceList extends BaseListComponent implements OnInit, OnDestroy {
   places: PlaceModel[] = [];
   loading$!: Observable<boolean>;
-
+  totalCount$!: Observable<number>;
   constructor(
     private dialog: MatDialog,
     private store: Store,
@@ -73,7 +73,7 @@ export class PlaceList extends BaseListComponent implements OnInit, OnDestroy {
 
   override ngOnInit() {
     this.loading$ = this.store.select(selectPlaceLoading);
-
+    this.totalCount$ = this.store.select(selectPlaceTotalCount);
     // Subscribe to pagination metadata
     this.store.select(selectPlaceTotalCount)
       .pipe(takeUntil(this.destroy$))
@@ -103,12 +103,10 @@ export class PlaceList extends BaseListComponent implements OnInit, OnDestroy {
   }
 
   loadData() {
-    // Merge queryParams with statusFilters (Active/Delete)
+    this.utilityService.applyDefaultSorting(this.queryParams);
     const params = {
       ...this.queryParams,
       ...this.statusFilters,
-      Limit: this.pageSize, // Using this.pageSize from base
-      PageNumber: this.currentPage // Using this.currentPage from base
     };
 
     console.log("Place Query Params", params);

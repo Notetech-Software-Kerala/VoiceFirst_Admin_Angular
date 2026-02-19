@@ -2,6 +2,7 @@ import { ProgramActionModel } from "../program-action/program-action.model";
 
 export interface PlaceModel {
   postOffices?: PostOffice[];
+  zipCodes?: any[]; // For edit mode patching
   placeId: number;
   placeName: string;
   active: boolean;
