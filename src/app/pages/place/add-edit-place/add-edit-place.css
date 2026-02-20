@@ -8,3 +8,56 @@
     cursor: pointer;
     transition: filter .2s, opacity .2s;
 }
+
+.selected-zips-container {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--color-border-hr) !important;
+    background-color: var(--color-bg-primary);
+}
+
+.zip-card {
+    background: #fff;
+    border: 1px solid var(--color-border-hr);
+    border-radius: 8px;
+    padding: 12px;
+    height: 100%;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.zip-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    border-color: var(--color-hover-primary, #695cfe);
+}
+
+.zip-code-badge {
+    background-color: #f0f2f5;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.location-text {
+    font-size: 0.85rem;
+    color: #6c757d;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.delete-btn-card {
+    cursor: pointer;
+    color: #dc3545;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.delete-btn-card:hover {
+    opacity: 1;
+    background-color: #ffe6e6;
+    border-radius: 50%;
+}

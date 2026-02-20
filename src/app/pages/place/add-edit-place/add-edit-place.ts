@@ -70,9 +70,7 @@ export class AddEditPlace implements OnInit {
       countryId: [''],
       divOneId: [''],
       divTwoId: [''],
-      divThreeId: [''],
-      postOfficeId: [''],
-      selectedZipCodeIds: this.fb.control([])
+      divThreeId: ['']
     });
   }
 
@@ -140,14 +138,12 @@ export class AddEditPlace implements OnInit {
     this.filterForm.patchValue({
       divOneId: '',
       divTwoId: '',
-      divThreeId: '',
-      postOfficeId: '',
-      selectedZipCodeIds: []
+      divThreeId: ''
     });
     this.divisionOneList = [];
     this.divisionTwoList = [];
     this.divisionThreeList = [];
-    this.zipCodeList = [];
+    this.postOfficeList = [];
 
     this.getPostOffices();
 
@@ -169,13 +165,10 @@ export class AddEditPlace implements OnInit {
     // Reset downstream fields
     this.filterForm.patchValue({
       divTwoId: '',
-      divThreeId: '',
-      postOfficeId: '',
-      selectedZipCodeIds: []
+      divThreeId: ''
     });
     this.divisionTwoList = [];
     this.divisionThreeList = [];
-    this.zipCodeList = [];
 
     this.getPostOffices();
 
@@ -196,12 +189,9 @@ export class AddEditPlace implements OnInit {
 
     // Reset downstream fields
     this.filterForm.patchValue({
-      divThreeId: '',
-      postOfficeId: '',
-      selectedZipCodeIds: []
+      divThreeId: ''
     });
     this.divisionThreeList = [];
-    this.zipCodeList = [];
 
     this.getPostOffices();
 
@@ -218,15 +208,35 @@ export class AddEditPlace implements OnInit {
   }
 
   onDivisionThreeChange(event: any) {
-    this.filterForm.patchValue({
-      postOfficeId: '',
-      selectedZipCodeIds: []
-    });
-    this.zipCodeList = [];
     this.getPostOffices();
   }
 
+  shouldFetchPostOffices(): boolean {
+    const { countryId, divOneId, divTwoId, divThreeId } = this.filterForm.value;
+    if (!countryId) return false;
+
+    let totalDivisions = 0;
+    if (this.divOneLabel) totalDivisions++;
+    if (this.divTwoLabel) totalDivisions++;
+    if (this.divThreeLabel) totalDivisions++;
+
+    if (totalDivisions === 3) {
+      return !!divTwoId; // fetch on second division
+    } else if (totalDivisions === 2) {
+      return !!divOneId; // fetch on first division
+    } else if (totalDivisions <= 1) {
+      return !!countryId; // fetch on country
+    }
+
+    return false;
+  }
+
   getPostOffices() {
+    if (!this.shouldFetchPostOffices()) {
+      this.postOfficeList = [];
+      return;
+    }
+
     const { countryId, divOneId, divTwoId, divThreeId } = this.filterForm.value;
     const params: any = {};
 
@@ -247,101 +257,49 @@ export class AddEditPlace implements OnInit {
     });
   }
 
-  onPostOfficeChange(event: any) {
-    const postOfficeId = event.target.value;
-    this.zipCodeList = [];
-    this.filterForm.patchValue({ selectedZipCodeIds: [] });
-    // Force reset just in case patch doesn't create it if missing
-    if (!this.filterForm.contains('selectedZipCodeIds')) {
-      this.filterForm.addControl('selectedZipCodeIds', this.fb.control([]));
-    }
+  toggleZipSelection(event: any, zipObj: any, postOffice: any) {
+    const checked = event.target.checked;
+    const normalizedZipId = zipObj.zipCodeId || zipObj.zipCodeLinkId || zipObj.id;
 
-    console.log('Post Office Changed:', postOfficeId);
-
-    if (postOfficeId) {
-      this.postOfficeService.getZipcodesByPostOfficeIds([postOfficeId]).subscribe({
-        next: (zipCodes: any) => {
-          // Normalize zip codes to ensure zipCodeId exists
-          this.zipCodeList = (zipCodes || []).map((z: any) => ({
-            ...z,
-            zipCodeId: z.zipCodeId || z.id || z.zipCodeLinkId // Fallback to other possible ID fields
-          }));
-
-          if (this.zipCodeList.length > 0) {
-            console.log('ZipCode Keys:', Object.keys(this.zipCodeList[0]));
-            console.log('Sample ZipCode:', this.zipCodeList[0]);
-          }
-        },
-        error: (err) => console.error(err)
-      });
-    }
-  }
-
-  toggleZipSelection(event: any, zipCodeId: number) {
-    const selectedIds = this.filterForm.get('selectedZipCodeIds')?.value || [];
-    let newSelectedIds = [...selectedIds];
-
-    if (event.target.checked) {
-      if (!newSelectedIds.some((id: any) => id == zipCodeId)) {
-        newSelectedIds.push(zipCodeId);
+    if (checked) {
+      if (!this.selectedZipCodes.some((z: any) => z.zipCodeId == normalizedZipId)) {
+        const locationString = this.generateLocationStringForPO(postOffice);
+        this.selectedZipCodes.push({
+          ...zipObj,
+          zipCodeId: normalizedZipId,
+          location: locationString
+        });
+        this.updateZipCodeIds();
       }
     } else {
-      newSelectedIds = newSelectedIds.filter((id: any) => id != zipCodeId);
-    }
-
-    console.log('Toggling Zip:', zipCodeId, 'New Selection:', newSelectedIds);
-    this.filterForm.patchValue({ selectedZipCodeIds: newSelectedIds });
-  }
-
-  isZipSelected(zipCodeId: number): boolean {
-    // Check if it's in the temporary selection
-    const selectedIds = this.filterForm.get('selectedZipCodeIds')?.value || [];
-    if (selectedIds.some((id: any) => id == zipCodeId)) return true;
-
-    // Check if it's already added to the main list
-    return this.selectedZipCodes.some(z => z.zipCodeId == zipCodeId);
-  }
-
-  addZipCodes() {
-    const selectedIds = this.filterForm.get('selectedZipCodeIds')?.value;
-    console.log('Selected IDs:', selectedIds);
-    console.log('Current ZipCode List:', this.zipCodeList);
-    console.log('Already Selected Zips:', this.selectedZipCodes);
-    if (!selectedIds || selectedIds.length === 0) return;
-
-    const newZipCodes = this.zipCodeList.filter(z =>
-      // Use loose equality or conversion to ensure match
-      selectedIds.some((id: any) => id == z.zipCodeId) &&
-      !this.selectedZipCodes.some(existing => existing.zipCodeId == z.zipCodeId)
-    );
-
-    if (newZipCodes.length > 0) {
-      this.selectedZipCodes = [...this.selectedZipCodes, ...newZipCodes];
+      this.selectedZipCodes = this.selectedZipCodes.filter((z: any) => z.zipCodeId != normalizedZipId);
       this.updateZipCodeIds();
-      this.toastService.success(`${newZipCodes.length} Zip Code(s) added`, 'Success');
-
-      // Clear selection
-      this.filterForm.patchValue({ selectedZipCodeIds: [] });
-
-      // Manually uncheck inputs
-      setTimeout(() => {
-        const checkboxes = document.querySelectorAll('.zip-checkbox') as NodeListOf<HTMLInputElement>;
-        checkboxes.forEach((cb) => cb.checked = false);
-      });
-    } else {
-      // Check if they were already added
-      const duplicates = this.zipCodeList.filter(z =>
-        selectedIds.some((id: any) => id == z.zipCodeId) &&
-        this.selectedZipCodes.some(existing => existing.zipCodeId == z.zipCodeId)
-      );
-
-      if (duplicates.length > 0) {
-        this.toastService.info('Selected Zip Codes are already added', 'Info');
-      } else {
-        // Fallback if filter logic is weird
-        this.toastService.warning('Could not add selected Zip Codes', 'Warning');
-      }
     }
+  }
+
+  isZipSelected(zipObj: any): boolean {
+    const normalizedZipId = zipObj.zipCodeId || zipObj.zipCodeLinkId || zipObj.id;
+    return this.selectedZipCodes.some(z => z.zipCodeId == normalizedZipId);
+  }
+
+  generateLocationStringForPO(postOffice: any): string {
+    const { countryId, divOneId, divTwoId, divThreeId } = this.filterForm.value;
+
+    const findName = (list: any[], id: any, idKey: string, nameKey: string) => {
+      if (!id) return null;
+      const item = list.find(x => x[idKey] == id);
+      return item ? item[nameKey] : null;
+    };
+
+    const parts = [
+      findName(this.countryList, countryId, 'countryId', 'countryName'),
+      findName(this.divisionOneList, divOneId, 'divOneId', 'divOneName'),
+      findName(this.divisionTwoList, divTwoId, 'divTwoId', 'divTwoName'),
+      findName(this.divisionThreeList, divThreeId, 'divThreeId', 'divThreeName'),
+      postOffice.postOfficeName
+    ];
+
+    return parts.filter(p => !!p).join(' - ');
   }
 
   removeZipCode(index: number) {
@@ -360,14 +318,41 @@ export class AddEditPlace implements OnInit {
       placeName: data.placeName
     });
 
-    if (data.zipCodes && data.zipCodes.length > 0) {
-      // Map existing links to have zipCodeId property for consistency
+    this.selectedZipCodes = [];
+
+    // Try to build from postOffices first as it has hierarchy info
+    if (data.postOffices && data.postOffices.length > 0) {
+      data.postOffices.forEach((po: any) => {
+        // Build location string for this PO
+        const locationParts = [
+          po.countryName,
+          po.divisionOneName,
+          po.divisionTwoName,
+          po.divisionThreeName,
+          po.postOfficeName
+        ].filter(p => !!p);
+
+        const locationString = locationParts.join(' | ');
+
+        if (po.zipCodes && po.zipCodes.length > 0) {
+          po.zipCodes.forEach((link: any) => {
+            this.selectedZipCodes.push({
+              ...link,
+              zipCodeId: link.zipCodeLinkId || link.zipCodeId,
+              location: locationString
+            });
+          });
+        }
+      });
+    } else if (data.zipCodes && data.zipCodes.length > 0) {
+      // Fallback if postOffices not available or empty structure
       this.selectedZipCodes = data.zipCodes.map((link: any) => ({
         ...link,
         zipCodeId: link.zipCodeLinkId || link.zipCodeId // Handle both cases
       }));
-      this.updateZipCodeIds();
     }
+
+    this.updateZipCodeIds();
   }
 
   goBack() {
@@ -404,20 +389,20 @@ export class AddEditPlace implements OnInit {
       console.log(payload);
 
 
-      // this.placeService.create(payload).subscribe({
-      //   next: (res) => {
-      //     this.submitting = false;
-      //     if (res.statusCode === 201) {
-      //       this.toastService.success('Place created successfully', 'Success');
+      this.placeService.create(payload).subscribe({
+        next: (res) => {
+          this.submitting = false;
+          if (res.statusCode === 201) {
+            this.toastService.success('Place created successfully', 'Success');
 
-      //     } else {
-      //       this.toastService.error(res.message || 'Operation failed', 'Error');
-      //     }
-      //   },
-      //   error: (error) => {
-      //     this.submitting = false;
-      //   }
-      // });
+          } else {
+            this.toastService.error(res.message || 'Operation failed', 'Error');
+          }
+        },
+        error: (error) => {
+          this.submitting = false;
+        }
+      });
     }
   }
 
