@@ -97,6 +97,8 @@ export class AddEditPlace implements OnInit {
       next: (response: any) => {
         if (response && response.data) {
           this.originalData = response.data;
+          console.log("Original Data", this.originalData);
+
           this.patchForm(response.data);
         }
       },
@@ -435,6 +437,8 @@ export class AddEditPlace implements OnInit {
           this.submitting = false;
           if (res.statusCode === 200) {
             this.toastService.success('Place updated successfully', 'Success');
+            const id = this.encryptionService.encrypt(res.data.placeId);
+            this.router.navigate(['/place/details/', id]);
           } else {
             this.toastService.error(res.message || 'Operation failed', 'Error');
           }
@@ -468,7 +472,7 @@ export class AddEditPlace implements OnInit {
 
     const originalMap = new Map<number, any>();
     originalLinks.forEach(link => {
-      const key = link.zipCodeLinkId || link.zipCodeId;
+      const key = link.zipCodeLinkId;
       if (!originalMap.has(key)) {
         originalMap.set(key, link);
       }
@@ -482,7 +486,7 @@ export class AddEditPlace implements OnInit {
       if (originalLink) {
         if (originalLink.active === false) {
           updateZipCodeLinkIds.push({
-            zipCodeLinkId: originalLink.placeZipCodeLinkId || originalLink.id || originalLink.zipCodeLinkId,
+            zipCodeLinkId: originalLink.zipCodeLinkId,
             active: true
           });
         }
@@ -495,7 +499,7 @@ export class AddEditPlace implements OnInit {
       if (!currentIds.includes(id)) {
         if (link.active !== false) {
           updateZipCodeLinkIds.push({
-            zipCodeLinkId: link.placeZipCodeLinkId || link.id || link.zipCodeLinkId,
+            zipCodeLinkId: link.zipCodeLinkId,
             active: false
           });
         }

@@ -7,7 +7,7 @@ import { Store } from '@ngrx/store';
 import { UtilityService } from '../../../partials/shared_services/utility.service';
 import { ToastService } from '../../../partials/shared_services/toast.service';
 import { MaterialModule } from '../../../material.module';
-import { CountryModel } from '../../../core/_state/country/country.model';
+import { CountryModel, DivisionOneModel, DivisionTwoModel, DivisionThreeModel } from '../../../core/_state/country/country.model';
 import { CountryService } from '../../../core/_state/country/country.service';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
@@ -24,6 +24,14 @@ export class AddEditPostOffice {
   postOffice !: PostOfficeModel;
   isSubmitting = false;
   countryList: CountryModel[] = [];
+  divisionOneList: DivisionOneModel[] = [];
+  divisionTwoList: DivisionTwoModel[] = [];
+  divisionThreeList: DivisionThreeModel[] = [];
+
+  divOneLabel: string | null = null;
+  divTwoLabel: string | null = null;
+  divThreeLabel: string | null = null;
+
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
   constructor(
@@ -66,6 +74,9 @@ export class AddEditPostOffice {
     this.form = this.fb.group({
       postOfficeName: ['', Validators.required],
       countryId: ['', Validators.required],
+      divOneId: [0],
+      divTwoId: [0],
+      divThreeId: [0],
       zipCodes: [[], Validators.required],
     });
   }
@@ -81,12 +92,133 @@ export class AddEditPostOffice {
         console.log("response", res);
         if (res.statusCode === 200) {
           this.countryList = res.data;
+          if (this.data && this.data.countryId) {
+            this.updateDivisionLabels(this.data.countryId);
+            this.loadDivisionsForEdit(this.data);
+          }
         }
       },
       error: (error) => {
         console.log("error", error);
       }
     })
+  }
+
+  loadDivisionsForEdit(data: any) {
+    if (data.countryId) {
+      this.countryService.getDivisionOneLookupByCountryId(data.countryId).subscribe((res: any) => {
+        if (res && res.data) this.divisionOneList = res.data;
+      });
+    }
+    if (data.divOneId) {
+      this.countryService.getDivisionTwoLookupByDivisionOneId(data.divOneId).subscribe((res: any) => {
+        if (res && res.data) this.divisionTwoList = res.data;
+      });
+    }
+    if (data.divTwoId) {
+      this.countryService.getDivisionThreeLookupByDivisionTwoId(data.divTwoId).subscribe((res: any) => {
+        if (res && res.data) this.divisionThreeList = res.data;
+      });
+    }
+  }
+
+  onCountryChange(event: any) {
+    const countryId = event.target.value;
+
+    this.updateDivisionLabels(countryId);
+
+    // Reset downstream fields
+    this.form.patchValue({
+      divOneId: 0,
+      divTwoId: 0,
+      divThreeId: 0
+    });
+    this.divisionOneList = [];
+    this.divisionTwoList = [];
+    this.divisionThreeList = [];
+
+    this.countryService.getDivisionOneLookupByCountryId(countryId).subscribe({
+      next: (response: any) => {
+        if (response && response.data) {
+          this.divisionOneList = response.data;
+        }
+      },
+      error: (error) => {
+        console.error(error);
+      }
+    });
+  }
+
+  onDivisionOneChange(event: any) {
+    const divisionOneId = event.target.value;
+
+    this.form.patchValue({
+      divTwoId: 0,
+      divThreeId: 0
+    });
+    this.divisionTwoList = [];
+    this.divisionThreeList = [];
+
+    this.countryService.getDivisionTwoLookupByDivisionOneId(divisionOneId).subscribe({
+      next: (response: any) => {
+        if (response && response.data) {
+          this.divisionTwoList = response.data;
+        }
+      },
+      error: (error) => {
+        console.error(error);
+      }
+    });
+  }
+
+  onDivisionTwoChange(event: any) {
+    const divisionTwoId = event.target.value;
+
+    this.form.patchValue({
+      divThreeId: 0
+    });
+    this.divisionThreeList = [];
+
+    this.countryService.getDivisionThreeLookupByDivisionTwoId(divisionTwoId).subscribe({
+      next: (response: any) => {
+        if (response && response.data) {
+          this.divisionThreeList = response.data;
+        }
+      },
+      error: (error) => {
+        console.error(error);
+      }
+    });
+  }
+
+  onDivisionThreeChange(event: any) {
+    // No downstream lists to fetch at division three
+  }
+
+  updateDivisionLabels(countryId: any) {
+    const country = this.countryList.find(c => c.countryId == countryId);
+    if (country) {
+      this.divOneLabel = country.divisionOne || null;
+      this.divTwoLabel = country.divisionTwo || null;
+      this.divThreeLabel = country.divisionThree || null;
+    } else {
+      this.divOneLabel = null;
+      this.divTwoLabel = null;
+      this.divThreeLabel = null;
+    }
+
+    this.updateValidator('divOneId', this.divOneLabel);
+    this.updateValidator('divTwoId', this.divTwoLabel);
+    this.updateValidator('divThreeId', this.divThreeLabel);
+  }
+
+  updateValidator(controlName: string, label: string | null) {
+    const control = this.form.get(controlName);
+    if (!label) {
+      control?.clearValidators();
+      control?.setValue(0); // Start clean if hidden
+      control?.updateValueAndValidity();
+    }
   }
 
 
@@ -195,10 +327,14 @@ export class AddEditPostOffice {
 
   addPostOffice() {
     if (this.form.valid) {
+      const formValue = this.form.value;
       const newPostOffice = {
-        postOfficeName: this.form.value.postOfficeName,
-        countryId: this.form.value.countryId,
-        zipCodes: (this.form.value.zipCodes || []).map((z: any) => z.zipCode),
+        postOfficeName: formValue.postOfficeName,
+        countryId: formValue.countryId,
+        divOneId: formValue.divOneId || 0,
+        divTwoId: formValue.divTwoId || 0,
+        divThreeId: formValue.divThreeId || 0,
+        zipCodes: (formValue.zipCodes || []).map((z: any) => z.zipCode),
       }
       console.log("payload", newPostOffice);
       this.postOfficeService.create(newPostOffice).subscribe({
@@ -274,7 +410,7 @@ export class AddEditPostOffice {
     });
   }
 
-  getChangedValues(formValue: any, originalData: PostOfficeModel): any {
+  getChangedValues(formValue: any, originalData: any): any {
     const changes: any = {};
 
     if (formValue.postOfficeName !== originalData.postOfficeName) {
@@ -285,19 +421,28 @@ export class AddEditPostOffice {
       changes.countryId = formValue.countryId;
     }
 
-    // Zip codes: deletions are handled by deleteZipcode API.
-    // For updates we only send newly added zip codes.
-    const formZips = formValue.zipCodes || [];
+    if ((formValue.divOneId || 0) !== (originalData.divOneId || 0)) {
+      changes.divOneId = formValue.divOneId || 0;
+    }
 
-    // Filter out only new ones (zipCodeId == 0)
+    if ((formValue.divTwoId || 0) !== (originalData.divTwoId || 0)) {
+      changes.divTwoId = formValue.divTwoId || 0;
+    }
+
+    if ((formValue.divThreeId || 0) !== (originalData.divThreeId || 0)) {
+      changes.divThreeId = formValue.divThreeId || 0;
+    }
+
+    // Zip codes handling:
+    const formZips = formValue.zipCodes || [];
     const addedZips = formZips.filter((z: any) => z.zipCodeId === 0);
 
     if (addedZips.length > 0) {
-      changes.zipCodes = addedZips.map((z: any) => ({
-        zipCode: z.zipCode
-      }));
+      changes.addZipCodes = addedZips.map((z: any) => z.zipCode);
     }
 
+    // We only update changes if the updateZipCodes pattern is needed instead of independent API calls.
+    // If you ever populate updateZipCodes locally before saving, add it logic here.
     return changes;
   }
 

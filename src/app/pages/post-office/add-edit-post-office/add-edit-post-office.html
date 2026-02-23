@@ -15,13 +15,52 @@
         </div>
 
         <div class="col-md-12">
-            <label for="postOfficeName" class="form-label">Country<span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="countryId">
+            <label for="countryId" class="form-label">Country<span class="text-danger">*</span></label>
+            <select class="form-control" formControlName="countryId" id="countryId" (change)="onCountryChange($event)">
                 <option *ngFor="let country of countryList" [value]="country.countryId">
                     {{country.countryName}}
                 </option>
             </select>
         </div>
+
+        @if (divOneLabel) {
+        <div class="col-md-12">
+            <label for="divOneId" class="form-label">{{divOneLabel | titlecase}}</label>
+            <select class="form-control" id="divOneId" formControlName="divOneId"
+                (change)="onDivisionOneChange($event)">
+                <option [value]="0">Select {{divOneLabel}}</option>
+                @for (divisionOne of divisionOneList; track divisionOne.divOneId) {
+                <option [value]="divisionOne.divOneId">{{ divisionOne.divOneName }}</option>
+                }
+            </select>
+        </div>
+        }
+
+        @if (divTwoLabel) {
+        <div class="col-md-12">
+            <label for="divTwoId" class="form-label">{{divTwoLabel | titlecase}}</label>
+            <select class="form-control" id="divTwoId" formControlName="divTwoId"
+                (change)="onDivisionTwoChange($event)">
+                <option [value]="0">Select {{divTwoLabel}}</option>
+                @for (divisionTwo of divisionTwoList; track divisionTwo.divTwoId) {
+                <option [value]="divisionTwo.divTwoId">{{ divisionTwo.divTwoName }}</option>
+                }
+            </select>
+        </div>
+        }
+
+        @if (divThreeLabel) {
+        <div class="col-md-12">
+            <label for="divThreeId" class="form-label">{{divThreeLabel | titlecase}}</label>
+            <select class="form-control" id="divThreeId" formControlName="divThreeId"
+                (change)="onDivisionThreeChange($event)">
+                <option [value]="0">Select {{divThreeLabel}}</option>
+                @for (divisionThree of divisionThreeList; track divisionThree.divThreeId) {
+                <option [value]="divisionThree.divThreeId">{{ divisionThree.divThreeName }}</option>
+                }
+            </select>
+        </div>
+        }
 
         <div class="col-md-12">
             <label for="zipCode" class="form-label">Zip Code</label><br>
