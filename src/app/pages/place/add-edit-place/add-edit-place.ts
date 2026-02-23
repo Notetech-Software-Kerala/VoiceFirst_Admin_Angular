@@ -336,20 +336,26 @@ export class AddEditPlace implements OnInit {
 
         if (po.zipCodes && po.zipCodes.length > 0) {
           po.zipCodes.forEach((link: any) => {
-            this.selectedZipCodes.push({
-              ...link,
-              zipCodeId: link.zipCodeLinkId || link.zipCodeId,
-              location: locationString
-            });
+            if (link.active !== false) {
+              this.selectedZipCodes.push({
+                ...link,
+                zipCodeId: link.zipCodeLinkId || link.zipCodeId,
+                location: locationString
+              });
+            }
           });
         }
       });
     } else if (data.zipCodes && data.zipCodes.length > 0) {
       // Fallback if postOffices not available or empty structure
-      this.selectedZipCodes = data.zipCodes.map((link: any) => ({
-        ...link,
-        zipCodeId: link.zipCodeLinkId || link.zipCodeId // Handle both cases
-      }));
+      data.zipCodes.forEach((link: any) => {
+        if (link.active !== false) {
+          this.selectedZipCodes.push({
+            ...link,
+            zipCodeId: link.zipCodeLinkId || link.zipCodeId // Handle both cases
+          });
+        }
+      });
     }
 
     this.updateZipCodeIds();
@@ -421,12 +427,14 @@ export class AddEditPlace implements OnInit {
         return;
       }
 
+      console.log("Payload", changes);
+
+
       this.placeService.update(this.placeId, changes).subscribe({
         next: (res) => {
           this.submitting = false;
           if (res.statusCode === 200) {
             this.toastService.success('Place updated successfully', 'Success');
-            this.goBack();
           } else {
             this.toastService.error(res.message || 'Operation failed', 'Error');
           }
@@ -445,20 +453,61 @@ export class AddEditPlace implements OnInit {
       changes.placeName = formValue.placeName;
     }
 
-    // Compare zipCodeLinkIds arrays
-    // currentIds are already strings from updateZipCodeIds
-    const currentIds = (formValue.zipCodeLinkIds || []).sort();
+    const currentIds = (formValue.zipCodeLinkIds || []).map((id: any) => Number(id));
 
-    // originalData.zipCodes contains the associated objects. 
-    // We need to extract IDs and convert to string for comparison.
-    // Note: originalData.postOffices? usage in previous diff was likely incorrect if that field doesn't exist or isn't the zip list.
-    // Assuming originalData.zipCodes is the source of truth for existing zips.
-    const originalIds = (originalData.zipCodes || [])
-      .map((z: any) => String(z.zipCodeId))
-      .sort();
+    const originalLinks: any[] = [];
+    if (originalData.postOffices && originalData.postOffices.length > 0) {
+      originalData.postOffices.forEach(po => {
+        if (po.zipCodes) {
+          originalLinks.push(...po.zipCodes);
+        }
+      });
+    } else if (originalData.zipCodes && originalData.zipCodes.length > 0) {
+      originalLinks.push(...originalData.zipCodes);
+    }
 
-    if (JSON.stringify(currentIds) !== JSON.stringify(originalIds)) {
-      changes.zipCodeLinkIds = formValue.zipCodeLinkIds;
+    const originalMap = new Map<number, any>();
+    originalLinks.forEach(link => {
+      const key = link.zipCodeLinkId || link.zipCodeId;
+      if (!originalMap.has(key)) {
+        originalMap.set(key, link);
+      }
+    });
+
+    const insertZipCodeLinkIds: number[] = [];
+    const updateZipCodeLinkIds: any[] = [];
+
+    currentIds.forEach((id: number) => {
+      const originalLink = originalMap.get(id);
+      if (originalLink) {
+        if (originalLink.active === false) {
+          updateZipCodeLinkIds.push({
+            zipCodeLinkId: originalLink.placeZipCodeLinkId || originalLink.id || originalLink.zipCodeLinkId,
+            active: true
+          });
+        }
+      } else {
+        insertZipCodeLinkIds.push(id);
+      }
+    });
+
+    originalMap.forEach((link, id) => {
+      if (!currentIds.includes(id)) {
+        if (link.active !== false) {
+          updateZipCodeLinkIds.push({
+            zipCodeLinkId: link.placeZipCodeLinkId || link.id || link.zipCodeLinkId,
+            active: false
+          });
+        }
+      }
+    });
+
+    if (insertZipCodeLinkIds.length > 0) {
+      changes.insertZipCodeLinkIds = insertZipCodeLinkIds;
+    }
+
+    if (updateZipCodeLinkIds.length > 0) {
+      changes.updateZipCodeLinkIds = updateZipCodeLinkIds;
     }
 
     return changes;
