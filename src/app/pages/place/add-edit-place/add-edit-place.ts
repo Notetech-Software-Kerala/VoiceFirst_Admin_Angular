@@ -41,6 +41,8 @@ export class AddEditPlace implements OnInit {
 
   selectedZipCodes: any[] = [];
 
+  isLocationPanelOpen = false;
+
   constructor(
     private location: Location,
     private fb: FormBuilder,
@@ -543,5 +545,9 @@ export class AddEditPlace implements OnInit {
       control?.setValue(''); // Start clean if hidden
       control?.updateValueAndValidity();
     }
+  }
+
+  toggleLocationPanel() {
+    this.isLocationPanelOpen = !this.isLocationPanelOpen;
   }
 }

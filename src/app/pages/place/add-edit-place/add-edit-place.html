@@ -30,108 +30,132 @@
             <hr class="my-4" style="border-color: var(--color-border-hr); opacity: 0.5;">
 
             <div class="row">
-                <div class="col-12 mb-2">
-                    <label class="form-label fw-bold">Selected Zip Codes</label>
+                <div class="col-12 mb-2 d-flex justify-content-between align-items-center">
+                    <label class="form-label fw-bold mb-0">Selected Zip Codes</label>
+                    <button type="button" class="btn btn-sm btn-action btn-outline" (click)="toggleLocationPanel()"
+                        style="min-width: 150px;">
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <mat-icon class="msr"
+                                style="font-size: 1.1rem; width: 1.1rem; height: 1.1rem; display: flex; align-items: center;">add_location</mat-icon>
+                            <span class="btn-text">Select Locations</span>
+                        </div>
+                    </button>
                 </div>
 
+                <!-- Side Panel Overlay -->
+                <div class="location-panel-overlay" [class.show]="isLocationPanelOpen" (click)="toggleLocationPanel()">
+                </div>
 
+                <!-- Side Panel -->
+                <div class="location-side-panel shadow-lg" [class.open]="isLocationPanelOpen">
+                    <div class="panel-header d-flex justify-content-between align-items-center p-3 border-bottom">
+                        <h6 class="mb-0 fw-bold">Select Locations</h6>
+                        <button type="button" class="btn-close" (click)="toggleLocationPanel()"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="panel-body p-3">
+                        <form [formGroup]="filterForm" class="row g-3">
 
-                <div class="col-lg-4 col-md-12 mt-4">
-                    <form [formGroup]="filterForm" class="row g-3 p-3 rounded h-100 mb-5"
-                        style="border: 1px solid var(--color-border-hr);">
-
-                        <div class="col-md-12">
-                            <label for="countryId" class="form-label">Country <span class="text-danger">*</span></label>
-                            <select class="form-select" id="countryId" formControlName="countryId" required
-                                (change)="onCountryChange($event)">
-                                <option [ngValue]="null" disabled>Select Country</option>
-                                @for (country of countryList; track country.countryId) {
-                                <option [value]="country.countryId">{{ country.countryName }}</option>
-                                }
-                            </select>
-                        </div>
-
-                        @if (divOneLabel) {
-                        <div class="col-md-6">
-                            <label for="divOneId" class="form-label">{{divOneLabel | titlecase}}</label>
-                            <select class="form-select" id="divOneId" formControlName="divOneId"
-                                (change)="onDivisionOneChange($event)">
-                                <option [ngValue]="null" disabled>Select {{divOneLabel}}</option>
-                                @for (divisionOne of divisionOneList; track divisionOne.divOneId) {
-                                <option [value]="divisionOne.divOneId">{{ divisionOne.divOneName }}</option>
-                                }
-                            </select>
-                        </div>
-                        }
-
-                        @if (divTwoLabel) {
-                        <div class="col-md-6">
-                            <label for="divTwoId" class="form-label">{{divTwoLabel | titlecase}}</label>
-                            <select class="form-select" id="divTwoId" formControlName="divTwoId"
-                                (change)="onDivisionTwoChange($event)">
-                                <option [ngValue]="null" disabled>Select {{divTwoLabel}}</option>
-                                @for (divisionTwo of divisionTwoList; track divisionTwo.divTwoId) {
-                                <option [value]="divisionTwo.divTwoId">{{ divisionTwo.divTwoName }}</option>
-                                }
-                            </select>
-                        </div>
-                        }
-
-                        @if (divThreeLabel) {
-                        <div class="col-md-6">
-                            <label for="divThreeId" class="form-label">{{divThreeLabel | titlecase}}</label>
-                            <select class="form-select" id="divThreeId" formControlName="divThreeId"
-                                (change)="onDivisionThreeChange($event)">
-                                <option [ngValue]="null" disabled>Select {{divThreeLabel}}</option>
-                                @for (divisionThree of divisionThreeList; track divisionThree.divThreeId) {
-                                <option [value]="divisionThree.divThreeId">{{ divisionThree.divThreeName }}</option>
-                                }
-                            </select>
-                        </div>
-                        }
-
-                        @if (postOfficeList.length > 0) {
-                        <div class="col-12 mt-4 mb-2">
-                            <label class="form-label fw-bold">Post Offices & Zip Codes</label>
-                            <div class="d-flex flex-column gap-3 mt-2"
-                                style="max-height: 400px; overflow-y: auto; padding-right: 5px;">
-                                @for (postOffice of postOfficeList; track postOffice.postOfficeId) {
-                                <div class="program-group border rounded p-3 bg-white shadow-sm"
-                                    style="border-color: var(--color-border-hr) !important;">
-                                    <div class="program-header mb-3 border-bottom pb-2">
-                                        <span class="program-title fw-bold" style="color: var(--color-text-primary);">
-                                            <mat-icon class="msr"
-                                                style="font-size: 1rem; width: 1rem; height: 1rem;">local_post_office</mat-icon>
-                                            {{ postOffice.postOfficeName }}
-                                        </span>
-                                    </div>
-                                    <div class="action-grid d-flex flex-wrap gap-4">
-                                        @for (zip of postOffice.zipCodes; track zip.zipCodeId || zip.id ||
-                                        zip.zipCodeLinkId) {
-                                        <div class="form-check action-check">
-                                            <input class="form-check-input zip-checkbox" type="checkbox"
-                                                [id]="'zip-' + postOffice.postOfficeId + '-' + (zip.zipCodeId || zip.id || zip.zipCodeLinkId)"
-                                                [checked]="isZipSelected(zip)"
-                                                (change)="toggleZipSelection($event, zip, postOffice)">
-                                            <label class="form-check-label user-select-none" style="cursor: pointer;"
-                                                [for]="'zip-' + postOffice.postOfficeId + '-' + (zip.zipCodeId || zip.id || zip.zipCodeLinkId)">
-                                                {{ zip.zipCode }}
-                                            </label>
-                                        </div>
-                                        }
-                                        @if (!postOffice.zipCodes || postOffice.zipCodes.length === 0) {
-                                        <small class="text-muted">No zip codes available.</small>
-                                        }
-                                    </div>
-                                </div>
-                                }
+                            <div class="col-md-12">
+                                <label for="countryId" class="form-label">Country <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="countryId" formControlName="countryId" required
+                                    (change)="onCountryChange($event)">
+                                    <option [ngValue]="null" disabled>Select Country</option>
+                                    @for (country of countryList; track country.countryId) {
+                                    <option [value]="country.countryId">{{ country.countryName }}</option>
+                                    }
+                                </select>
                             </div>
-                        </div>
-                        }
-                    </form>
+
+                            @if (divOneLabel) {
+                            <div class="col-md-6">
+                                <label for="divOneId" class="form-label">{{divOneLabel | titlecase}}</label>
+                                <select class="form-select" id="divOneId" formControlName="divOneId"
+                                    (change)="onDivisionOneChange($event)">
+                                    <option [ngValue]="null" disabled>Select {{divOneLabel}}</option>
+                                    @for (divisionOne of divisionOneList; track divisionOne.divOneId) {
+                                    <option [value]="divisionOne.divOneId">{{ divisionOne.divOneName }}</option>
+                                    }
+                                </select>
+                            </div>
+                            }
+
+                            @if (divTwoLabel) {
+                            <div class="col-md-6">
+                                <label for="divTwoId" class="form-label">{{divTwoLabel | titlecase}}</label>
+                                <select class="form-select" id="divTwoId" formControlName="divTwoId"
+                                    (change)="onDivisionTwoChange($event)">
+                                    <option [ngValue]="null" disabled>Select {{divTwoLabel}}</option>
+                                    @for (divisionTwo of divisionTwoList; track divisionTwo.divTwoId) {
+                                    <option [value]="divisionTwo.divTwoId">{{ divisionTwo.divTwoName }}</option>
+                                    }
+                                </select>
+                            </div>
+                            }
+
+                            @if (divThreeLabel) {
+                            <div class="col-md-6">
+                                <label for="divThreeId" class="form-label">{{divThreeLabel | titlecase}}</label>
+                                <select class="form-select" id="divThreeId" formControlName="divThreeId"
+                                    (change)="onDivisionThreeChange($event)">
+                                    <option [ngValue]="null" disabled>Select {{divThreeLabel}}</option>
+                                    @for (divisionThree of divisionThreeList; track divisionThree.divThreeId) {
+                                    <option [value]="divisionThree.divThreeId">{{ divisionThree.divThreeName }}</option>
+                                    }
+                                </select>
+                            </div>
+                            }
+
+                            @if (postOfficeList.length > 0) {
+                            <div class="col-12 mt-4 mb-2">
+                                <label class="form-label fw-bold">Post Offices & Zip Codes</label>
+                                <div class="d-flex flex-column gap-3 mt-2"
+                                    style="max-height: 400px; overflow-y: auto; padding-right: 5px;">
+                                    @for (postOffice of postOfficeList; track postOffice.postOfficeId) {
+                                    <div class="program-group border rounded p-3 bg-white shadow-sm"
+                                        style="border-color: var(--color-border-hr) !important;">
+                                        <div class="program-header mb-3 border-bottom pb-2">
+                                            <span class="program-title fw-bold"
+                                                style="color: var(--color-text-primary);">
+                                                <mat-icon class="msr"
+                                                    style="font-size: 1rem; width: 1rem; height: 1rem;">local_post_office</mat-icon>
+                                                {{ postOffice.postOfficeName }}
+                                            </span>
+                                        </div>
+                                        <div class="action-grid d-flex flex-wrap gap-4">
+                                            @for (zip of postOffice.zipCodes; track zip.zipCodeId || zip.id ||
+                                            zip.zipCodeLinkId) {
+                                            <div class="form-check action-check">
+                                                <input class="form-check-input zip-checkbox" type="checkbox"
+                                                    [id]="'zip-' + postOffice.postOfficeId + '-' + (zip.zipCodeId || zip.id || zip.zipCodeLinkId)"
+                                                    [checked]="isZipSelected(zip)"
+                                                    (change)="toggleZipSelection($event, zip, postOffice)">
+                                                <label class="form-check-label user-select-none"
+                                                    style="cursor: pointer;"
+                                                    [for]="'zip-' + postOffice.postOfficeId + '-' + (zip.zipCodeId || zip.id || zip.zipCodeLinkId)">
+                                                    {{ zip.zipCode }}
+                                                </label>
+                                            </div>
+                                            }
+                                            @if (!postOffice.zipCodes || postOffice.zipCodes.length === 0) {
+                                            <small class="text-muted">No zip codes available.</small>
+                                            }
+                                        </div>
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+                            }
+                        </form>
+                    </div>
+                    <div class="panel-footer p-3 border-top d-flex justify-content-end bg-light mt-auto">
+                        <button type="button" class="btn btn-primary btn-sm px-4"
+                            (click)="toggleLocationPanel()">Done</button>
+                    </div>
                 </div>
 
-                <div class="col-lg-8 col-md-12 mb-4">
+                <div class="col-12 mb-4">
                     @if (selectedZipCodes.length > 0) {
                     <div class="h-100 d-flex flex-column mt-2">
                         <div class="selected-zips-container border rounded flex-grow-1 p-3">
