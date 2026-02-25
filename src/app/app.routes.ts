@@ -67,7 +67,16 @@ export const routes: Routes = [
             },
             {
                 path: 'post-office',
-                loadComponent: () => import('./pages/post-office/post-office').then(m => m.PostOffice)
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () => import('./pages/post-office/post-office-list/post-office-list').then(m => m.PostOfficeList)
+                    },
+                    {
+                        path: 'details/:id',
+                        loadComponent: () => import('./pages/post-office/post-office-details/post-office-details').then(m => m.PostOfficeDetails)
+                    }
+                ]
             },
             {
                 path: 'country',

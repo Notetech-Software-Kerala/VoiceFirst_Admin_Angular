@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ToastService } from '../../../partials/shared_services/toast.service';
 import { PlanService } from '../../../core/_state/plan/plan.service';
 import { ProgramActionService } from '../../../core/_state/program-action/program-action.service';
@@ -12,6 +14,7 @@ import { ProgramLookupModel } from '../../../core/_state/program/program.model';
 
 
 import { EncryptionService } from '../../../partials/shared_services/encryption.service';
+import { SearchBar } from '../../../partials/shared_modules/search-bar/search-bar';
 
 @Component({
   selector: 'app-add-edit-plan',
@@ -28,6 +31,17 @@ export class AddEditPlan implements OnInit {
 
   actionList: ProgramLookupModel[] = [];
   originalData: any = {};
+  dataLoaded = false;
+
+  searchProgramText: string = '';
+  searchSubject = new Subject<string>();
+
+  currentPage = 1;
+  pageSize = 10;
+  totalCount = 0;
+  totalPages = 1;
+
+  private actionPageCache = new Map<number, { items: ProgramLookupModel[], totalCount: number, totalPages: number }>();
 
   constructor(
     private fb: FormBuilder,
@@ -59,20 +73,80 @@ export class AddEditPlan implements OnInit {
       }
     }
 
+    this.searchSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged()
+    ).subscribe(searchText => {
+      this.searchProgramText = searchText;
+      this.currentPage = 1; // reset to 1 on search
+      this.loadActions();
+    });
+
     this.loadActions();
   }
 
+  onSearchPrograms(event: any) {
+    this.searchSubject.next(event.target.value);
+  }
+
   loadActions() {
-    this.programService.lookupForPlan().subscribe({
+    // If there is a search text, we might want to bypass local page cache 
+    // or key cache off both page AND search term. For simplicity, if searching,
+    // let's clear the cache or create a composite key.
+    const cacheKey = `${this.currentPage}_${this.searchProgramText}`;
+    const cached = this.actionPageCache.get(cacheKey as any);
+    if (cached) {
+      this.actionList = cached.items;
+      this.totalCount = cached.totalCount;
+      this.totalPages = cached.totalPages;
+      return;
+    }
+
+    const params: any = { PageNumber: this.currentPage, PageSize: this.pageSize };
+
+    // Add search parameters
+    if (this.searchProgramText) {
+      // API expects merely SearchText without SearchBy mappings
+      params.SearchText = this.searchProgramText;
+    }
+
+    this.programService.lookupForPlan(params).subscribe({
       next: (res) => {
-        this.actionList = res.data || [];
-        if (this.isEditMode) {
+
+        console.log("API Calling");
+
+        const items = res?.data?.items || [];
+        const totalCount = res?.data?.totalCount || 0;
+        const totalPages = res?.data?.totalPages || 1;
+
+        this.actionPageCache.set(cacheKey as any, { items, totalCount, totalPages });
+
+        this.actionList = items;
+        this.totalCount = totalCount;
+        this.totalPages = totalPages;
+
+        if (this.isEditMode && !this.dataLoaded) {
           this.loadPlanData();
+          this.dataLoaded = true;
         }
-      },
-      error: (error) => {
       }
     });
+  }
+
+  onPrevPage(event: Event) {
+    event.preventDefault();
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.loadActions();
+    }
+  }
+
+  onNextPage(event: Event) {
+    event.preventDefault();
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.loadActions();
+    }
   }
 
   loadPlanData() {
