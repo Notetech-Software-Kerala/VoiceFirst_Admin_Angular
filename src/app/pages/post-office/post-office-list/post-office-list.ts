@@ -181,54 +181,18 @@ export class PostOfficeList extends BaseListComponent implements OnInit, OnDestr
       });
   }
 
-  // Open add dialog
-  openAddDialog() {
-    const dialogRef = this.dialog.open(AddEditPostOffice, {
-      width: '500px',
-      disableClose: true,
-      data: null
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        console.log("result", result);
-
-        if (result.statusCode === 201) {
-          // Add new item
-          this.store.dispatch(PostOfficeActions.add({ postOffice: result.data }));
-        } else if (result.statusCode === 200) {
-          // Update existing item - use correct NgRx Entity format
-          this.store.dispatch(PostOfficeActions.update({
-            postOffice: {
-              id: result.data.postOfficeId,
-              changes: result.data
-            }
-          }));
-        }
-      }
-    });
+  // Direct to add page
+  navigateToAdd() {
+    this.router.navigate(['/post-office/add']);
   }
 
-  // Open edit dialog
-  openEditDialog(item: PostOfficeModel) {
-    const dialogRef = this.dialog.open(AddEditPostOffice, {
-      width: '500px',
-      disableClose: true,
-      data: item
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        // Dispatch update action
-        this.store.dispatch(PostOfficeActions.update({
-          postOffice: {
-            id: result.data.postOfficeId,
-            changes: result.data
-          }
-        }));
-      }
-    });
+  // Direct to edit page
+  navigateToEdit(item: PostOfficeModel) {
+    const encryptedId = this.encryptionService.encryptForRoute(item.postOfficeId);
+    this.router.navigate(['/post-office/edit', encryptedId]);
   }
+
+
   // Sort zip codes: active first, then deleted
   sortZipCodes(zips: any[]): any[] {
     if (!zips) return [];

@@ -17,33 +17,33 @@
 }
 
 .zip-card {
-    background: #fff;
+    background: var(--color-bg-sidebar);
     border: 1px solid var(--color-border-hr);
     border-radius: 8px;
     padding: 12px;
     height: 100%;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    box-shadow: 0 2px 4px var(--color-shadow);
 }
 
 .zip-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 8px var(--color-shadow);
     border-color: var(--color-hover-primary, #695cfe);
 }
 
 .zip-code-badge {
-    background-color: #f0f2f5;
+    background-color: var(--color-chip-bg);
     padding: 4px 8px;
     border-radius: 4px;
     font-weight: 600;
     font-size: 0.9rem;
-    color: #333;
+    color: var(--color-chip-text);
 }
 
 .location-text {
     font-size: 0.85rem;
-    color: #6c757d;
+    color: var(--color-text-placeholder);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -51,14 +51,14 @@
 
 .delete-btn-card {
     cursor: pointer;
-    color: #dc3545;
+    color: var(--invalid-border-color);
     opacity: 0.7;
     transition: opacity 0.2s;
 }
 
 .delete-btn-card:hover {
     opacity: 1;
-    background-color: #ffe6e6;
+    background-color: var(--color-status-error-bg);
     border-radius: 50%;
 }
 
@@ -85,20 +85,51 @@
 .location-side-panel {
     position: fixed;
     top: 0;
-    right: -450px;
+    right: -700px;
     /* Start off-screen */
-    width: 450px;
+    width: 700px;
     height: 100vh;
-    background: #fff;
+    background: var(--color-bg-sidebar);
     z-index: 1050;
     transition: right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     display: flex;
     flex-direction: column;
-    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    box-shadow: -5px 0 15px var(--color-shadow);
+}
+
+.panel-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-border-hr);
+    background-color: var(--color-bg-sidebar);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.btn-close-white {
+    filter: brightness(0) invert(1);
+    opacity: 1;
+    color: var(--color-border-hr) !important;
+    font-size: .7rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.btn-close:hover {
+    opacity: 1;
 }
 
 .location-side-panel.open {
     right: 0;
+}
+
+.panel-footer {
+    padding: 12px 16px;
+    border-top: 1px solid var(--color-border-hr) !important;
+    background-color: var(--color-bg-sidebar) !important;
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
 }
 
 @media (max-width: 576px) {
@@ -111,4 +142,22 @@
 .panel-body {
     flex-grow: 1;
     overflow-y: auto;
+}
+
+/* Modern Thinner Scrollbar for Panel Body */
+.panel-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.panel-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.panel-body::-webkit-scrollbar-thumb {
+    background: var(--color-border-hr, #ddd);
+    border-radius: 10px;
+}
+
+.panel-body::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-tertiary, #aaa);
 }

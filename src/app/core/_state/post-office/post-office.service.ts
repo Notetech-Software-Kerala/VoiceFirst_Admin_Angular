@@ -25,6 +25,12 @@ export class PostOfficeService {
     );
   }
 
+  getById(id: number): Observable<ApiResponse<PostOfficeModel>> {
+    return this.http.get<ApiResponse<PostOfficeModel>>(
+      `${this.base}${apiConfig.postOffice}/${id}`
+    );
+  }
+
   create(data: any): Observable<ApiResponse<PostOfficeModel>> {
     return this.http.post<ApiResponse<PostOfficeModel>>(
       `${this.base}${apiConfig.postOffice}`,

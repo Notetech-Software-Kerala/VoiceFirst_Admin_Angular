@@ -26,9 +26,13 @@ export class CountryService {
     );
   }
 
-  lookup(): Observable<ApiResponse<CountryModel>> {
+  lookup(queryParams?: any): Observable<ApiResponse<CountryModel>> {
+    let params = new HttpParams({
+      fromObject: queryParams || {}
+    });
     return this.http.get<ApiResponse<CountryModel>>(
-      `${this.base}${apiConfig.getCountryLookup}`
+      `${this.base}${apiConfig.getCountryLookup}`,
+      { params }
     )
   }
 
@@ -44,9 +48,13 @@ export class CountryService {
     )
   }
 
-  getDivisionOneLookupByCountryId(countryId: number): Observable<ApiResponse<DivisionOneModel>> {
+  getDivisionOneLookup(queryParams: any): Observable<ApiResponse<DivisionOneModel>> {
+    let params = new HttpParams({
+      fromObject: queryParams
+    });
     return this.http.get<ApiResponse<DivisionOneModel>>(
-      `${this.base}${apiConfig.getDivisionOneLookup}/${countryId}`
+      `${this.base}${apiConfig.getDivisionOneLookup}`,
+      { params }
     )
   }
 
@@ -62,9 +70,13 @@ export class CountryService {
     )
   }
 
-  getDivisionTwoLookupByDivisionOneId(divisionOneId: number): Observable<ApiResponse<DivisionTwoModel>> {
+  getDivisionTwoLookup(queryParams: any): Observable<ApiResponse<DivisionTwoModel>> {
+    let params = new HttpParams({
+      fromObject: queryParams
+    });
     return this.http.get<ApiResponse<DivisionTwoModel>>(
-      `${this.base}${apiConfig.getDivisionTwoLookup}/${divisionOneId}`
+      `${this.base}${apiConfig.getDivisionTwoLookup}`,
+      { params }
     )
   }
 
@@ -80,9 +92,13 @@ export class CountryService {
     )
   }
 
-  getDivisionThreeLookupByDivisionTwoId(divisionTwoId: number): Observable<ApiResponse<DivisionThreeModel>> {
+  getDivisionThreeLookup(queryParams: any): Observable<ApiResponse<DivisionThreeModel>> {
+    let params = new HttpParams({
+      fromObject: queryParams
+    });
     return this.http.get<ApiResponse<DivisionThreeModel>>(
-      `${this.base}${apiConfig.getDivisionThreeLookup}/${divisionTwoId}`
+      `${this.base}${apiConfig.getDivisionThreeLookup}`,
+      { params }
     )
   }
 

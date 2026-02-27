@@ -48,62 +48,245 @@
 
                 <!-- Side Panel -->
                 <div class="location-side-panel shadow-lg" [class.open]="isLocationPanelOpen">
-                    <div class="panel-header d-flex justify-content-between align-items-center p-3 border-bottom">
+                    <div class="panel-header d-flex justify-content-between align-items-center">
                         <h6 class="mb-0 fw-bold">Select Locations</h6>
-                        <button type="button" class="btn-close" (click)="toggleLocationPanel()"
+                        <button type="button" class="btn-close btn-close-white" (click)="toggleLocationPanel()"
                             aria-label="Close"></button>
                     </div>
                     <div class="panel-body p-3">
                         <form [formGroup]="filterForm" class="row g-3">
 
                             <div class="col-md-12">
-                                <label for="countryId" class="form-label">Country <span
-                                        class="text-danger">*</span></label>
-                                <select class="form-select" id="countryId" formControlName="countryId" required
-                                    (change)="onCountryChange($event)">
-                                    <option [ngValue]="null" disabled>Select Country</option>
-                                    @for (country of countryList; track country.countryId) {
-                                    <option [value]="country.countryId">{{ country.countryName }}</option>
-                                    }
-                                </select>
+                                <label class="form-label">Country <span class="text-danger">*</span></label>
+                                <div class="dropdown w-100">
+                                    <button class="form-select text-start" type="button" data-bs-toggle="dropdown"
+                                        aria-expanded="false" style="min-height: 38px;">
+                                        {{ filterForm.get('countryId')?.value ? selectedCountryName : 'Select Country'
+                                        }}
+                                    </button>
+
+                                    <ul class="dropdown-menu w-100 p-0 shadow-sm custom-dropdown-menu">
+                                        <li class="p-2 border-bottom sticky-top custom-dropdown-header-footer"
+                                            style="z-index: 3;" (click)="$event.stopPropagation()">
+                                            <input type="text" class="form-control form-control-sm"
+                                                placeholder="Search Country..." (input)="onCountrySearch($event)"
+                                                autofocus>
+                                        </li>
+                                        @if (countryPage > 1) {
+                                        <li class="border-bottom sticky-top custom-dropdown-header-footer"
+                                            style="z-index: 2;">
+                                            <button type="button"
+                                                class="dropdown-item custom-pagination-btn fw-bold py-2"
+                                                (click)="onPrevCountryPage($event)">
+                                                &laquo; Previous Page
+                                            </button>
+                                        </li>
+                                        }
+
+                                        @for (country of filteredCountryList; track country.countryId) {
+                                        <li>
+                                            <button type="button" class="dropdown-item py-2"
+                                                [class.active]="filterForm.get('countryId')?.value == country.countryId"
+                                                (click)="selectCountry(country)">
+                                                {{country.countryName}}
+                                            </button>
+                                        </li>
+                                        }
+
+                                        @if (filteredCountryList.length === 0) {
+                                        <li class="text-center text-muted p-2 small custom-dropdown-header-footer">
+                                            <span>No countries found.</span>
+                                        </li>
+                                        }
+
+                                        @if (countryPage < countryTotalPages) { <li
+                                            class="border-top sticky-bottom custom-dropdown-header-footer"
+                                            style="z-index: 2;">
+                                            <button type="button"
+                                                class="dropdown-item custom-pagination-btn fw-bold py-2"
+                                                (click)="onNextCountryPage($event)">
+                                                Next Page &raquo;
+                                            </button>
+                                            </li>
+                                            }
+                                    </ul>
+                                </div>
                             </div>
 
                             @if (divOneLabel) {
                             <div class="col-md-6">
-                                <label for="divOneId" class="form-label">{{divOneLabel | titlecase}}</label>
-                                <select class="form-select" id="divOneId" formControlName="divOneId"
-                                    (change)="onDivisionOneChange($event)">
-                                    <option [ngValue]="null" disabled>Select {{divOneLabel}}</option>
-                                    @for (divisionOne of divisionOneList; track divisionOne.divOneId) {
-                                    <option [value]="divisionOne.divOneId">{{ divisionOne.divOneName }}</option>
-                                    }
-                                </select>
+                                <label class="form-label">{{divOneLabel | titlecase}}</label>
+                                <div class="dropdown w-100">
+                                    <button class="form-select text-start" type="button" data-bs-toggle="dropdown"
+                                        aria-expanded="false" style="min-height: 38px;">
+                                        {{ filterForm.get('divOneId')?.value ? selectedDivOneName : 'Select ' +
+                                        divOneLabel }}
+                                    </button>
+
+                                    <ul class="dropdown-menu w-100 p-0 shadow-sm custom-dropdown-menu">
+                                        <li class="p-2 border-bottom sticky-top custom-dropdown-header-footer"
+                                            style="z-index: 3;" (click)="$event.stopPropagation()">
+                                            <input type="text" class="form-control form-control-sm"
+                                                [placeholder]="'Search ' + divOneLabel + '...'"
+                                                (input)="onDivOneSearch($event)">
+                                        </li>
+                                        @if (divOnePage > 1) {
+                                        <li class="border-bottom sticky-top custom-dropdown-header-footer"
+                                            style="z-index: 2;">
+                                            <button type="button"
+                                                class="dropdown-item custom-pagination-btn fw-bold py-2"
+                                                (click)="onPrevDivOnePage($event)">
+                                                &laquo; Previous Page
+                                            </button>
+                                        </li>
+                                        }
+
+                                        @for (divisionOne of filteredDivOneList; track divisionOne.divOneId) {
+                                        <li>
+                                            <button type="button" class="dropdown-item py-2"
+                                                [class.active]="filterForm.get('divOneId')?.value == divisionOne.divOneId"
+                                                (click)="selectDivOne(divisionOne)">
+                                                {{divisionOne.divOneName}}
+                                            </button>
+                                        </li>
+                                        }
+
+                                        @if (filteredDivOneList.length === 0) {
+                                        <li class="text-center text-muted p-2 small custom-dropdown-header-footer">
+                                            <span>No {{divOneLabel | lowercase}} found.</span>
+                                        </li>
+                                        }
+
+                                        @if (divOnePage < divOneTotalPages) { <li
+                                            class="border-top sticky-bottom custom-dropdown-header-footer"
+                                            style="z-index: 2;">
+                                            <button type="button"
+                                                class="dropdown-item custom-pagination-btn fw-bold py-2"
+                                                (click)="onNextDivOnePage($event)">
+                                                Next Page &raquo;
+                                            </button>
+                                            </li>
+                                            }
+                                    </ul>
+                                </div>
                             </div>
                             }
 
                             @if (divTwoLabel) {
                             <div class="col-md-6">
-                                <label for="divTwoId" class="form-label">{{divTwoLabel | titlecase}}</label>
-                                <select class="form-select" id="divTwoId" formControlName="divTwoId"
-                                    (change)="onDivisionTwoChange($event)">
-                                    <option [ngValue]="null" disabled>Select {{divTwoLabel}}</option>
-                                    @for (divisionTwo of divisionTwoList; track divisionTwo.divTwoId) {
-                                    <option [value]="divisionTwo.divTwoId">{{ divisionTwo.divTwoName }}</option>
-                                    }
-                                </select>
+                                <label class="form-label">{{divTwoLabel | titlecase}}</label>
+                                <div class="dropdown w-100">
+                                    <button class="form-select text-start" type="button" data-bs-toggle="dropdown"
+                                        aria-expanded="false" style="min-height: 38px;">
+                                        {{ filterForm.get('divTwoId')?.value ? selectedDivTwoName : 'Select ' +
+                                        divTwoLabel }}
+                                    </button>
+
+                                    <ul class="dropdown-menu w-100 p-0 shadow-sm custom-dropdown-menu">
+                                        <li class="p-2 border-bottom sticky-top custom-dropdown-header-footer"
+                                            style="z-index: 3;" (click)="$event.stopPropagation()">
+                                            <input type="text" class="form-control form-control-sm"
+                                                [placeholder]="'Search ' + divTwoLabel + '...'"
+                                                (input)="onDivTwoSearch($event)">
+                                        </li>
+                                        @if (divTwoPage > 1) {
+                                        <li class="border-bottom sticky-top custom-dropdown-header-footer"
+                                            style="z-index: 2;">
+                                            <button type="button"
+                                                class="dropdown-item custom-pagination-btn fw-bold py-2"
+                                                (click)="onPrevDivTwoPage($event)">
+                                                &laquo; Previous Page
+                                            </button>
+                                        </li>
+                                        }
+
+                                        @for (divisionTwo of filteredDivTwoList; track divisionTwo.divTwoId) {
+                                        <li>
+                                            <button type="button" class="dropdown-item py-2"
+                                                [class.active]="filterForm.get('divTwoId')?.value == divisionTwo.divTwoId"
+                                                (click)="selectDivTwo(divisionTwo)">
+                                                {{divisionTwo.divTwoName}}
+                                            </button>
+                                        </li>
+                                        }
+
+                                        @if (filteredDivTwoList.length === 0) {
+                                        <li class="text-center text-muted p-2 small custom-dropdown-header-footer">
+                                            <span>No {{divTwoLabel | lowercase}} found.</span>
+                                        </li>
+                                        }
+
+                                        @if (divTwoPage < divTwoTotalPages) { <li
+                                            class="border-top sticky-bottom custom-dropdown-header-footer"
+                                            style="z-index: 2;">
+                                            <button type="button"
+                                                class="dropdown-item custom-pagination-btn fw-bold py-2"
+                                                (click)="onNextDivTwoPage($event)">
+                                                Next Page &raquo;
+                                            </button>
+                                            </li>
+                                            }
+                                    </ul>
+                                </div>
                             </div>
                             }
 
                             @if (divThreeLabel) {
                             <div class="col-md-6">
-                                <label for="divThreeId" class="form-label">{{divThreeLabel | titlecase}}</label>
-                                <select class="form-select" id="divThreeId" formControlName="divThreeId"
-                                    (change)="onDivisionThreeChange($event)">
-                                    <option [ngValue]="null" disabled>Select {{divThreeLabel}}</option>
-                                    @for (divisionThree of divisionThreeList; track divisionThree.divThreeId) {
-                                    <option [value]="divisionThree.divThreeId">{{ divisionThree.divThreeName }}</option>
-                                    }
-                                </select>
+                                <label class="form-label">{{divThreeLabel | titlecase}}</label>
+                                <div class="dropdown w-100">
+                                    <button class="form-select text-start" type="button" data-bs-toggle="dropdown"
+                                        aria-expanded="false" style="min-height: 38px;">
+                                        {{ filterForm.get('divThreeId')?.value ? selectedDivThreeName : 'Select ' +
+                                        divThreeLabel }}
+                                    </button>
+
+                                    <ul class="dropdown-menu w-100 p-0 shadow-sm custom-dropdown-menu">
+                                        <li class="p-2 border-bottom sticky-top custom-dropdown-header-footer"
+                                            style="z-index: 3;" (click)="$event.stopPropagation()">
+                                            <input type="text" class="form-control form-control-sm"
+                                                [placeholder]="'Search ' + divThreeLabel + '...'"
+                                                (input)="onDivThreeSearch($event)">
+                                        </li>
+                                        @if (divThreePage > 1) {
+                                        <li class="border-bottom sticky-top custom-dropdown-header-footer"
+                                            style="z-index: 2;">
+                                            <button type="button"
+                                                class="dropdown-item custom-pagination-btn fw-bold py-2"
+                                                (click)="onPrevDivThreePage($event)">
+                                                &laquo; Previous Page
+                                            </button>
+                                        </li>
+                                        }
+
+                                        @for (divisionThree of filteredDivThreeList; track divisionThree.divThreeId) {
+                                        <li>
+                                            <button type="button" class="dropdown-item py-2"
+                                                [class.active]="filterForm.get('divThreeId')?.value == divisionThree.divThreeId"
+                                                (click)="selectDivThree(divisionThree)">
+                                                {{divisionThree.divThreeName}}
+                                            </button>
+                                        </li>
+                                        }
+
+                                        @if (filteredDivThreeList.length === 0) {
+                                        <li class="text-center text-muted p-2 small custom-dropdown-header-footer">
+                                            <span>No {{divThreeLabel | lowercase}} found.</span>
+                                        </li>
+                                        }
+
+                                        @if (divThreePage < divThreeTotalPages) { <li
+                                            class="border-top sticky-bottom custom-dropdown-header-footer"
+                                            style="z-index: 2;">
+                                            <button type="button"
+                                                class="dropdown-item custom-pagination-btn fw-bold py-2"
+                                                (click)="onNextDivThreePage($event)">
+                                                Next Page &raquo;
+                                            </button>
+                                            </li>
+                                            }
+                                    </ul>
+                                </div>
                             </div>
                             }
 
@@ -149,9 +332,8 @@
                             }
                         </form>
                     </div>
-                    <div class="panel-footer p-3 border-top d-flex justify-content-end bg-light mt-auto">
-                        <button type="button" class="btn btn-primary btn-sm px-4"
-                            (click)="toggleLocationPanel()">Done</button>
+                    <div class="panel-footer p-3 d-flex justify-content-end  mt-auto">
+                        <button type="button" class="submit-btn" (click)="toggleLocationPanel()">Done</button>
                     </div>
                 </div>
 

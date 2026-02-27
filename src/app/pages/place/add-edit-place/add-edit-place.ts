@@ -7,7 +7,8 @@ import { PlaceService } from '../../../core/_state/place/place.service';
 import { ToastService } from '../../../partials/shared_services/toast.service';
 import { EncryptionService } from '../../../partials/shared_services/encryption.service';
 import { PlaceModel } from '../../../core/_state/place/place.model';
-import { forkJoin, of, switchMap } from 'rxjs';
+import { forkJoin, of, switchMap, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { CountryService } from '../../../core/_state/country/country.service';
 import { CountryModel, DivisionOneModel, DivisionThreeModel, DivisionTwoModel } from '../../../core/_state/country/country.model';
 import { PostOfficeService } from '../../../core/_state/post-office/post-office.service';
@@ -43,6 +44,44 @@ export class AddEditPlace implements OnInit {
 
   isLocationPanelOpen = false;
 
+  selectedCountryName: string = '';
+  filteredCountryList: CountryModel[] = [];
+
+  selectedDivOneName: string = '';
+  filteredDivOneList: DivisionOneModel[] = [];
+
+  selectedDivTwoName: string = '';
+  filteredDivTwoList: DivisionTwoModel[] = [];
+
+  selectedDivThreeName: string = '';
+  filteredDivThreeList: DivisionThreeModel[] = [];
+
+  searchCountryText: string = '';
+  searchCountrySubject = new Subject<string>();
+
+  searchDivOneText: string = '';
+  searchDivOneSubject = new Subject<string>();
+
+  searchDivTwoText: string = '';
+  searchDivTwoSubject = new Subject<string>();
+
+  searchDivThreeText: string = '';
+  searchDivThreeSubject = new Subject<string>();
+
+  countryPage = 1;
+  countryTotalPages = 1;
+
+  divOnePage = 1;
+  divOneTotalPages = 1;
+
+  divTwoPage = 1;
+  divTwoTotalPages = 1;
+
+  divThreePage = 1;
+  divThreeTotalPages = 1;
+
+  lookupLimit = 10;
+
   constructor(
     private location: Location,
     private fb: FormBuilder,
@@ -57,6 +96,52 @@ export class AddEditPlace implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.searchCountrySubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged()
+    ).subscribe(searchText => {
+      this.searchCountryText = searchText;
+      this.countryPage = 1;
+      this.countryList = [];
+      this.loadCountryLookup();
+    });
+
+    this.searchDivOneSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged()
+    ).subscribe(searchText => {
+      this.searchDivOneText = searchText;
+      if (this.filterForm.value.countryId) {
+        this.divOnePage = 1;
+        this.divisionOneList = [];
+        this.fetchDivisionOne(this.filterForm.value.countryId);
+      }
+    });
+
+    this.searchDivTwoSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged()
+    ).subscribe(searchText => {
+      this.searchDivTwoText = searchText;
+      if (this.filterForm.value.divOneId) {
+        this.divTwoPage = 1;
+        this.divisionTwoList = [];
+        this.fetchDivisionTwo(this.filterForm.value.divOneId);
+      }
+    });
+
+    this.searchDivThreeSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged()
+    ).subscribe(searchText => {
+      this.searchDivThreeText = searchText;
+      if (this.filterForm.value.divTwoId) {
+        this.divThreePage = 1;
+        this.divisionThreeList = [];
+        this.fetchDivisionThree(this.filterForm.value.divTwoId);
+      }
+    });
+
     this.loadCountryLookup();
     this.formInItialize();
     this.loadData();
@@ -111,10 +196,19 @@ export class AddEditPlace implements OnInit {
   }
 
   loadCountryLookup() {
-    this.countryService.lookup().subscribe({
+    let params: any = { PageNumber: this.countryPage, Limit: this.lookupLimit };
+    if (this.searchCountryText) {
+      params.SearchText = this.searchCountryText;
+    }
+    this.countryService.lookup(params).subscribe({
       next: (response: any) => {
         if (response && response.data) {
-          this.countryList = response.data;
+          const items = response.data.items || response.data;
+          this.countryList = [...this.countryList, ...items];
+          // Remove duplicates 
+          this.countryList = Array.from(new Map(this.countryList.map(item => [item.countryId, item])).values());
+          this.filteredCountryList = [...this.countryList];
+          this.countryTotalPages = response.data.totalPages || 1;
           console.log("Country List", this.countryList);
 
           // If in edit mode and form is patched, we might need to update labels now
@@ -133,6 +227,24 @@ export class AddEditPlace implements OnInit {
     });
   }
 
+  onPrevCountryPage(event: Event) {
+    event.stopPropagation();
+    if (this.countryPage > 1) {
+      this.countryPage--;
+      this.countryList = [];
+      this.loadCountryLookup();
+    }
+  }
+
+  onNextCountryPage(event: Event) {
+    event.stopPropagation();
+    if (this.countryPage < this.countryTotalPages) {
+      this.countryPage++;
+      this.countryList = [];
+      this.loadCountryLookup();
+    }
+  }
+
   onCountryChange(event: any) {
     const countryId = event.target.value;
 
@@ -145,22 +257,77 @@ export class AddEditPlace implements OnInit {
       divThreeId: ''
     });
     this.divisionOneList = [];
+    this.filteredDivOneList = [];
+    this.selectedDivOneName = '';
+    this.searchDivOneText = '';
+    this.divOnePage = 1;
+
     this.divisionTwoList = [];
+    this.filteredDivTwoList = [];
+    this.selectedDivTwoName = '';
+    this.searchDivTwoText = '';
+    this.divTwoPage = 1;
+
     this.divisionThreeList = [];
+    this.filteredDivThreeList = [];
+    this.selectedDivThreeName = '';
+    this.searchDivThreeText = '';
+    this.divThreePage = 1;
+
     this.postOfficeList = [];
 
     this.getPostOffices();
 
-    this.countryService.getDivisionOneLookupByCountryId(countryId).subscribe({
+    this.fetchDivisionOne(countryId);
+  }
+
+  fetchDivisionOne(countryId: any) {
+    let params: any = { CountryId: countryId, PageNumber: this.divOnePage, Limit: this.lookupLimit };
+    if (this.searchDivOneText) {
+      params.SearchText = this.searchDivOneText;
+    }
+    this.countryService.getDivisionOneLookup(params).subscribe({
       next: (response: any) => {
         if (response && response.data) {
-          this.divisionOneList = response.data;
+          const items = response.data.items || response.data;
+          this.divisionOneList = [...this.divisionOneList, ...items];
+          this.divisionOneList = Array.from(new Map(this.divisionOneList.map(item => [item.divOneId, item])).values());
+          this.filteredDivOneList = [...this.divisionOneList];
+          this.divOneTotalPages = response.data.totalPages || 1;
         }
       },
       error: (error) => {
         console.error(error);
       }
     });
+  }
+
+  onPrevDivOnePage(event: Event) {
+    event.stopPropagation();
+    if (this.divOnePage > 1) {
+      this.divOnePage--;
+      this.divisionOneList = [];
+      this.fetchDivisionOne(this.filterForm.value.countryId);
+    }
+  }
+
+  onNextDivOnePage(event: Event) {
+    event.stopPropagation();
+    if (this.divOnePage < this.divOneTotalPages) {
+      this.divOnePage++;
+      this.divisionOneList = [];
+      this.fetchDivisionOne(this.filterForm.value.countryId);
+    }
+  }
+
+  onCountrySearch(event: any) {
+    this.searchCountrySubject.next(event.target.value);
+  }
+
+  selectCountry(country: CountryModel) {
+    this.selectedCountryName = country.countryName;
+    this.filterForm.patchValue({ countryId: country.countryId });
+    this.onCountryChange({ target: { value: country.countryId } });
   }
 
   onDivisionOneChange(event: any) {
@@ -172,20 +339,59 @@ export class AddEditPlace implements OnInit {
       divThreeId: ''
     });
     this.divisionTwoList = [];
+    this.filteredDivTwoList = [];
+    this.selectedDivTwoName = '';
+    this.searchDivTwoText = '';
+    this.divTwoPage = 1;
+
     this.divisionThreeList = [];
+    this.filteredDivThreeList = [];
+    this.selectedDivThreeName = '';
+    this.searchDivThreeText = '';
+    this.divThreePage = 1;
 
     this.getPostOffices();
 
-    this.countryService.getDivisionTwoLookupByDivisionOneId(divisionOneId).subscribe({
+    this.fetchDivisionTwo(divisionOneId);
+  }
+
+  fetchDivisionTwo(divisionOneId: any) {
+    let params: any = { DivisionOneId: divisionOneId, PageNumber: this.divTwoPage, Limit: this.lookupLimit };
+    if (this.searchDivTwoText) {
+      params.SearchText = this.searchDivTwoText;
+    }
+    this.countryService.getDivisionTwoLookup(params).subscribe({
       next: (response: any) => {
         if (response && response.data) {
-          this.divisionTwoList = response.data;
+          const items = response.data.items || response.data;
+          this.divisionTwoList = [...this.divisionTwoList, ...items];
+          this.divisionTwoList = Array.from(new Map(this.divisionTwoList.map(item => [item.divTwoId, item])).values());
+          this.filteredDivTwoList = [...this.divisionTwoList];
+          this.divTwoTotalPages = response.data.totalPages || 1;
         }
       },
       error: (error) => {
         console.error(error);
       }
     });
+  }
+
+  onPrevDivTwoPage(event: Event) {
+    event.stopPropagation();
+    if (this.divTwoPage > 1) {
+      this.divTwoPage--;
+      this.divisionTwoList = [];
+      this.fetchDivisionTwo(this.filterForm.value.divOneId);
+    }
+  }
+
+  onNextDivTwoPage(event: Event) {
+    event.stopPropagation();
+    if (this.divTwoPage < this.divTwoTotalPages) {
+      this.divTwoPage++;
+      this.divisionTwoList = [];
+      this.fetchDivisionTwo(this.filterForm.value.divOneId);
+    }
   }
 
   onDivisionTwoChange(event: any) {
@@ -196,13 +402,29 @@ export class AddEditPlace implements OnInit {
       divThreeId: ''
     });
     this.divisionThreeList = [];
+    this.filteredDivThreeList = [];
+    this.selectedDivThreeName = '';
+    this.searchDivThreeText = '';
+    this.divThreePage = 1;
 
     this.getPostOffices();
 
-    this.countryService.getDivisionThreeLookupByDivisionTwoId(divisionTwoId).subscribe({
+    this.fetchDivisionThree(divisionTwoId);
+  }
+
+  fetchDivisionThree(divisionTwoId: any) {
+    let params: any = { DivisionTwoId: divisionTwoId, PageNumber: this.divThreePage, Limit: this.lookupLimit };
+    if (this.searchDivThreeText) {
+      params.SearchText = this.searchDivThreeText;
+    }
+    this.countryService.getDivisionThreeLookup(params).subscribe({
       next: (response: any) => {
         if (response && response.data) {
-          this.divisionThreeList = response.data;
+          const items = response.data.items || response.data;
+          this.divisionThreeList = [...this.divisionThreeList, ...items];
+          this.divisionThreeList = Array.from(new Map(this.divisionThreeList.map(item => [item.divThreeId, item])).values());
+          this.filteredDivThreeList = [...this.divisionThreeList];
+          this.divThreeTotalPages = response.data.totalPages || 1;
         }
       },
       error: (error) => {
@@ -211,8 +433,56 @@ export class AddEditPlace implements OnInit {
     });
   }
 
+  onPrevDivThreePage(event: Event) {
+    event.stopPropagation();
+    if (this.divThreePage > 1) {
+      this.divThreePage--;
+      this.divisionThreeList = [];
+      this.fetchDivisionThree(this.filterForm.value.divTwoId);
+    }
+  }
+
+  onNextDivThreePage(event: Event) {
+    event.stopPropagation();
+    if (this.divThreePage < this.divThreeTotalPages) {
+      this.divThreePage++;
+      this.divisionThreeList = [];
+      this.fetchDivisionThree(this.filterForm.value.divTwoId);
+    }
+  }
+
   onDivisionThreeChange(event: any) {
     this.getPostOffices();
+  }
+
+  onDivOneSearch(event: any) {
+    this.searchDivOneSubject.next(event.target.value);
+  }
+
+  selectDivOne(division: DivisionOneModel) {
+    this.selectedDivOneName = division.divOneName;
+    this.filterForm.patchValue({ divOneId: division.divOneId });
+    this.onDivisionOneChange({ target: { value: division.divOneId } });
+  }
+
+  onDivTwoSearch(event: any) {
+    this.searchDivTwoSubject.next(event.target.value);
+  }
+
+  selectDivTwo(division: DivisionTwoModel) {
+    this.selectedDivTwoName = division.divTwoName;
+    this.filterForm.patchValue({ divTwoId: division.divTwoId });
+    this.onDivisionTwoChange({ target: { value: division.divTwoId } });
+  }
+
+  onDivThreeSearch(event: any) {
+    this.searchDivThreeSubject.next(event.target.value);
+  }
+
+  selectDivThree(division: DivisionThreeModel) {
+    this.selectedDivThreeName = division.divThreeName;
+    this.filterForm.patchValue({ divThreeId: division.divThreeId });
+    this.onDivisionThreeChange({ target: { value: division.divThreeId } });
   }
 
   shouldFetchPostOffices(): boolean {
@@ -225,10 +495,13 @@ export class AddEditPlace implements OnInit {
     if (this.divThreeLabel) totalDivisions++;
 
     if (totalDivisions === 3) {
-      return !!divTwoId; // fetch on second division
+      return !!divThreeId; // fetch on third division
     } else if (totalDivisions === 2) {
+      return !!divTwoId; // fetch on second division
+    } else if (totalDivisions === 1) {
       return !!divOneId; // fetch on first division
-    } else if (totalDivisions <= 1) {
+    }
+    else if (totalDivisions === 0) {
       return !!countryId; // fetch on country
     }
 
@@ -251,8 +524,9 @@ export class AddEditPlace implements OnInit {
 
     this.postOfficeService.lookup(params).subscribe({
       next: (response: any) => {
-        // Response is directly the array due to map in service
-        this.postOfficeList = response || [];
+        console.log("Post Office -list", response);
+
+        this.postOfficeList = response.items || [];
       },
       error: (error) => {
         console.error(error);
@@ -549,5 +823,9 @@ export class AddEditPlace implements OnInit {
 
   toggleLocationPanel() {
     this.isLocationPanelOpen = !this.isLocationPanelOpen;
+    this.filterForm.reset();
+    this.divOneLabel = null;
+    this.divTwoLabel = null;
+    this.divThreeLabel = null;
   }
 }

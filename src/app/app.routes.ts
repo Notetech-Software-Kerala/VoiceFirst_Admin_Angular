@@ -73,6 +73,14 @@ export const routes: Routes = [
                         loadComponent: () => import('./pages/post-office/post-office-list/post-office-list').then(m => m.PostOfficeList)
                     },
                     {
+                        path: 'add',
+                        loadComponent: () => import('./pages/post-office/add-edit-post-office/add-edit-post-office').then(m => m.AddEditPostOffice)
+                    },
+                    {
+                        path: 'edit/:id',
+                        loadComponent: () => import('./pages/post-office/add-edit-post-office/add-edit-post-office').then(m => m.AddEditPostOffice)
+                    },
+                    {
                         path: 'details/:id',
                         loadComponent: () => import('./pages/post-office/post-office-details/post-office-details').then(m => m.PostOfficeDetails)
                     }
