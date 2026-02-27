@@ -82,6 +82,12 @@ export class AddEditPlace implements OnInit {
 
   lookupLimit = 10;
 
+  // Post office pagination and accordion state
+  postOfficePage = 1;
+  postOfficeTotalPages = 1;
+  expandedPostOffices: Set<number> = new Set<number>();
+  postOfficeZipCodes: { [key: number]: any[] } = {};
+
   constructor(
     private location: Location,
     private fb: FormBuilder,
@@ -515,7 +521,10 @@ export class AddEditPlace implements OnInit {
     }
 
     const { countryId, divOneId, divTwoId, divThreeId } = this.filterForm.value;
-    const params: any = {};
+    const params: any = {
+      PageNumber: this.postOfficePage,
+      Limit: this.lookupLimit
+    };
 
     if (countryId) params.CountryId = countryId;
     if (divOneId) params.DivOneId = divOneId;
@@ -525,14 +534,59 @@ export class AddEditPlace implements OnInit {
     this.postOfficeService.lookup(params).subscribe({
       next: (response: any) => {
         console.log("Post Office -list", response);
-
         this.postOfficeList = response.items || [];
+        this.postOfficeTotalPages = response.totalPages || 1;
+
+        // Reset accordion state when filter changes
+        this.expandedPostOffices.clear();
       },
       error: (error) => {
         console.error(error);
         this.postOfficeList = [];
       }
     });
+  }
+
+  onPrevPostOfficePage(event: Event) {
+    event.stopPropagation();
+    if (this.postOfficePage > 1) {
+      this.postOfficePage--;
+      this.getPostOffices();
+    }
+  }
+
+  onNextPostOfficePage(event: Event) {
+    event.stopPropagation();
+    if (this.postOfficePage < this.postOfficeTotalPages) {
+      this.postOfficePage++;
+      this.getPostOffices();
+    }
+  }
+
+  togglePostOfficePanel(postOfficeId: number) {
+    if (this.expandedPostOffices.has(postOfficeId)) {
+      this.expandedPostOffices.delete(postOfficeId);
+    } else {
+      this.expandedPostOffices.add(postOfficeId);
+      // Fetch zip codes only if not already fetched
+      if (!this.postOfficeZipCodes[postOfficeId]) {
+        this.postOfficeService.getZipcodesByPostOfficeIds([postOfficeId]).subscribe({
+          next: (response: any) => {
+            // Depending on how getZipcodesByPostOfficeIds formats the response:
+            // Assuming it returns an array of zipCodes
+            this.postOfficeZipCodes[postOfficeId] = response || [];
+          },
+          error: (error) => {
+            console.error(error);
+            this.postOfficeZipCodes[postOfficeId] = [];
+          }
+        });
+      }
+    }
+  }
+
+  isPostOfficeExpanded(postOfficeId: number): boolean {
+    return this.expandedPostOffices.has(postOfficeId);
   }
 
   toggleZipSelection(event: any, zipObj: any, postOffice: any) {
@@ -823,9 +877,16 @@ export class AddEditPlace implements OnInit {
 
   toggleLocationPanel() {
     this.isLocationPanelOpen = !this.isLocationPanelOpen;
-    this.filterForm.reset();
-    this.divOneLabel = null;
-    this.divTwoLabel = null;
-    this.divThreeLabel = null;
+    if (this.isLocationPanelOpen) {
+      this.filterForm.reset();
+      this.divOneLabel = null;
+      this.divTwoLabel = null;
+      this.divThreeLabel = null;
+      this.postOfficeList = [];
+      this.postOfficePage = 1;
+      this.postOfficeTotalPages = 1;
+      this.expandedPostOffices.clear();
+      this.postOfficeZipCodes = {};
+    }
   }
 }
