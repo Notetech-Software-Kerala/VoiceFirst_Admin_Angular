@@ -35,6 +35,7 @@ export const apiConfig = {
     getDivisionOneLookup: '/division/one/lookup',
     getDivisionTwoLookup: '/division/two/lookup',
     getDivisionThreeLookup: '/division/three/lookup',
+    getDialCodeLookup: '/dialCode/lookup',
 
     //Program
     program: '/program',
@@ -72,5 +73,11 @@ export const apiConfig = {
     place: '/place',
     getPlaceLookup: '/place/lookup',
     placeRestore: '/place/recover',
+
+
+    //Employee
+    employee: '/employee',
+    getEmployeeLookup: '/employee/lookup',
+    employeeRestore: '/employee/recover',
 
 };

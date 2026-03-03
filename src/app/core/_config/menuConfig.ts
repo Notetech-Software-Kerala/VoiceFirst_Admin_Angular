@@ -15,15 +15,16 @@ export const MENU_CONFIG: MenuItem[] = [
   { id: 4, label: 'Program', icon: 'dvr', route: '/program' },
   { id: 5, label: 'Roles', route: '/role', icon: 'security' },
   { id: 6, label: 'Plan', route: '/plan', icon: 'price_change' },
-  {
-    id: 7,
-    label: 'User',
-    icon: 'group',
-    children: [
-      { id: 71, label: 'Employees', route: '/employees', icon: 'group' },
-      // { id: 62, label: 'Roles', route: '/role', icon: 'security' },
-    ],
-  },
+  { id: 7, label: 'Employees', route: '/employees', icon: 'group' },
+  // {
+  //   id: 7,
+  //   label: 'User',
+  //   icon: 'group',
+  //   children: [
+  //     { id: 71, label: 'Employees', route: '/employees', icon: 'group' },
+  //     // { id: 62, label: 'Roles', route: '/role', icon: 'security' },
+  //   ],
+  // },
   {
     id: 8,
     label: 'Master Data',

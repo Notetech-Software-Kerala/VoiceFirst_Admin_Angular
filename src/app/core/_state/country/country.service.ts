@@ -36,6 +36,16 @@ export class CountryService {
     )
   }
 
+  dialCodeLookup(queryParams?: any): Observable<ApiResponse<CountryModel>> {
+    let params = new HttpParams({
+      fromObject: queryParams || {}
+    });
+    return this.http.get<ApiResponse<CountryModel>>(
+      `${this.base}${apiConfig.getDialCodeLookup}`,
+      { params }
+    )
+  }
+
   //----------------- Division One -----------------//
 
   getDivisionOne(queryParams: any): Observable<ApiResponse<any>> {
