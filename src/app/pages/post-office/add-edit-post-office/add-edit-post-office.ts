@@ -1,17 +1,21 @@
-import { ChangeDetectorRef, Component, Inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PostOfficeModel } from '../../../core/_state/post-office/post-office.model';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { PostOfficeService } from '../../../core/_state/post-office/post-office.service';
 import { Store } from '@ngrx/store';
 import { UtilityService } from '../../../partials/shared_services/utility.service';
 import { ToastService } from '../../../partials/shared_services/toast.service';
 import { MaterialModule } from '../../../material.module';
-import { CountryModel } from '../../../core/_state/country/country.model';
+import { CountryModel, DivisionOneModel, DivisionTwoModel, DivisionThreeModel } from '../../../core/_state/country/country.model';
 import { CountryService } from '../../../core/_state/country/country.service';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { ConfirmationService } from '../../../partials/shared_directives/confirmation';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
+import { EncryptionService } from '../../../partials/shared_services/encryption.service';
+import { switchMap, of, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-add-edit-post-office',
@@ -19,74 +23,544 @@ import { ConfirmationService } from '../../../partials/shared_directives/confirm
   templateUrl: './add-edit-post-office.html',
   styleUrl: './add-edit-post-office.css',
 })
-export class AddEditPostOffice {
+export class AddEditPostOffice implements OnInit {
   form!: FormGroup;
   postOffice !: PostOfficeModel;
   isSubmitting = false;
   countryList: CountryModel[] = [];
+  filteredCountryList: CountryModel[] = [];
+  selectedCountryName: string = '';
+  divisionOneList: DivisionOneModel[] = [];
+  filteredDivOneList: DivisionOneModel[] = [];
+  selectedDivOneName: string = '';
+
+  divisionTwoList: DivisionTwoModel[] = [];
+  filteredDivTwoList: DivisionTwoModel[] = [];
+  selectedDivTwoName: string = '';
+
+  divisionThreeList: DivisionThreeModel[] = [];
+  filteredDivThreeList: DivisionThreeModel[] = [];
+  selectedDivThreeName: string = '';
+
+  divOneLabel: string | null = null;
+  divTwoLabel: string | null = null;
+  divThreeLabel: string | null = null;
+
+  searchCountryText: string = '';
+  searchCountrySubject = new Subject<string>();
+
+  searchDivOneText: string = '';
+  searchDivOneSubject = new Subject<string>();
+
+  searchDivTwoText: string = '';
+  searchDivTwoSubject = new Subject<string>();
+
+  searchDivThreeText: string = '';
+  searchDivThreeSubject = new Subject<string>();
+
+  countryPage = 1;
+  countryTotalPages = 1;
+
+  divOnePage = 1;
+  divOneTotalPages = 1;
+
+  divTwoPage = 1;
+  divTwoTotalPages = 1;
+
+  divThreePage = 1;
+  divThreeTotalPages = 1;
+
+  lookupLimit = 10;
+
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
+  isEditMode = false;
+  postOfficeId!: number;
+
   constructor(
+    private location: Location,
+    private route: ActivatedRoute,
+    private router: Router,
+    private encryptionService: EncryptionService,
     private fb: FormBuilder,
-    private dialogRef: MatDialogRef<AddEditPostOffice>,
     private store: Store,
     private postOfficeService: PostOfficeService,
     private utilityService: UtilityService,
     private toastService: ToastService,
     private countryService: CountryService,
     private cdr: ChangeDetectorRef,
-    private confirmationService: ConfirmationService,
-    @Inject(MAT_DIALOG_DATA) public data: PostOfficeModel | null,
+    private confirmationService: ConfirmationService
   ) { }
 
 
 
   ngOnInit() {
+    this.searchCountrySubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged()
+    ).subscribe(searchText => {
+      this.searchCountryText = searchText;
+      this.countryPage = 1;
+      this.countryList = [];
+      this.getCountries();
+    });
+
+    this.searchDivOneSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged()
+    ).subscribe(searchText => {
+      this.searchDivOneText = searchText;
+      if (this.form.value.countryId) {
+        this.divOnePage = 1;
+        this.divisionOneList = [];
+        this.fetchDivisionOne(this.form.value.countryId);
+      }
+    });
+
+    this.searchDivTwoSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged()
+    ).subscribe(searchText => {
+      this.searchDivTwoText = searchText;
+      if (this.form.value.divOneId) {
+        this.divTwoPage = 1;
+        this.divisionTwoList = [];
+        this.fetchDivisionTwo(this.form.value.divOneId);
+      }
+    });
+
+    this.searchDivThreeSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged()
+    ).subscribe(searchText => {
+      this.searchDivThreeText = searchText;
+      if (this.form.value.divTwoId) {
+        this.divThreePage = 1;
+        this.divisionThreeList = [];
+        this.fetchDivisionThree(this.form.value.divTwoId);
+      }
+    });
+
     this.formInItialize();
-    if (this.data) {
-      this.postOffice = this.data;
-      const formData = {
-        ...this.data,
-        zipCodes: this.data.zipCodes.map(z => ({
-          zipCode: z.zipCode,
-          zipCodeId: z.zipCodeId,
-          deleted: z.deleted,
-          active: z.active
-        }))
-      };
-      this.form.patchValue(formData);
-    }
-
     this.getCountries();
-    this.cdr.detectChanges();
 
+    this.route.params.pipe(
+      switchMap(params => {
+        if (params['id']) {
+          const decryptedId = this.encryptionService.decryptFromRoute(params['id']);
+          if (decryptedId) {
+            this.isEditMode = true;
+            this.postOfficeId = +decryptedId;
+            return this.postOfficeService.getById(this.postOfficeId);
+          } else {
+            this.toastService.error('Invalid Post Office ID', 'Error');
+            this.goBack();
+            return of(null);
+          }
+        }
+        return of(null);
+      })
+    ).subscribe({
+      next: (response: any) => {
+        if (response && response.data) {
+          this.patchForm(response.data);
+        }
+      },
+      error: (error) => {
+        console.error(error);
+      }
+    });
+  }
+
+  patchForm(data: PostOfficeModel) {
+    this.postOffice = data;
+    const formData = {
+      ...data,
+      zipCodes: data.zipCodes.map(z => ({
+        zipCode: z.zipCode,
+        zipCodeId: z.zipCodeId,
+        deleted: z.deleted,
+        active: z.active
+      }))
+    };
+    this.form.patchValue(formData);
+
+    // Attempt to set labels if countryList is already loaded
+    if (this.countryList.length > 0) {
+      this.setInitialDropdownState(data);
+    }
+  }
+
+  setInitialDropdownState(data: PostOfficeModel) {
+    if (data.countryId) {
+      const country = this.countryList.find(c => c.countryId == data.countryId);
+      if (country) {
+        this.selectedCountryName = country.countryName;
+      }
+      this.updateDivisionLabels(data.countryId);
+      this.loadDivisionsForEdit(data);
+    }
   }
 
   formInItialize() {
     this.form = this.fb.group({
       postOfficeName: ['', Validators.required],
       countryId: ['', Validators.required],
+      divOneId: [0],
+      divTwoId: [0],
+      divThreeId: [0],
       zipCodes: [[], Validators.required],
     });
   }
 
-  closeDialog(response?: any): void {
-    this.dialogRef.close(response);
+  goBack() {
+    this.location.back();
   }
 
-
   getCountries() {
-    this.countryService.lookup().subscribe({
+    let params: any = { PageNumber: this.countryPage, Limit: this.lookupLimit };
+    if (this.searchCountryText) {
+      params.SearchText = this.searchCountryText;
+    }
+    this.countryService.lookup(params).subscribe({
       next: (res: any) => {
-        console.log("response", res);
         if (res.statusCode === 200) {
-          this.countryList = res.data;
+          const items = res.data.items || res.data;
+          this.countryList = [...this.countryList, ...items];
+          this.countryList = Array.from(new Map(this.countryList.map(item => [item.countryId, item])).values());
+          this.filteredCountryList = [...this.countryList];
+          this.countryTotalPages = res.data.totalPages || 1;
+
+          if (this.isEditMode && this.postOffice) {
+            this.setInitialDropdownState(this.postOffice);
+          }
         }
       },
       error: (error) => {
         console.log("error", error);
       }
     })
+  }
+
+  onPrevCountryPage(event: Event) {
+    event.stopPropagation();
+    if (this.countryPage > 1) {
+      this.countryPage--;
+      this.countryList = [];
+      this.getCountries();
+    }
+  }
+
+  onNextCountryPage(event: Event) {
+    event.stopPropagation();
+    if (this.countryPage < this.countryTotalPages) {
+      this.countryPage++;
+      this.countryList = [];
+      this.getCountries();
+    }
+  }
+
+  loadDivisionsForEdit(data: any) {
+    console.log("data", data);
+
+    if (data.countryId) {
+      this.countryService.getDivisionOneLookup({ CountryId: data.countryId }).subscribe((res: any) => {
+        if (res && res.data) {
+          console.log("res", res);
+
+          this.divisionOneList = res.data.items;
+          this.filteredDivOneList = [...this.divisionOneList];
+          if (data.divOneId) {
+            const div = this.divisionOneList.find(d => d.divOneId == data.divOneId);
+            if (div) this.selectedDivOneName = div.divOneName;
+          }
+        }
+      });
+    }
+    if (data.divOneId) {
+      this.countryService.getDivisionTwoLookup({ DivisionOneId: data.divOneId }).subscribe((res: any) => {
+        if (res && res.data) {
+          this.divisionTwoList = res.data.items;
+          this.filteredDivTwoList = [...this.divisionTwoList];
+          if (data.divTwoId) {
+            const div = this.divisionTwoList.find(d => d.divTwoId == data.divTwoId);
+            if (div) this.selectedDivTwoName = div.divTwoName;
+          }
+        }
+      });
+    }
+    if (data.divTwoId) {
+      this.countryService.getDivisionThreeLookup({ DivisionTwoId: data.divTwoId }).subscribe((res: any) => {
+        if (res && res.data) {
+          this.divisionThreeList = res.data.items;
+          this.filteredDivThreeList = [...this.divisionThreeList];
+          if (data.divThreeId) {
+            const div = this.divisionThreeList.find(d => d.divThreeId == data.divThreeId);
+            if (div) this.selectedDivThreeName = div.divThreeName;
+          }
+        }
+      });
+    }
+  }
+
+  onCountrySearch(event: any) {
+    const searchText = event.target.value.toLowerCase();
+    this.filteredCountryList = this.countryList.filter(c =>
+      c.countryName.toLowerCase().includes(searchText)
+    );
+  }
+
+  selectCountry(country: CountryModel) {
+    this.selectedCountryName = country.countryName;
+    this.form.patchValue({ countryId: country.countryId });
+    // Need to trigger the change using the exact format expected by onCountryChange
+    this.onCountryChange({ target: { value: country.countryId } });
+  }
+
+  onCountryChange(event: any) {
+    const countryId = event.target.value;
+
+    this.updateDivisionLabels(countryId);
+
+    // Reset downstream fields
+    this.form.patchValue({
+      divOneId: 0,
+      divTwoId: 0,
+      divThreeId: 0
+    });
+    this.divisionOneList = [];
+    this.filteredDivOneList = [];
+    this.selectedDivOneName = '';
+    this.searchDivOneText = '';
+    this.divOnePage = 1;
+
+    this.divisionTwoList = [];
+    this.filteredDivTwoList = [];
+    this.selectedDivTwoName = '';
+    this.searchDivTwoText = '';
+    this.divTwoPage = 1;
+
+    this.divisionThreeList = [];
+    this.filteredDivThreeList = [];
+    this.selectedDivThreeName = '';
+    this.searchDivThreeText = '';
+    this.divThreePage = 1;
+
+    this.fetchDivisionOne(countryId);
+  }
+
+  fetchDivisionOne(countryId: any) {
+    let params: any = { CountryId: countryId, PageNumber: this.divOnePage, Limit: this.lookupLimit };
+    if (this.searchDivOneText) {
+      params.SearchText = this.searchDivOneText;
+    }
+    this.countryService.getDivisionOneLookup(params).subscribe({
+      next: (response: any) => {
+        if (response && response.data) {
+          const items = response.data.items || response.data;
+          this.divisionOneList = [...this.divisionOneList, ...items];
+          this.divisionOneList = Array.from(new Map(this.divisionOneList.map(item => [item.divOneId, item])).values());
+          this.filteredDivOneList = [...this.divisionOneList];
+          this.divOneTotalPages = response.data.totalPages || 1;
+        }
+      },
+      error: (error) => {
+        console.error(error);
+      }
+    });
+  }
+
+  onPrevDivOnePage(event: Event) {
+    event.stopPropagation();
+    if (this.divOnePage > 1) {
+      this.divOnePage--;
+      this.divisionOneList = [];
+      this.fetchDivisionOne(this.form.value.countryId);
+    }
+  }
+
+  onNextDivOnePage(event: Event) {
+    event.stopPropagation();
+    if (this.divOnePage < this.divOneTotalPages) {
+      this.divOnePage++;
+      this.divisionOneList = [];
+      this.fetchDivisionOne(this.form.value.countryId);
+    }
+  }
+
+  onDivisionOneChange(event: any) {
+    const divisionOneId = event.target.value;
+
+    this.form.patchValue({
+      divTwoId: 0,
+      divThreeId: 0
+    });
+    this.divisionTwoList = [];
+    this.filteredDivTwoList = [];
+    this.selectedDivTwoName = '';
+    this.searchDivTwoText = '';
+    this.divTwoPage = 1;
+
+    this.divisionThreeList = [];
+    this.filteredDivThreeList = [];
+    this.selectedDivThreeName = '';
+    this.searchDivThreeText = '';
+    this.divThreePage = 1;
+
+    this.fetchDivisionTwo(divisionOneId);
+  }
+
+  fetchDivisionTwo(divisionOneId: any) {
+    let params: any = { DivisionOneId: divisionOneId, PageNumber: this.divTwoPage, Limit: this.lookupLimit };
+    if (this.searchDivTwoText) {
+      params.SearchText = this.searchDivTwoText;
+    }
+    this.countryService.getDivisionTwoLookup(params).subscribe({
+      next: (response: any) => {
+        if (response && response.data) {
+          const items = response.data.items || response.data;
+          this.divisionTwoList = [...this.divisionTwoList, ...items];
+          this.divisionTwoList = Array.from(new Map(this.divisionTwoList.map(item => [item.divTwoId, item])).values());
+          this.filteredDivTwoList = [...this.divisionTwoList];
+          this.divTwoTotalPages = response.data.totalPages || 1;
+        }
+      },
+      error: (error) => {
+        console.error(error);
+      }
+    });
+  }
+
+  onPrevDivTwoPage(event: Event) {
+    event.stopPropagation();
+    if (this.divTwoPage > 1) {
+      this.divTwoPage--;
+      this.divisionTwoList = [];
+      this.fetchDivisionTwo(this.form.value.divOneId);
+    }
+  }
+
+  onNextDivTwoPage(event: Event) {
+    event.stopPropagation();
+    if (this.divTwoPage < this.divTwoTotalPages) {
+      this.divTwoPage++;
+      this.divisionTwoList = [];
+      this.fetchDivisionTwo(this.form.value.divOneId);
+    }
+  }
+
+  onDivisionTwoChange(event: any) {
+    const divisionTwoId = event.target.value;
+
+    this.form.patchValue({
+      divThreeId: 0
+    });
+    this.divisionThreeList = [];
+    this.filteredDivThreeList = [];
+    this.selectedDivThreeName = '';
+    this.searchDivThreeText = '';
+    this.divThreePage = 1;
+
+    this.fetchDivisionThree(divisionTwoId);
+  }
+
+  fetchDivisionThree(divisionTwoId: any) {
+    let params: any = { DivisionTwoId: divisionTwoId, PageNumber: this.divThreePage, Limit: this.lookupLimit };
+    if (this.searchDivThreeText) {
+      params.SearchText = this.searchDivThreeText;
+    }
+    this.countryService.getDivisionThreeLookup(params).subscribe({
+      next: (response: any) => {
+        if (response && response.data) {
+          const items = response.data.items || response.data;
+          this.divisionThreeList = [...this.divisionThreeList, ...items];
+          this.divisionThreeList = Array.from(new Map(this.divisionThreeList.map(item => [item.divThreeId, item])).values());
+          this.filteredDivThreeList = [...this.divisionThreeList];
+          this.divThreeTotalPages = response.data.totalPages || 1;
+        }
+      },
+      error: (error) => {
+        console.error(error);
+      }
+    });
+  }
+
+  onPrevDivThreePage(event: Event) {
+    event.stopPropagation();
+    if (this.divThreePage > 1) {
+      this.divThreePage--;
+      this.divisionThreeList = [];
+      this.fetchDivisionThree(this.form.value.divTwoId);
+    }
+  }
+
+  onNextDivThreePage(event: Event) {
+    event.stopPropagation();
+    if (this.divThreePage < this.divThreeTotalPages) {
+      this.divThreePage++;
+      this.divisionThreeList = [];
+      this.fetchDivisionThree(this.form.value.divTwoId);
+    }
+  }
+
+  onDivisionThreeChange(event: any) {
+    // No downstream lists to fetch at division three
+  }
+
+  onDivOneSearch(event: any) {
+    this.searchDivOneSubject.next(event.target.value);
+  }
+
+  selectDivOne(division: DivisionOneModel) {
+    this.selectedDivOneName = division.divOneName;
+    this.form.patchValue({ divOneId: division.divOneId });
+    this.onDivisionOneChange({ target: { value: division.divOneId } });
+  }
+
+  onDivTwoSearch(event: any) {
+    this.searchDivTwoSubject.next(event.target.value);
+  }
+
+  selectDivTwo(division: DivisionTwoModel) {
+    this.selectedDivTwoName = division.divTwoName;
+    this.form.patchValue({ divTwoId: division.divTwoId });
+    this.onDivisionTwoChange({ target: { value: division.divTwoId } });
+  }
+
+  onDivThreeSearch(event: any) {
+    this.searchDivThreeSubject.next(event.target.value);
+  }
+
+  selectDivThree(division: DivisionThreeModel) {
+    this.selectedDivThreeName = division.divThreeName;
+    this.form.patchValue({ divThreeId: division.divThreeId });
+    this.onDivisionThreeChange({ target: { value: division.divThreeId } });
+  }
+
+  updateDivisionLabels(countryId: any) {
+    const country = this.countryList.find(c => c.countryId == countryId);
+    if (country) {
+      this.divOneLabel = country.divisionOne || null;
+      this.divTwoLabel = country.divisionTwo || null;
+      this.divThreeLabel = country.divisionThree || null;
+    } else {
+      this.divOneLabel = null;
+      this.divTwoLabel = null;
+      this.divThreeLabel = null;
+    }
+
+    this.updateValidator('divOneId', this.divOneLabel);
+    this.updateValidator('divTwoId', this.divTwoLabel);
+    this.updateValidator('divThreeId', this.divThreeLabel);
+  }
+
+  updateValidator(controlName: string, label: string | null) {
+    const control = this.form.get(controlName);
+    if (!label) {
+      control?.clearValidators();
+      control?.setValue(0); // Start clean if hidden
+      control?.updateValueAndValidity();
+    }
   }
 
 
@@ -183,7 +657,7 @@ export class AddEditPostOffice {
     if (this.form.valid) {
       this.isSubmitting = true;
       console.log('Form Data:', this.form.value);
-      if (this.data) {
+      if (this.isEditMode) {
         this.updatePostOffice();
       } else {
         this.addPostOffice();
@@ -195,10 +669,14 @@ export class AddEditPostOffice {
 
   addPostOffice() {
     if (this.form.valid) {
+      const formValue = this.form.value;
       const newPostOffice = {
-        postOfficeName: this.form.value.postOfficeName,
-        countryId: this.form.value.countryId,
-        zipCodes: (this.form.value.zipCodes || []).map((z: any) => z.zipCode),
+        postOfficeName: formValue.postOfficeName,
+        countryId: formValue.countryId,
+        divOneId: formValue.divOneId || 0,
+        divTwoId: formValue.divTwoId || 0,
+        divThreeId: formValue.divThreeId || 0,
+        zipCodes: (formValue.zipCodes || []).map((z: any) => z.zipCode),
       }
       console.log("payload", newPostOffice);
       this.postOfficeService.create(newPostOffice).subscribe({
@@ -206,7 +684,7 @@ export class AddEditPostOffice {
           console.log("response", res);
           if (res.statusCode === 201) {
             this.toastService.success('Post Office added successfully', 'Success');
-            this.closeDialog(res);
+            this.goBack();
           }
           else {
             this.toastService.error(res.message, 'Failed');
@@ -227,8 +705,8 @@ export class AddEditPostOffice {
   }
 
   updatePostOffice() {
-    if (this.form.valid && this.data) {
-      const changes = this.getChangedValues(this.form.value, this.data);
+    if (this.form.valid && this.postOffice) {
+      const changes = this.getChangedValues(this.form.value, this.postOffice);
 
       if (Object.keys(changes).length === 0) {
         this.toastService.info('No changes detected', 'Info');
@@ -237,12 +715,12 @@ export class AddEditPostOffice {
       }
 
       console.log("payload", changes);
-      this.postOfficeService.update(this.data.postOfficeId, changes).subscribe({
+      this.postOfficeService.update(this.postOfficeId, changes).subscribe({
         next: (res) => {
           console.log("response", res);
           if (res.statusCode === 200) {
             this.toastService.success('Post Office updated successfully', 'Success');
-            this.closeDialog(res);
+            this.goBack();
           }
           else {
             this.toastService.error(res.message, 'Failed');
@@ -263,7 +741,7 @@ export class AddEditPostOffice {
           next: (restoreRes) => {
             if (restoreRes.statusCode === 200) {
               this.toastService.success('Post Office restored successfully', 'Success');
-              this.closeDialog(restoreRes);
+              this.goBack();
             }
           },
           error: (err) => {
@@ -274,7 +752,7 @@ export class AddEditPostOffice {
     });
   }
 
-  getChangedValues(formValue: any, originalData: PostOfficeModel): any {
+  getChangedValues(formValue: any, originalData: any): any {
     const changes: any = {};
 
     if (formValue.postOfficeName !== originalData.postOfficeName) {
@@ -285,19 +763,28 @@ export class AddEditPostOffice {
       changes.countryId = formValue.countryId;
     }
 
-    // Zip codes: deletions are handled by deleteZipcode API.
-    // For updates we only send newly added zip codes.
-    const formZips = formValue.zipCodes || [];
+    if ((formValue.divOneId || 0) !== (originalData.divOneId || 0)) {
+      changes.divOneId = formValue.divOneId || 0;
+    }
 
-    // Filter out only new ones (zipCodeId == 0)
+    if ((formValue.divTwoId || 0) !== (originalData.divTwoId || 0)) {
+      changes.divTwoId = formValue.divTwoId || 0;
+    }
+
+    if ((formValue.divThreeId || 0) !== (originalData.divThreeId || 0)) {
+      changes.divThreeId = formValue.divThreeId || 0;
+    }
+
+    // Zip codes handling:
+    const formZips = formValue.zipCodes || [];
     const addedZips = formZips.filter((z: any) => z.zipCodeId === 0);
 
     if (addedZips.length > 0) {
-      changes.zipCodes = addedZips.map((z: any) => ({
-        zipCode: z.zipCode
-      }));
+      changes.addZipCodes = addedZips.map((z: any) => z.zipCode);
     }
 
+    // We only update changes if the updateZipCodes pattern is needed instead of independent API calls.
+    // If you ever populate updateZipCodes locally before saving, add it logic here.
     return changes;
   }
 
@@ -317,6 +804,6 @@ export class AddEditPostOffice {
   }
 
   get title(): string {
-    return this.data ? 'Edit Post Office' : 'Add Post Office';
+    return this.isEditMode ? 'Edit Post Office' : 'Add Post Office';
   }
 }

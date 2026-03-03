@@ -94,12 +94,7 @@ export class PlanList extends BaseListComponent implements OnInit, OnDestroy {
 
   // Load data with current query parameters
   loadData() {
-    if (!this.queryParams.SortBy) {
-      this.queryParams.SortBy = "createdAt";
-    }
-    if (!this.queryParams.SortOrder) {
-      this.queryParams.SortOrder = "Desc";
-    }
+    this.utilityService.applyDefaultSorting(this.queryParams);
     // Merge queryParams with statusFilters (Active/Delete)
     const params = {
       ...this.queryParams,

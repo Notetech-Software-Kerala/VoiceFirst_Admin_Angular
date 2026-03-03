@@ -1,0 +1,53 @@
+.dropdown-menu {
+    background-color: var(--color-bg-sidebar);
+    border-color: var(--color-border-hr) !important;
+    font-size: .875rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Modern Thinner Scrollbar for Custom Dropdowns */
+.dropdown-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dropdown-menu::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+    background: var(--color-border-hr);
+    border-radius: 10px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-tertiary);
+}
+
+.dropdown-menu .dropdown-item {
+    color: var(--color-text-primary);
+}
+
+.dropdown-menu .dropdown-item:hover {
+    background-color: var(--color-hover-secondary);
+    color: var(--color-text-primary);
+}
+
+.dropdown-menu .dropdown-item.active {
+    background-color: var(--color-chip-more-bg) !important;
+    color: var(--color-chip-more-text) !important;
+}
+
+.custom-pagination-btn {
+    color: var(--color-hover-primary) !important;
+    background-color: var(--color-bg-primary) !important;
+}
+
+.custom-pagination-btn:hover {
+    background-color: var(--color-hover-secondary) !important;
+}
+
+.custom-dropdown-header-footer {
+    background-color: var(--color-bg-primary) !important;
+    border-color: var(--color-border-hr) !important;
+}

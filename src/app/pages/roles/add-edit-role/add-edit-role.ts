@@ -109,12 +109,14 @@ export class AddEditRole implements OnInit {
     });
 
     if (data.planRoleActionLink) {
-      const requests = data.planRoleActionLink.map(link =>
-        this.planService.getById(link.planId).pipe(switchMap(res => of({
-          planDetails: res.data,
-          roleLink: link
-        })))
-      );
+      const requests = data.planRoleActionLink
+        .filter(link => link.active !== false)
+        .map(link =>
+          this.planService.getById(link.planId).pipe(switchMap(res => of({
+            planDetails: res.data,
+            roleLink: link
+          })))
+        );
 
       if (requests.length > 0) {
         forkJoin(requests).subscribe(results => {
@@ -173,16 +175,28 @@ export class AddEditRole implements OnInit {
   }
 
   removePlan(index: number) {
-    this.selectedPlans.splice(index, 1);
+    // If it's a new plan (not in DB), just remove it
+    if (!this.selectedPlans[index].isExisting) {
+      this.selectedPlans.splice(index, 1);
+    } else {
+      // If it exists in DB, mark it as removed (active: false)
+      this.selectedPlans[index].isRemoved = true;
+    }
+  }
+
+  restorePlan(index: number) {
+    this.selectedPlans[index].isRemoved = false;
   }
 
   toggleAction(plan: ExtendedPlanModel, actionId: number, isChecked: boolean) {
+    if (plan.isRemoved) return; // Prevent toggling on removed plans
     if (isChecked) {
       plan.selectedActions.add(actionId);
     } else {
       plan.selectedActions.delete(actionId);
     }
   }
+
 
   isActionSelected(plan: ExtendedPlanModel, actionId: number): boolean {
     return plan.selectedActions.has(actionId);
@@ -248,18 +262,37 @@ export class AddEditRole implements OnInit {
     const original = this.originalData;
     const changes = this.getChangedValues(formValue, original);
 
-    // List of new plans
-    const newPlans = this.selectedPlans.filter(p => !p.isExisting);
-    const newPlanPayloads: createPlanActionLink[] = newPlans.map(p => ({
-      planId: p.planId,
-      actionLinkIds: Array.from(p.selectedActions)
-    }));
-
-    // Existing Plans Payload Arrays
+    // Initialize arrays
+    const newPlanPayloads: createPlanActionLink[] = [];
     const existingPlanNewActions: createPlanActionLink[] = [];
     const updateActionLinks: updatePlanActionLinks[] = [];
 
-    const existingPlans = this.selectedPlans.filter(p => p.isExisting);
+    const existingPlans = this.selectedPlans.filter(p => p.isExisting && !p.isRemoved);
+    const newPlansToCheck = this.selectedPlans.filter(p => !p.isExisting);
+
+    // Filter out "New" plans that are actually existing plans re-added
+    // and process them as updates
+    newPlansToCheck.forEach(newP => {
+      const originalLink = original.planRoleActionLink?.find(link => link.planId === newP.planId);
+      if (originalLink) {
+        // It's actually an existing plan!
+        // Add it to existingPlans list for processing
+        const reAddedPlan: ExtendedPlanModel = {
+          ...newP,
+          isExisting: true,
+          rolePlanLinkId: originalLink.planRoleLinkId
+        };
+        // Ensure that we track if this plan needs reactivation from inactive state
+        reAddedPlan.isReactivation = !originalLink.active;
+        existingPlans.push(reAddedPlan);
+      } else {
+        // Truly new
+        newPlanPayloads.push({
+          planId: newP.planId,
+          actionLinkIds: Array.from(newP.selectedActions)
+        });
+      }
+    });
 
     existingPlans.forEach(p => {
       // Find original linkage info using planRoleActionLink
@@ -312,13 +345,38 @@ export class AddEditRole implements OnInit {
         });
       }
 
-      if (updates.length > 0) {
-        updateActionLinks.push({
+      if (updates.length > 0 || (p.isReactivation)) {
+        // We only push to updateActionLinks if there are action updates OR if the plan itself needs reactivation.
+        const payload: updatePlanActionLinks = {
           rolePlanLinkId: p.rolePlanLinkId!,
           updateActionLinks: updates
-        });
+        };
+
+        if (p.isReactivation) {
+          payload.active = true;
+        }
+
+        updateActionLinks.push(payload);
       }
     });
+
+    // Handle Removed Plans
+    if (original.planRoleActionLink) {
+      // Get IDs of ALL plans currently selected (whether designated existing or new)
+      const currentPlanIds = this.selectedPlans.filter(p => !p.isRemoved).map(p => p.planId);
+
+      const removedPlans = original.planRoleActionLink.filter(link =>
+        !currentPlanIds.includes(link.planId) && link.active !== false
+      );
+
+      removedPlans.forEach(removed => {
+        updateActionLinks.push({
+          rolePlanLinkId: removed.planRoleLinkId,
+          active: false,
+          updateActionLinks: []
+        });
+      });
+    }
 
     // Merge New Plan Payloads + Existing Plan New Actions
     if (newPlanPayloads.length > 0 || existingPlanNewActions.length > 0) {
@@ -384,4 +442,6 @@ interface ExtendedPlanModel extends PlanModel {
   isExisting: boolean; // True if it was already part of the role
   rolePlanLinkId?: number; // Only for existing
   selectedActions: Set<number>;
+  isRemoved?: boolean;
+  isReactivation?: boolean;
 }

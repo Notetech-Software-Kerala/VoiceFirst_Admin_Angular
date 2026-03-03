@@ -23,6 +23,8 @@ export interface PostOfficeModel {
 export interface ZipCode {
   zipCodeId: number;
   zipCode: string;
+  zipCodeLinkId?: number;
+  id?: number;
 
   active: boolean;
   deleted: boolean;

@@ -73,7 +73,7 @@ export class SearchBar implements OnInit, OnDestroy {
 
   clearInput() {
     this.value = '';
-    this.searchSubject$.next(''); // Emit to debounced subject
+    this.valueChange.emit(''); // Emit immediately, skipping debounce
   }
 
   selectSearchBy(value: string) {

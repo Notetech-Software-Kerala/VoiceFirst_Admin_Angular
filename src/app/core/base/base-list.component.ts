@@ -75,7 +75,7 @@ export abstract class BaseListComponent implements OnInit, OnDestroy {
     onSearch(searchText: string) {
         this.queryParams = {
             ...this.queryParams,
-            SearchText: searchText,
+            SearchText: searchText || undefined,
             PageNumber: 1
         };
         this.currentPage = 1;

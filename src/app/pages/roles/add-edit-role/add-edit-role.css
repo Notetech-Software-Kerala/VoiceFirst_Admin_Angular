@@ -174,3 +174,43 @@ h6 {
     font-size: 0.8rem;
     padding: 4px 10px;
 }
+
+/* Removed Plan Styling */
+.removed-plan {
+    background-color: color-mix(in srgb, var(--color-bg-sidebar) 50%, white);
+    border: 1px dashed var(--color-border-hr) !important;
+    opacity: 0.8;
+}
+
+.removed-plan .card-header h6 {
+    text-decoration: line-through;
+    color: var(--color-text-placeholder);
+}
+
+.removed-plan .card-body {
+    opacity: 0.5;
+    pointer-events: none;
+    filter: grayscale(100%);
+}
+
+.removed-overlay {
+    padding: 6px;
+    background: var(--color-status-error-bg);
+    color: var(--color-status-error-text);
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-bottom: 1px dashed var(--color-border-hr);
+}
+
+.btn-outline-primary {
+    color: var(--color-hover-primary);
+    border: 1px solid var(--color-hover-primary);
+    background: transparent;
+    transition: all 0.2s;
+}
+
+.btn-outline-primary:hover {
+    background: var(--color-hover-primary);
+    color: #fff;
+}

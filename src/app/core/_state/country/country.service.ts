@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CountryModel } from './country.model';
+import { CountryModel, DivisionOneModel, DivisionThreeModel, DivisionTwoModel } from './country.model';
 import { apiConfig } from '../../_config/apiConfig';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../environment/environment';
 import { ApiResponse, PaginatedData } from '../../_models/api-response.model';
 import { map } from 'rxjs/operators';
+
 
 @Injectable({ providedIn: 'root' })
 export class CountryService {
@@ -25,38 +26,80 @@ export class CountryService {
     );
   }
 
-  lookup(): Observable<ApiResponse<CountryModel>> {
+  lookup(queryParams?: any): Observable<ApiResponse<CountryModel>> {
+    let params = new HttpParams({
+      fromObject: queryParams || {}
+    });
     return this.http.get<ApiResponse<CountryModel>>(
-      `${this.base}${apiConfig.getCountryLookup}`
+      `${this.base}${apiConfig.getCountryLookup}`,
+      { params }
     )
   }
 
-  // create(data: any): Observable<ApiResponse<CountryModel>> {
-  //   return this.http.post<ApiResponse<CountryModel>>(
-  //     `${this.base}${apiConfig.country}`,
-  //     data
-  //   )
-  // }
+  //----------------- Division One -----------------//
 
-  // update(id: number, data: Partial<CountryModel>): Observable<ApiResponse<CountryModel>> {
-  //   return this.http.patch<ApiResponse<CountryModel>>(
-  //     `${this.base}${apiConfig.country}/${id}`,
-  //     data
-  //   )
-  // }
+  getDivisionOne(queryParams: any): Observable<ApiResponse<any>> {
+    let params = new HttpParams({
+      fromObject: queryParams
+    });
+    return this.http.get<ApiResponse<any>>(
+      `${this.base}${apiConfig.divisionOne}`,
+      { params }
+    )
+  }
 
-  // delete(id: number): Observable<ApiResponse<void>> {
-  //   return this.http.delete<ApiResponse<void>>(
-  //     `${this.base}${apiConfig.country}/${id}`
-  //   );
-  // }
+  getDivisionOneLookup(queryParams: any): Observable<ApiResponse<DivisionOneModel>> {
+    let params = new HttpParams({
+      fromObject: queryParams
+    });
+    return this.http.get<ApiResponse<DivisionOneModel>>(
+      `${this.base}${apiConfig.getDivisionOneLookup}`,
+      { params }
+    )
+  }
 
-  // restore(id: number): Observable<ApiResponse<void>> {
-  //   return this.http.patch<ApiResponse<void>>(
-  //     `${this.base}${apiConfig.countryRestore}/${id}`,
-  //     {}
-  //   );
-  // }
+  //----------------- Division Two -----------------//
 
+  getDivisionTwo(queryParams: any): Observable<ApiResponse<DivisionTwoModel[]>> {
+    let params = new HttpParams({
+      fromObject: queryParams
+    });
+    return this.http.get<ApiResponse<DivisionTwoModel[]>>(
+      `${this.base}${apiConfig.divisionTwo}`,
+      { params }
+    )
+  }
+
+  getDivisionTwoLookup(queryParams: any): Observable<ApiResponse<DivisionTwoModel>> {
+    let params = new HttpParams({
+      fromObject: queryParams
+    });
+    return this.http.get<ApiResponse<DivisionTwoModel>>(
+      `${this.base}${apiConfig.getDivisionTwoLookup}`,
+      { params }
+    )
+  }
+
+  //----------------- Division Three -----------------//
+
+  getDivisionThree(queryParams: any): Observable<ApiResponse<DivisionThreeModel[]>> {
+    let params = new HttpParams({
+      fromObject: queryParams
+    });
+    return this.http.get<ApiResponse<DivisionThreeModel[]>>(
+      `${this.base}${apiConfig.divisionThree}`,
+      { params }
+    )
+  }
+
+  getDivisionThreeLookup(queryParams: any): Observable<ApiResponse<DivisionThreeModel>> {
+    let params = new HttpParams({
+      fromObject: queryParams
+    });
+    return this.http.get<ApiResponse<DivisionThreeModel>>(
+      `${this.base}${apiConfig.getDivisionThreeLookup}`,
+      { params }
+    )
+  }
 
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { PostOfficeModel } from './post-office.model';
+import { PostOfficeModel, ZipCode } from './post-office.model';
 import { apiConfig } from '../../_config/apiConfig';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../environment/environment';
@@ -22,6 +22,12 @@ export class PostOfficeService {
       { params }
     ).pipe(
       map(response => response.data)
+    );
+  }
+
+  getById(id: number): Observable<ApiResponse<PostOfficeModel>> {
+    return this.http.get<ApiResponse<PostOfficeModel>>(
+      `${this.base}${apiConfig.postOffice}/${id}`
     );
   }
 
@@ -52,8 +58,28 @@ export class PostOfficeService {
     );
   }
 
+  lookup(queryParams: any): Observable<PostOfficeModel[]> {
+    const params = new HttpParams({ fromObject: queryParams });
 
-  //Zipcode related APIs
+    return this.http.get<ApiResponse<PostOfficeModel[]>>(
+      `${this.base}${apiConfig.getPostOfficeLookup}`,
+      { params }
+    ).pipe(
+      map(res => res.data)
+    );
+  }
+
+  getZipcodesByPostOfficeIds(postOfficeIds: number[]): Observable<ZipCode[]> {
+    return this.http.get<ApiResponse<ZipCode[]>>(
+      `${this.base}${apiConfig.getZipcodeLookupByPostOfficeId}`,
+      { params: { postOfficeIds } }
+    ).pipe(
+      map(res => res.data)
+    );
+  }
+
+
+
 
   deleteZipcode(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(

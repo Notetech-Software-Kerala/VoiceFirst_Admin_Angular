@@ -54,16 +54,6 @@ export const routes: Routes = [
                     {
                         path: 'configure',
                         loadComponent: () => import('./pages/menu/configure-menu/configure-menu').then(m => m.ConfigureMenu),
-                        // children: [
-                        //     {
-                        //         path: 'web-menu',
-                        //         loadComponent: () => import('./pages/menu/configure-menu/web-menu/web-menu').then(m => m.WebMenu)
-                        //     },
-                        //     {
-                        //         path: 'app-menu',
-                        //         loadComponent: () => import('./pages/menu/configure-menu/app-menu/app-menu').then(m => m.AppMenu)
-                        //     }
-                        // ]
                     },
                 ]
             },
@@ -77,7 +67,24 @@ export const routes: Routes = [
             },
             {
                 path: 'post-office',
-                loadComponent: () => import('./pages/post-office/post-office').then(m => m.PostOffice)
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () => import('./pages/post-office/post-office-list/post-office-list').then(m => m.PostOfficeList)
+                    },
+                    {
+                        path: 'add',
+                        loadComponent: () => import('./pages/post-office/add-edit-post-office/add-edit-post-office').then(m => m.AddEditPostOffice)
+                    },
+                    {
+                        path: 'edit/:id',
+                        loadComponent: () => import('./pages/post-office/add-edit-post-office/add-edit-post-office').then(m => m.AddEditPostOffice)
+                    },
+                    {
+                        path: 'details/:id',
+                        loadComponent: () => import('./pages/post-office/post-office-details/post-office-details').then(m => m.PostOfficeDetails)
+                    }
+                ]
             },
             {
                 path: 'country',
@@ -147,6 +154,28 @@ export const routes: Routes = [
                     {
                         path: 'details/:id',
                         loadComponent: () => import('./pages/plan/plan-details/plan-details').then(m => m.PlanDetails)
+                    }
+                ]
+            },
+            {
+                path: 'place',
+                loadComponent: () => import('./pages/place/place').then(m => m.Place),
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () => import('./pages/place/place-list/place-list').then(m => m.PlaceList)
+                    },
+                    {
+                        path: 'add',
+                        loadComponent: () => import('./pages/place/add-edit-place/add-edit-place').then(m => m.AddEditPlace)
+                    },
+                    {
+                        path: 'edit/:id',
+                        loadComponent: () => import('./pages/place/add-edit-place/add-edit-place').then(m => m.AddEditPlace)
+                    },
+                    {
+                        path: 'details/:id',
+                        loadComponent: () => import('./pages/place/place-details/place-details').then(m => m.PlaceDetails)
                     }
                 ]
             }

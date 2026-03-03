@@ -12,3 +12,30 @@ export interface CountryModel {
   active: boolean;
   deleted: boolean;
 }
+
+export interface DivisionOneModel {
+  divOneId: number;
+  divOneName: string;
+  divTwoId: number;
+  divTwoName: string;
+  active: boolean;
+  deleted: boolean;
+}
+
+export interface DivisionTwoModel {
+  divTwoId: number;
+  divTwoName: string;
+  divOneId: number;
+  divOneName: string;
+  active: boolean;
+  deleted: boolean;
+}
+
+export interface DivisionThreeModel {
+  divThreeId: number;
+  divThreeName: string;
+  divTwoId: number;
+  divTwoName: string;
+  active: boolean;
+  deleted: boolean;
+}

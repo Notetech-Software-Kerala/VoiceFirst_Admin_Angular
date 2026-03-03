@@ -58,15 +58,19 @@ export class ProgramService {
     );
   }
 
-  lookup(): Observable<ApiResponse<ProgramModel[]>> {
-    return this.http.get<ApiResponse<ProgramModel[]>>(
+  lookup(): Observable<ApiResponse<ProgramLookupModel[]>> {
+    return this.http.get<ApiResponse<ProgramLookupModel[]>>(
       `${this.base}${apiConfig.getProgramLookup}`
     )
   }
 
-  lookupForPlan(): Observable<ApiResponse<ProgramLookupModel[]>> {
-    return this.http.get<ApiResponse<ProgramLookupModel[]>>(
-      `${this.base}${apiConfig.getProgramForPlan}`
+  lookupForPlan(queryParams: any = {}): Observable<ApiResponse<PaginatedData<ProgramLookupModel>>> {
+    let params = new HttpParams({
+      fromObject: queryParams
+    });
+    return this.http.get<ApiResponse<PaginatedData<ProgramLookupModel>>>(
+      `${this.base}${apiConfig.getProgramForPlan}`,
+      { params }
     )
   }
 

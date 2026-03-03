@@ -9,7 +9,7 @@ export interface RoleModel {
 
   applicationId: number;
   platformId: number;
-
+  platform: string;
   active: boolean;
   deleted: boolean;
 
@@ -30,6 +30,7 @@ export interface PlanRoleActionLink {
   planRoleLinkId: number;
   planId: number;
   planActionLink: PlanActionLink[];
+  active?: boolean;
 }
 
 export interface PlanActionLink {
@@ -51,6 +52,7 @@ export interface createPlanActionLink {
 
 export interface updatePlanActionLinks {
   rolePlanLinkId: number;
+  active?: boolean;
   updateActionLinks: UpdateActionLinkDto[];
 }
 

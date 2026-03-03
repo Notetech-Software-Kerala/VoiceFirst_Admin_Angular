@@ -1,0 +1,392 @@
+<div class="card detail-card p-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+        <div class="d-flex flex-column gap-2">
+            <div class="d-flex align-items-center gap-3">
+                <h2 class="page-title m-0">{{ place?.placeName }}</h2>
+                @if(place) {
+                <app-status-badge [item]="place"></app-status-badge>
+                }
+            </div>
+
+            <!-- Meta Info Row -->
+            @if(place) {
+            <div class="row g-3 mt-1">
+                @if(place.createdDate) {
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2">
+                        <mat-icon class="tiny-icon">calendar_today</mat-icon>
+                        <span class="small">Created: <strong>{{ place.createdDate | date:'mediumDate'
+                                }}</strong> by <strong>{{ place.createdUser }}</strong></span>
+                    </div>
+                </div>
+                }
+
+                @if(place.modifiedDate ) {
+                <div class="col-md-auto border-start ps-3 d-none d-md-block"></div>
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2">
+                        <mat-icon class="tiny-icon">edit</mat-icon>
+                        <span class="small">Modified: <strong>{{ place.modifiedDate | date:'mediumDate'
+                                }}</strong> by <strong>{{ place.modifiedUser }}</strong></span>
+                    </div>
+                </div>
+                }
+
+                @if(place.deleted) {
+                <div class="col-md-auto border-start ps-3 d-none d-md-block"></div>
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2 text-danger">
+                        <mat-icon class="tiny-icon">delete</mat-icon>
+                        <span class="small">Deleted: <strong>{{ place.deletedDate | date:'mediumDate' }}</strong> by
+                            <strong>{{ place.deletedUser }}</strong></span>
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2 flex-wrap">
+            @if(place) {
+            @if(!place.deleted) {
+            <button type="button" class="btn-action btn-outline-info" (click)="onEdit()">
+                <mat-icon class="msr">edit</mat-icon>
+                <span class="btn-text">Edit</span>
+            </button>
+            <button type="button" class="btn-action"
+                [ngClass]="place.active ? 'btn-outline-warning' : 'btn-outline-success'" (click)="onSuspend()">
+                <mat-icon class="msr">{{ place.active ? 'block' : 'check_circle' }}</mat-icon>
+                <span class="btn-text">{{ place.active ? 'Suspend' : 'Reinstate' }}</span>
+            </button>
+            }
+
+            @if(!place.deleted) {
+            <button type="button" class="btn-action btn-outline-danger" (click)="onDelete()">
+                <mat-icon class="msr">delete</mat-icon>
+                <span class="btn-text">Delete</span>
+            </button>
+            }
+            @else {
+            <button type="button" class="btn-action btn-outline-success" (click)="onRestore()">
+                <mat-icon class="msr">restore</mat-icon>
+                <span class="btn-text">Restore</span>
+            </button>
+            }
+
+            <button type="button" class="btn-action btn-outline" (click)="goBack()">
+                <mat-icon class="msr">arrow_back</mat-icon>
+                <span class="btn-text">Back</span>
+            </button>
+            }
+        </div>
+    </div>
+
+    @if(loading) {
+    <app-details-loader [rows]="2"></app-details-loader>
+    } @else if (place) {
+
+    <!-- Post Offices Table Section -->
+    <div class="row">
+        <div class="col-12">
+            <h5 class="section-title mb-3">Associated Zip Codes & Post Offices</h5>
+
+            <div class="d-flex flex-column gap-3 detail-card p-3">
+                <!-- Filters Section -->
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-md-3">
+                        <div class="search-box position-relative w-100">
+                            <mat-icon class="position-absolute top-50 translate-middle-y ms-2 text-muted"
+                                style="font-size: 20px; width: 20px; height: 20px;">search</mat-icon>
+                            <input type="text" class="form-control form-control-sm ps-5"
+                                placeholder="Search Zip Code or PO..." [(ngModel)]="searchText"
+                                (ngModelChange)="onFilterChange()">
+                        </div>
+                    </div>
+
+                    <div class="col-md-auto">
+                        <div class="dropdown">
+                            <button class="form-select form-select-sm text-start" type="button"
+                                data-bs-toggle="dropdown" aria-expanded="false" style="min-width: 150px;">
+                                {{ selectedCountryId ? selectedCountryName : 'Select Country' }}
+                            </button>
+
+                            <ul class="dropdown-menu w-100 p-0 shadow-sm">
+                                <li class="p-2 border-bottom sticky-top custom-dropdown-header-footer"
+                                    style="z-index: 3;" (click)="$event.stopPropagation()">
+                                    <input type="text" class="form-control form-control-sm"
+                                        placeholder="Search Country..." (input)="onCountrySearch($event)">
+                                </li>
+                                @if (countryPage > 1) {
+                                <li class="border-bottom sticky-top custom-dropdown-header-footer" style="z-index: 2;">
+                                    <button type="button" class="dropdown-item custom-pagination-btn fw-bold py-2"
+                                        (click)="onPrevCountryPage($event)">
+                                        &laquo; Previous Page
+                                    </button>
+                                </li>
+                                }
+
+                                @for (country of filteredCountryList; track country.countryId) {
+                                <li>
+                                    <button type="button" class="dropdown-item py-2"
+                                        [class.active]="selectedCountryId === country.countryId"
+                                        (click)="selectCountry(country)">
+                                        {{country.countryName}}
+                                    </button>
+                                </li>
+                                }
+
+                                @if (filteredCountryList.length === 0) {
+                                <li class="text-center text-muted p-2 small custom-dropdown-header-footer">
+                                    <span>No country found.</span>
+                                </li>
+                                }
+
+                                @if (countryPage < countryTotalPages) { <li
+                                    class="border-top sticky-bottom custom-dropdown-header-footer" style="z-index: 2;">
+                                    <button type="button" class="dropdown-item custom-pagination-btn fw-bold py-2"
+                                        (click)="onNextCountryPage($event)">
+                                        Next Page &raquo;
+                                    </button>
+                                    </li>
+                                    }
+                            </ul>
+                        </div>
+                    </div>
+
+                    @if (divOneLabel) {
+                    <div class="col-md-auto">
+                        <div class="dropdown">
+                            <button class="form-select form-select-sm text-start" type="button"
+                                data-bs-toggle="dropdown" aria-expanded="false" style="min-width: 150px;">
+                                {{ selectedDivOneId ? selectedDivOneName : 'Select ' + divOneLabel }}
+                            </button>
+
+                            <ul class="dropdown-menu w-100 p-0 shadow-sm">
+                                <li class="p-2 border-bottom sticky-top custom-dropdown-header-footer"
+                                    style="z-index: 3;" (click)="$event.stopPropagation()">
+                                    <input type="text" class="form-control form-control-sm"
+                                        [placeholder]="'Search ' + divOneLabel + '...'"
+                                        (input)="onDivOneSearch($event)">
+                                </li>
+                                @if (divOnePage > 1) {
+                                <li class="border-bottom sticky-top custom-dropdown-header-footer" style="z-index: 2;">
+                                    <button type="button" class="dropdown-item custom-pagination-btn fw-bold py-2"
+                                        (click)="onPrevDivOnePage($event)">
+                                        &laquo; Previous Page
+                                    </button>
+                                </li>
+                                }
+
+                                @for (divisionOne of filteredDivOneList; track divisionOne.divOneId) {
+                                <li>
+                                    <button type="button" class="dropdown-item py-2"
+                                        [class.active]="selectedDivOneId === divisionOne.divOneId"
+                                        (click)="selectDivOne(divisionOne)">
+                                        {{divisionOne.divOneName}}
+                                    </button>
+                                </li>
+                                }
+
+                                @if (filteredDivOneList.length === 0) {
+                                <li class="text-center text-muted p-2 small custom-dropdown-header-footer">
+                                    <span>No {{divOneLabel | lowercase}} found.</span>
+                                </li>
+                                }
+
+                                @if (divOnePage < divOneTotalPages) { <li
+                                    class="border-top sticky-bottom custom-dropdown-header-footer" style="z-index: 2;">
+                                    <button type="button" class="dropdown-item custom-pagination-btn fw-bold py-2"
+                                        (click)="onNextDivOnePage($event)">
+                                        Next Page &raquo;
+                                    </button>
+                                    </li>
+                                    }
+                            </ul>
+                        </div>
+                    </div>
+                    }
+
+                    @if (divTwoLabel) {
+                    <div class="col-md-auto">
+                        <div class="dropdown">
+                            <button class="form-select form-select-sm text-start" type="button"
+                                data-bs-toggle="dropdown" aria-expanded="false" style="min-width: 150px;">
+                                {{ selectedDivTwoId ? selectedDivTwoName : 'Select ' + divTwoLabel }}
+                            </button>
+
+                            <ul class="dropdown-menu w-100 p-0 shadow-sm">
+                                <li class="p-2 border-bottom sticky-top custom-dropdown-header-footer"
+                                    style="z-index: 3;" (click)="$event.stopPropagation()">
+                                    <input type="text" class="form-control form-control-sm"
+                                        [placeholder]="'Search ' + divTwoLabel + '...'"
+                                        (input)="onDivTwoSearch($event)">
+                                </li>
+                                @if (divTwoPage > 1) {
+                                <li class="border-bottom sticky-top custom-dropdown-header-footer" style="z-index: 2;">
+                                    <button type="button" class="dropdown-item custom-pagination-btn fw-bold py-2"
+                                        (click)="onPrevDivTwoPage($event)">
+                                        &laquo; Previous Page
+                                    </button>
+                                </li>
+                                }
+
+                                @for (divisionTwo of filteredDivTwoList; track divisionTwo.divTwoId) {
+                                <li>
+                                    <button type="button" class="dropdown-item py-2"
+                                        [class.active]="selectedDivTwoId === divisionTwo.divTwoId"
+                                        (click)="selectDivTwo(divisionTwo)">
+                                        {{divisionTwo.divTwoName}}
+                                    </button>
+                                </li>
+                                }
+
+                                @if (filteredDivTwoList.length === 0) {
+                                <li class="text-center text-muted p-2 small custom-dropdown-header-footer">
+                                    <span>No {{divTwoLabel | lowercase}} found.</span>
+                                </li>
+                                }
+
+                                @if (divTwoPage < divTwoTotalPages) { <li
+                                    class="border-top sticky-bottom custom-dropdown-header-footer" style="z-index: 2;">
+                                    <button type="button" class="dropdown-item custom-pagination-btn fw-bold py-2"
+                                        (click)="onNextDivTwoPage($event)">
+                                        Next Page &raquo;
+                                    </button>
+                                    </li>
+                                    }
+                            </ul>
+                        </div>
+                    </div>
+                    }
+
+                    @if (divThreeLabel) {
+                    <div class="col-md-auto">
+                        <div class="dropdown">
+                            <button class="form-select form-select-sm text-start" type="button"
+                                data-bs-toggle="dropdown" aria-expanded="false" style="min-width: 150px;">
+                                {{ selectedDivThreeId ? selectedDivThreeName : 'Select ' + divThreeLabel }}
+                            </button>
+
+                            <ul class="dropdown-menu w-100 p-0 shadow-sm">
+                                <li class="p-2 border-bottom sticky-top custom-dropdown-header-footer"
+                                    style="z-index: 3;" (click)="$event.stopPropagation()">
+                                    <input type="text" class="form-control form-control-sm"
+                                        [placeholder]="'Search ' + divThreeLabel + '...'"
+                                        (input)="onDivThreeSearch($event)">
+                                </li>
+                                @if (divThreePage > 1) {
+                                <li class="border-bottom sticky-top custom-dropdown-header-footer" style="z-index: 2;">
+                                    <button type="button" class="dropdown-item custom-pagination-btn fw-bold py-2"
+                                        (click)="onPrevDivThreePage($event)">
+                                        &laquo; Previous Page
+                                    </button>
+                                </li>
+                                }
+
+                                @for (divisionThree of filteredDivThreeList; track divisionThree.divThreeId) {
+                                <li>
+                                    <button type="button" class="dropdown-item py-2"
+                                        [class.active]="selectedDivThreeId === divisionThree.divThreeId"
+                                        (click)="selectDivThree(divisionThree)">
+                                        {{divisionThree.divThreeName}}
+                                    </button>
+                                </li>
+                                }
+
+                                @if (filteredDivThreeList.length === 0) {
+                                <li class="text-center text-muted p-2 small custom-dropdown-header-footer">
+                                    <span>No {{divThreeLabel | lowercase}} found.</span>
+                                </li>
+                                }
+
+                                @if (divThreePage < divThreeTotalPages) { <li
+                                    class="border-top sticky-bottom custom-dropdown-header-footer" style="z-index: 2;">
+                                    <button type="button" class="dropdown-item custom-pagination-btn fw-bold py-2"
+                                        (click)="onNextDivThreePage($event)">
+                                        Next Page &raquo;
+                                    </button>
+                                    </li>
+                                    }
+                            </ul>
+                        </div>
+                    </div>
+                    }
+
+                    <div class="col-md-auto ms-auto">
+                        <button class="btn btn-sm btn-outline-secondary" (click)="clearFilters()">Clear Filters</button>
+                    </div>
+                </div>
+
+                <!-- List Section -->
+                <div class="d-flex flex-column gap-2" style="max-height: 500px; overflow-y: auto;">
+                    @for (zipObj of filteredZipCodes; track zipObj.zipCodeLinkId) {
+                    <div class="program-list-item p-3">
+                        <div
+                            class="d-flex flex-column flex-md-row w-100 justify-content-between align-items-md-center gap-3">
+                            <!-- Left Side -->
+                            <div class="d-flex align-items-center gap-3 flex-grow-1" style="max-width: 70%;">
+                                <div class="icon-box"
+                                    style="background-color: var(--color-chip-more-bg); color: var(--color-chip-more-text); min-width: 40px;">
+                                    <mat-icon>place</mat-icon>
+                                </div>
+                                <div class="d-flex flex-column">
+                                    <h6 class="program-name mb-0 fs-6 fw-bold"
+                                        style="color: var(--color-text-primary);">{{ zipObj.zipCode }}</h6>
+                                    <div class="d-flex flex-wrap gap-2 mt-1"
+                                        style="font-size: 0.8rem; color: var(--color-text-placeholder);">
+                                        <span class="fw-medium" style="color: var(--color-hover-primary);">{{
+                                            zipObj.postOfficeName }}</span>
+                                        <span>• {{ zipObj.countryName }}</span>
+                                        @if(zipObj.divisionOneName) { <span>•
+                                            {{zipObj.divisionOneName}}</span> }
+                                        @if(zipObj.divisionTwoName) { <span>•
+                                            {{zipObj.divisionTwoName}}</span> }
+                                        @if(zipObj.divisionThreeName) { <span>•
+                                            {{zipObj.divisionThreeName}}</span> }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Side -->
+                            <div
+                                class="d-flex flex-column align-items-start align-items-md-end justify-content-md-end gap-2 text-start text-md-end mt-2 mt-md-0">
+                                <app-status-badge [item]="zipObj" class="ms-md-auto"></app-status-badge>
+                                <div style="font-size: 0.75rem; color: var(--color-text-placeholder);">
+                                    @if(zipObj.createdDate){
+                                    <div>Created <strong style="color: var(--color-text-primary);">{{ zipObj.createdDate
+                                            | date:'mediumDate' }}</strong> by
+                                        <strong style="color: var(--color-text-primary);">{{ zipObj.createdUser
+                                            }}</strong>
+                                    </div>
+                                    }
+                                    @if(zipObj.modifiedDate){
+                                    <div>Updated <strong style="color: var(--color-text-primary);">{{
+                                            zipObj.modifiedDate
+                                            | date:'mediumDate' }}</strong> by
+                                        <strong style="color: var(--color-text-primary);">{{ zipObj.modifiedUser
+                                            }}</strong>
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    } @empty {
+                    <div class="info-box mt-2">
+                        <mat-icon>info</mat-icon>
+                        <span>No Zip Codes found matching your filters.</span>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    } @else {
+    <div class="alert alert-warning">
+        Place not found.
+    </div>
+    }
+</div>

@@ -27,7 +27,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             }
             // Other: Show valid error message
             else if (error.status === 409) {
-                toastService.warning('Similar record already exists.', 'Duplicate Entry');
+                toastService.warning(error.error.message);
             }
             else if (error.status === 422) {
 
