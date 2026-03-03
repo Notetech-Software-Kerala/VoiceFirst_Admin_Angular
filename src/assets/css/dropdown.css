@@ -2,6 +2,8 @@
     background-color: var(--color-bg-sidebar);
     border-color: var(--color-border-hr) !important;
     font-size: .875rem;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 /* Modern Thinner Scrollbar for Custom Dropdowns */
