@@ -1,1 +1,191 @@
-<p>employee-details works!</p>
+<div class="card detail-card p-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+        <div class="d-flex flex-column gap-2">
+            <div class="d-flex align-items-center gap-3">
+                <h2 class="page-title m-0">{{ employee?.firstName }} {{ employee?.lastName }}</h2>
+                @if(employee) {
+                <app-status-badge [item]="employee"></app-status-badge>
+                }
+            </div>
+
+            <!-- Meta Info Row -->
+            @if(employee) {
+            <div class="row g-3 mt-1">
+                @if(employee.createdDate) {
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2">
+                        <mat-icon class="tiny-icon">calendar_today</mat-icon>
+                        <span class="small">Created: <strong>{{ employee.createdDate | date:'mediumDate'
+                                }}</strong> by <strong>{{ employee.createdUser }}</strong></span>
+                    </div>
+                </div>
+                }
+
+                @if(employee.modifiedDate) {
+                <div class="col-md-auto border-start ps-3 d-none d-md-block"></div>
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2">
+                        <mat-icon class="tiny-icon">edit</mat-icon>
+                        <span class="small">Modified: <strong>{{ employee.modifiedDate | date:'mediumDate'
+                                }}</strong> by <strong>{{ employee.modifiedUser }}</strong></span>
+                    </div>
+                </div>
+                }
+
+                @if(employee.deleted) {
+                <div class="col-md-auto border-start ps-3 d-none d-md-block"></div>
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2 text-danger">
+                        <mat-icon class="tiny-icon">delete</mat-icon>
+                        <span class="small">Deleted: <strong>{{ employee.deletedDate | date:'mediumDate' }}</strong> by
+                            <strong>{{ employee.deletedUser }}</strong></span>
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2 flex-wrap">
+            @if(employee) {
+            @if(!employee.deleted) {
+            <button type="button" class="btn-action btn-outline-info" (click)="onEdit()">
+                <mat-icon class="msr">edit</mat-icon>
+                <span class="btn-text">Edit</span>
+            </button>
+            <button type="button" class="btn-action"
+                [ngClass]="employee.active ? 'btn-outline-warning' : 'btn-outline-success'" (click)="onSuspend()">
+                <mat-icon class="msr">{{ employee.active ? 'block' : 'check_circle' }}</mat-icon>
+                <span class="btn-text">{{ employee.active ? 'Suspend' : 'Reinstate' }}</span>
+            </button>
+            }
+
+            @if(!employee.deleted) {
+            <button type="button" class="btn-action btn-outline-danger" (click)="onDelete()">
+                <mat-icon class="msr">delete</mat-icon>
+                <span class="btn-text">Delete</span>
+            </button>
+            }
+            @else {
+            <button type="button" class="btn-action btn-outline-success" (click)="onRestore()">
+                <mat-icon class="msr">restore</mat-icon>
+                <span class="btn-text">Restore</span>
+            </button>
+            }
+
+            <button type="button" class="btn-action btn-outline" (click)="goBack()">
+                <mat-icon class="msr">arrow_back</mat-icon>
+                <span class="btn-text">Back</span>
+            </button>
+            }
+        </div>
+    </div>
+
+    @if(loading) {
+    <app-details-loader [rows]="2"></app-details-loader>
+    } @else if (employee) {
+
+    <!-- Employee Details Section -->
+    <div class="row mt-4 mb-4">
+        <div class="row align-items-center">
+            @if(employee.email) {
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="info-label">Email Address</div>
+                <div class="info-value d-flex align-items-center gap-2">
+                    <mat-icon class="tiny-icon text-muted">email</mat-icon>
+                    <span>{{ employee.email }}</span>
+                </div>
+            </div>
+            }
+
+            @if(employee.mobileNo) {
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="info-label">Mobile Number</div>
+                <div class="info-value d-flex align-items-center gap-2">
+                    <mat-icon class="tiny-icon text-muted">phone</mat-icon>
+                    <span>{{ employee.dialCode }} {{ employee.mobileNo }}</span>
+                </div>
+            </div>
+            }
+
+            @if(employee.gender) {
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="info-label">Gender</div>
+                <div class="info-value d-flex align-items-center gap-2 text-capitalize">
+                    <mat-icon class="tiny-icon text-muted">person</mat-icon>
+                    <span>{{ employee.gender }}</span>
+                </div>
+            </div>
+            }
+
+            @if(employee.birthYear) {
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="info-label">Birth Year</div>
+                <div class="info-value d-flex align-items-center gap-2">
+                    <mat-icon class="tiny-icon text-muted">cake</mat-icon>
+                    <span>{{ employee.birthYear }}</span>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+
+    <!-- Roles Section -->
+    <div class="row">
+        <div class="col-12">
+            <h5 class="section-title mb-3">Assigned Roles</h5>
+
+            <div class="d-flex flex-column gap-3 detail-card p-3">
+                @if(employee.roles && employee.roles.length > 0) {
+                @for(role of employee.roles; track role.roleId) {
+                <div class="program-list-item p-3">
+                    <div
+                        class="d-flex flex-column flex-md-row w-100 justify-content-between align-items-md-center gap-3">
+                        <!-- Left Side -->
+                        <div class="d-flex align-items-center gap-3 flex-grow-1" style="max-width: 70%;">
+                            <div class="icon-box"
+                                style="background-color: var(--color-chip-more-bg); color: var(--color-chip-more-text); min-width: 40px;">
+                                <mat-icon>admin_panel_settings</mat-icon>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <h6 class="program-name mb-0 fs-6 fw-bold" style="color: var(--color-text-primary);">{{
+                                    role.roleName }}</h6>
+                            </div>
+                        </div>
+
+                        <!-- Right Side -->
+                        <div
+                            class="d-flex flex-column align-items-start align-items-md-end justify-content-md-end gap-2 text-start text-md-end mt-2 mt-md-0">
+                            <app-status-badge [item]="role" class="ms-md-auto"></app-status-badge>
+                            <div style="font-size: 0.75rem; color: var(--color-text-placeholder);">
+                                @if(role.createdDate){
+                                <div>Created <strong style="color: var(--color-text-primary);">{{ role.createdDate
+                                        | date:'mediumDate' }}</strong> by
+                                    <strong style="color: var(--color-text-primary);">{{ role.createdUser
+                                        }}</strong>
+                                </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+
+                } @else {
+                <div class="alert alert-light border m-0 d-flex align-items-center gap-2 text-muted">
+                    <mat-icon>info</mat-icon>
+                    <span>No roles assigned to this employee.</span>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    } @else {
+    <div class="alert alert-warning mt-4">
+        Employee not found.
+    </div>
+    }
+</div>

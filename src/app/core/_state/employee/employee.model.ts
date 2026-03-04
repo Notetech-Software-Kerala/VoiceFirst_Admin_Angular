@@ -20,5 +20,15 @@ export interface EmployeeModel {
     deletedUser?: string;
     deletedDate?: string;
 
-    employeeRoles?: any[];
+    roles?: EmployeeRole[];
+}
+
+export interface EmployeeRole {
+    roleId: number;
+    roleName: string;
+    active: boolean;
+    createdUser: string;
+    createdDate: string;
+    modifiedUser?: string;
+    modifiedDate?: string;
 }

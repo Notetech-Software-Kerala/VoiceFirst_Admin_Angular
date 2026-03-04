@@ -299,8 +299,7 @@ export class AddEditEmployee implements OnInit, OnDestroy {
     const currentSelectedRoleIds = this.getSelectedRoleIds();
 
     const rawRoles: any[] =
-      this.originalData.employeeRoles ||
-      (this.originalData as any).roles ||
+      this.originalData.roles ||
       (this.originalData as any).userRoles ||
       (this.originalData as any).assignedRoles ||
       [];
