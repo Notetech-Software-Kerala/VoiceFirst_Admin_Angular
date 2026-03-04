@@ -30,6 +30,10 @@ export class TokenStore {
         return this.accessToken;
     }
 
+    getExpiresAtUtcMs(): number | null {
+        return this.expiresAtUtcMs;
+    }
+
     /** true if token missing or expiring soon */
     isExpiredOrNearExpiry(skewSeconds = 30): boolean {
         if (!this.accessToken || !this.expiresAtUtcMs) return true;
