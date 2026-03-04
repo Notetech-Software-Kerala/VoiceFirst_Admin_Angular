@@ -1,0 +1,49 @@
+import { createFeatureSelector, createSelector } from '@ngrx/store';
+import { adapter } from './issue-character-type.reducer';
+import { ProgramActionState } from './issue-character-type.state';
+
+export const PROGRAM_ACTION_FEATURE_KEY = 'programActions';
+
+export const selectProgramActionState =
+  createFeatureSelector<ProgramActionState>(PROGRAM_ACTION_FEATURE_KEY);
+
+const {
+  selectAll,
+  selectEntities,
+  selectTotal,
+} = adapter.getSelectors(selectProgramActionState);
+
+export const selectAllProgramActions = selectAll;
+
+export const selectProgramActionLoading = createSelector(
+  selectProgramActionState,
+  state => state.loading
+);
+
+export const selectProgramActionError = createSelector(
+  selectProgramActionState,
+  state => state.error
+);
+
+export const selectProgramActionTotal = selectTotal;
+
+// Pagination selectors
+export const selectProgramActionTotalCount = createSelector(
+  selectProgramActionState,
+  state => state.totalCount
+);
+
+export const selectProgramActionPageNumber = createSelector(
+  selectProgramActionState,
+  state => state.pageNumber
+);
+
+export const selectProgramActionPageSize = createSelector(
+  selectProgramActionState,
+  state => state.pageSize
+);
+
+export const selectProgramActionTotalPages = createSelector(
+  selectProgramActionState,
+  state => state.totalPages
+);
