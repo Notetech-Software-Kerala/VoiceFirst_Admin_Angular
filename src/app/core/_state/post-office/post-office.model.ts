@@ -5,6 +5,16 @@ export interface PostOfficeModel {
   countryName: string;
   countryId: number;
 
+  divOneId?: number;
+  divOneName?: string;
+  divOneLabel?: string;
+  divTwoId?: number;
+  divTwoName?: string;
+  divTwoLabel?: string;
+  divThreeId?: number;
+  divThreeName?: string;
+  divThreeLabel?: string;
+
   active: boolean;
   deleted: boolean;
 
