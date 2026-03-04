@@ -1,9 +1,9 @@
 export const apiConfig = {
 
     // Auth Endpoints
-    login: '/Auth/login',
-    refresh: '/Auth/refresh',
-    logout: '/Auth/logout',
+    login: '/auth/login',
+    refresh: '/auth/refresh-token',
+    logout: '/auth/logout',
 
     // Program Action Endpoints
     programAction: '/program-action',
@@ -35,6 +35,7 @@ export const apiConfig = {
     getDivisionOneLookup: '/division/one/lookup',
     getDivisionTwoLookup: '/division/two/lookup',
     getDivisionThreeLookup: '/division/three/lookup',
+    getDialCodeLookup: '/dialCode/lookup',
 
     //Program
     program: '/program',
@@ -72,5 +73,11 @@ export const apiConfig = {
     place: '/place',
     getPlaceLookup: '/place/lookup',
     placeRestore: '/place/recover',
+
+
+    //Employee
+    employee: '/employee',
+    getEmployeeLookup: '/employee/lookup',
+    employeeRestore: '/employee/recover',
 
 };

@@ -5,6 +5,7 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } fro
 import { filter, map, shareReplay, Subject, takeUntil } from 'rxjs';
 import { ConfirmDialog } from '../../partials/shared_modules/confirm-dialog/confirm-dialog';
 import { MENU_CONFIG, MenuItem } from '../../core/_config/menuConfig';
+import { AuthService } from '../../core/_auth/auth.service';
 
 @Component({
   selector: 'app-base-layout',
@@ -18,6 +19,7 @@ export class BaseLayout {
   private bpo = inject(BreakpointObserver);
   private dialog = inject(MatDialog);
   private destroy$ = new Subject<void>();
+  private authService = inject(AuthService);
 
   isHandset$ = this.bpo.observe('(max-width: 768px)')
     .pipe(map(state => state.matches), shareReplay(1));
@@ -175,8 +177,14 @@ export class BaseLayout {
 
     ref.afterClosed().subscribe(ok => {
       if (ok) {
-        // perform delete...
-        this.router.navigate(['/login']);
+        this.authService.logout().subscribe({
+          next: () => {
+            this.router.navigate(['/login']);
+          },
+          error: (err) => {
+            console.error(err);
+          }
+        });
       }
     });
   }

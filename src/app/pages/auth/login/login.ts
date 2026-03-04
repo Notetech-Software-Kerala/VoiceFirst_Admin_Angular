@@ -60,46 +60,46 @@ export class Login {
   async onSubmit() {
     if (this.loginForm.invalid) return;
     this.submitting = true;
-    console.log('Login data:', this.loginForm.value);
-    if (this.username === this.loginForm.value.email && this.password === this.loginForm.value.password) {
 
-      const device = await this.deviceService.collect();
-      console.log('device', device);
-      setTimeout(() => {
-        this.submitting = false;
-        this.router.navigate(['/dashboard']);
-        this.toast.success(`Welcome to Voice First`, 'Login Success');
-      }, 1000);
-    }
-    else {
-      setTimeout(() => {
-        this.submitting = false;
-        alert('Invalid credentials');
-      }, 1000);
-    }
-    // simulate async login
+    try {
+      // 1. Collect OS/Browser/Device info
+      const rawDevice = await this.deviceService.collect();
+      console.log('rawDevice', rawDevice);
+      // 2. Map payload specifically matching the new LoginRequest format
+      const payload = {
+        email: this.loginForm.value.email,
+        password: this.loginForm.value.password,
+        clientType: 'Web',
+        device: {
+          deviceID: rawDevice.deviceID,
+          version: 1, // Fixed version for initial deployment parsing
+          deviceName: rawDevice.deviceName,
+          deviceType: rawDevice.deviceType,
+          os: rawDevice.os,
+          osVersion: rawDevice.osVersion,
+          manufacturer: rawDevice.manufacturer,
+          model: rawDevice.model
+        }
+      };
 
+      console.log('Login Payload:', payload);
+
+      // 3. Make the API Call
+      this.authService.login(payload).subscribe({
+        next: (res) => {
+          this.submitting = false;
+          this.router.navigate(['/dashboard']);
+          this.toast.success(`Welcome to Voice First`, 'Login Success');
+        },
+        error: (err) => {
+          this.submitting = false;
+        }
+      });
+
+    } catch (e) {
+      console.error('Failed to prepare device payload prior to login', e);
+      this.submitting = false;
+      this.toast.error('Could not prepare device profile for login.', 'Error');
+    }
   }
-
-  // onSubmit() {
-  //   if (this.loginForm.invalid) return;
-  //   this.submitting = true;
-  //   console.log('Login data:', this.loginForm.value);
-  //   const payload = {
-  //     emailOrMobile: this.loginForm.value.email,
-  //     password: this.loginForm.value.password,
-  //     uniqueDeviceId: "e3ee5465-e103-4200-b882-50da1c700e42"
-  //   }
-  //   this.authService.login(payload).subscribe({
-  //     next: (res) => {
-  //       this.submitting = false;
-  //       this.router.navigate(['/dashboard']);
-  //       this.toast.success(`Welcome to Voice First`, 'Login Success');
-  //     },
-  //     error: (err) => {
-  //       this.submitting = false;
-  //       this.toast.error(`Login failed`, 'Login Failed');
-  //     }
-  //   });
-  // }
 }

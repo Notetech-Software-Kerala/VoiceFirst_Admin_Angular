@@ -1,7 +1,17 @@
 export interface LoginRequest {
-    emailOrMobile: string;
+    email: string;
     password: string;
-    uniqueDeviceId: string; // GUID string
+    clientType: string;
+    device: {
+        deviceID: string;
+        version: number;
+        deviceName: string;
+        deviceType: string;
+        os: string;
+        osVersion: string;
+        manufacturer: string;
+        model: string;
+    };
 }
 
 export interface ApiResponse<T> {
@@ -13,11 +23,6 @@ export interface ApiResponse<T> {
 }
 
 export interface LoginData {
-    userId: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-    mobileNo: string;
     accessToken: string;
     accessTokenExpiresAtUtc: string; // ISO string
 }

@@ -159,7 +159,6 @@ export const routes: Routes = [
             },
             {
                 path: 'place',
-                loadComponent: () => import('./pages/place/place').then(m => m.Place),
                 children: [
                     {
                         path: '',
@@ -176,6 +175,28 @@ export const routes: Routes = [
                     {
                         path: 'details/:id',
                         loadComponent: () => import('./pages/place/place-details/place-details').then(m => m.PlaceDetails)
+                    }
+                ]
+            },
+            {
+                path: 'employees',
+
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () => import('./pages/employees/employees-list/employees-list').then(m => m.EmployeesList)
+                    },
+                    {
+                        path: 'add',
+                        loadComponent: () => import('./pages/employees/add-edit-employee/add-edit-employee').then(m => m.AddEditEmployee)
+                    },
+                    {
+                        path: 'edit/:id',
+                        loadComponent: () => import('./pages/employees/add-edit-employee/add-edit-employee').then(m => m.AddEditEmployee)
+                    },
+                    {
+                        path: 'details/:id',
+                        loadComponent: () => import('./pages/employees/employee-details/employee-details').then(m => m.EmployeeDetails)
                     }
                 ]
             }

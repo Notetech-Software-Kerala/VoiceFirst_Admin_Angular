@@ -35,6 +35,9 @@ import { MenuEffects } from './core/_state/menu/menu.effects';
 import { placeReducer } from './core/_state/place/place.reducer';
 import { PLACE_FEATURE_KEY } from './core/_state/place/place.selectors';
 import { PlaceEffects } from './core/_state/place/place.effects';
+import { employeeReducer } from './core/_state/employee/employee.reducer';
+import { EMPLOYEE_FEATURE_KEY } from './core/_state/employee/employee.selectors';
+import { EmployeeEffects } from './core/_state/employee/employee.effects';
 
 
 
@@ -56,6 +59,7 @@ export const appConfig: ApplicationConfig = {
       [PLAN_FEATURE_KEY]: planReducer,
       [MENU_FEATURE_KEY]: menuReducer,
       [PLACE_FEATURE_KEY]: placeReducer,
+      [EMPLOYEE_FEATURE_KEY]: employeeReducer,
 
     }),
     provideEffects([
@@ -68,6 +72,7 @@ export const appConfig: ApplicationConfig = {
       PlanEffects,
       MenuEffects,
       PlaceEffects,
+      EmployeeEffects,
 
     ]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })
