@@ -1,9 +1,9 @@
 export const apiConfig = {
 
     // Auth Endpoints
-    login: '/Auth/login',
-    refresh: '/Auth/refresh',
-    logout: '/Auth/logout',
+    login: '/auth/login',
+    refresh: '/auth/refresh-token',
+    logout: '/auth/logout',
 
     // Program Action Endpoints
     programAction: '/program-action',

@@ -17,9 +17,7 @@ const refreshedToken$ = new BehaviorSubject<string | null>(null);
 
 function isAuthFreeEndpoint(url: string): boolean {
     return (
-        url.includes(apiConfig.login) ||
-        url.includes(apiConfig.refresh) ||
-        url.includes(apiConfig.logout)
+        url.includes(apiConfig.login)
     );
 }
 
