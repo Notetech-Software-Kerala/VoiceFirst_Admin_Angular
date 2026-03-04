@@ -38,7 +38,7 @@ export class Login {
     this.theme = localStorage.getItem('theme');
 
     this.loginForm = this.fb.group({
-      email: ['anil.p@notetech.com', [Validators.required, Validators.email]],
+      email: ['richardantony737@gmail.com', [Validators.required, Validators.email]],
       password: ['123456', [Validators.required, Validators.minLength(6)]],
       remember: [false]
     });
@@ -99,7 +99,6 @@ export class Login {
     } catch (e) {
       console.error('Failed to prepare device payload prior to login', e);
       this.submitting = false;
-      this.toast.error('Could not prepare device profile for login.', 'Error');
     }
   }
 }
