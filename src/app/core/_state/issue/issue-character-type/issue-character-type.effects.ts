@@ -1,24 +1,24 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { ProgramActionActions } from './issue-character-type.action';
+import { IssueCharacterTypeActions } from './issue-character-type.action';
 import { catchError, map, switchMap, of } from 'rxjs';
-import { ProgramActionService } from './issue-character-type.service';
+import { IssueCharacterTypeService } from './issue-character-type.service';
 
 @Injectable()
-export class ProgramActionEffects {
+export class IssueCharacterTypeEffects {
   load$;
 
   constructor(
     private actions$: Actions,
-    private service: ProgramActionService
+    private service: IssueCharacterTypeService
   ) {
     this.load$ = createEffect(() =>
       this.actions$.pipe(
-        ofType(ProgramActionActions.load),
+        ofType(IssueCharacterTypeActions.load),
         switchMap(({ queryParams }) =>
           this.service.getAll(queryParams).pipe(
-            map((paginatedData) => ProgramActionActions.loadSuccess({
-              programActions: paginatedData.items,
+            map((paginatedData) => IssueCharacterTypeActions.loadSuccess({
+              issueCharacterTypes: paginatedData.items,
               totalCount: paginatedData.totalCount,
               pageNumber: paginatedData.pageNumber,
               pageSize: paginatedData.pageSize,
@@ -26,7 +26,7 @@ export class ProgramActionEffects {
             })),
             catchError((err) =>
               of(
-                ProgramActionActions.loadFailure({
+                IssueCharacterTypeActions.loadFailure({
                   error: err?.message ?? 'Load failed',
                 })
               )

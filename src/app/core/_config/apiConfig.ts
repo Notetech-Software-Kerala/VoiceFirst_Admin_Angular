@@ -80,4 +80,9 @@ export const apiConfig = {
     getEmployeeLookup: '/employee/lookup',
     employeeRestore: '/employee/recover',
 
+    //Issue Character Type
+    issueCharacterType: '/issue-character-type',
+    getIssueCharacterTypeLookup: '/issue-character-type/lookup',
+    issueCharacterTypeRestore: '/issue-character-type/recover',
+
 };

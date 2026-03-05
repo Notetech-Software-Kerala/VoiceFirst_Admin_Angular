@@ -1,50 +1,47 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MaterialModule } from '../../../material.module';
-import { ProgramActionModel } from '../../../core/_state/program-action/program-action.model';
+import { MaterialModule } from '../../../../material.module';
+import { IssueCharacterTypeModel } from '../../../../core/_state/issue/issue-character-type/issue-character-type.model';
 import { Store } from '@ngrx/store';
-import { ProgramActionService } from '../../../core/_state/program-action/program-action.service';
-import { ProgramActionActions } from '../../../core/_state/program-action/program-action.action';
-import { ToastService } from '../../../partials/shared_services/toast.service';
-import { UtilityService } from '../../../partials/shared_services/utility.service';
-import { ConfirmationService } from '../../../partials/shared_directives/confirmation';
+import { IssueCharacterTypeService } from '../../../../core/_state/issue/issue-character-type/issue-character-type.service';
+import { IssueCharacterTypeActions } from '../../../../core/_state/issue/issue-character-type/issue-character-type.action';
+import { ToastService } from '../../../../partials/shared_services/toast.service';
+import { UtilityService } from '../../../../partials/shared_services/utility.service';
+import { ConfirmationService } from '../../../../partials/shared_directives/confirmation';
 
 @Component({
-  selector: 'app-add-edit-program-action',
+  selector: 'app-add-edit-issue-character-type',
   imports: [MaterialModule, ReactiveFormsModule],
-  templateUrl: './add-edit-program-action.component.html',
-  styleUrl: './add-edit-program-action.component.css'
+  templateUrl: './add-edit-issue-character-type.html',
+  styleUrl: './add-edit-issue-character-type.css',
 })
-export class AddEditProgramActionComponent implements OnInit {
+export class AddEditIssueCharacterTypeComponent implements OnInit {
   form!: FormGroup;
-  programAction !: ProgramActionModel;
+  issueCharacterType !: IssueCharacterTypeModel;
 
   constructor(
     private fb: FormBuilder,
-    private dialogRef: MatDialogRef<AddEditProgramActionComponent>,
+    private dialogRef: MatDialogRef<AddEditIssueCharacterTypeComponent>,
     private store: Store,
-    private programActionService: ProgramActionService,
+    private issueCharacterTypeService: IssueCharacterTypeService,
     private utilityService: UtilityService,
     private toastService: ToastService,
     private confirmationService: ConfirmationService,
-    @Inject(MAT_DIALOG_DATA) public data: ProgramActionModel | null,
+    @Inject(MAT_DIALOG_DATA) public data: IssueCharacterTypeModel | null,
   ) { }
-
-
 
   ngOnInit() {
     this.formInItialize();
     if (this.data) {
-      this.programAction = this.data;
+      this.issueCharacterType = this.data;
       this.form.patchValue(this.data as Partial<Record<string, any>>);
     }
-
   }
 
   formInItialize() {
     this.form = this.fb.group({
-      actionName: ['', Validators.required],
+      issueCharacterType: ['', Validators.required],
     });
   }
 
@@ -54,16 +51,15 @@ export class AddEditProgramActionComponent implements OnInit {
 
   isSubmitting = false;
 
-  // Form submit function
   onSubmit() {
     if (this.form.valid) {
       this.isSubmitting = true;
       console.log('Form Data:', this.form.value);
 
       if (this.data) {
-        this.updateProgramAction();
+        this.updateIssueCharacterType();
       } else {
-        this.addProgramAction();
+        this.addIssueCharacterType();
       }
 
     } else {
@@ -72,18 +68,17 @@ export class AddEditProgramActionComponent implements OnInit {
     }
   }
 
-  addProgramAction() {
+  addIssueCharacterType() {
     if (this.form.valid) {
-      const newProgramAction = {
-        actionName: this.form.value.actionName,
+      const newIssueCharacterType = {
+        issueCharacterType: this.form.value.issueCharacterType,
       }
-      console.log("payload", newProgramAction);
-      this.programActionService.create(newProgramAction).subscribe({
+      console.log("payload", newIssueCharacterType);
+      this.issueCharacterTypeService.create(newIssueCharacterType).subscribe({
         next: (res) => {
           console.log("response", res);
           if (res.statusCode === 201) {
-            this.toastService.success('Program Action added successfully', 'Success');
-
+            this.toastService.success('Issue Character Type added successfully', 'Success');
             this.closeDialog(res);
           }
           this.isSubmitting = false;
@@ -92,9 +87,9 @@ export class AddEditProgramActionComponent implements OnInit {
           console.log("error", error.error);
           this.isSubmitting = false;
           if (error.error.statusCode === 422) {
-            const existingId = error.error.data?.actionId;
+            const existingId = error.error.data?.issueCharacterTypeId;
             if (existingId) {
-              this.restoreProgramAction(existingId, this.form.value.actionName);
+              this.restoreIssueCharacterType(existingId, this.form.value.issueCharacterType);
             }
           }
         }
@@ -102,17 +97,18 @@ export class AddEditProgramActionComponent implements OnInit {
     }
   }
 
-  updateProgramAction() {
+  updateIssueCharacterType() {
     if (this.form.valid && this.data) {
-      const updatedProgramAction = {
-        actionName: this.form.value.actionName,
+      const updatedIssueCharacterType = {
+        issueCharacterType: this.form.value.issueCharacterType,
+        active: this.data.active
       }
-      console.log("payload", updatedProgramAction);
-      this.programActionService.update(this.data.actionId, updatedProgramAction).subscribe({
+      console.log("payload", updatedIssueCharacterType);
+      this.issueCharacterTypeService.update(this.data.issueCharacterTypeId, updatedIssueCharacterType).subscribe({
         next: (res) => {
           console.log("response", res);
           if (res.statusCode === 200) {
-            this.toastService.success('Program Action updated successfully', 'Success');
+            this.toastService.success('Issue Character Type updated successfully', 'Success');
             this.closeDialog(res);
           }
           this.isSubmitting = false;
@@ -125,13 +121,13 @@ export class AddEditProgramActionComponent implements OnInit {
     }
   }
 
-  restoreProgramAction(id: number, name: string) {
+  restoreIssueCharacterType(id: number, name: string) {
     this.confirmationService.confirmRestore(name, `${name} already available, do you want to restore?`).subscribe(confirmed => {
       if (confirmed) {
-        this.programActionService.restore(id).subscribe({
+        this.issueCharacterTypeService.restore(id).subscribe({
           next: (restoreRes) => {
             if (restoreRes.statusCode === 200) {
-              this.toastService.success('Program Action restored successfully', 'Success');
+              this.toastService.success('Issue Character Type restored successfully', 'Success');
               this.closeDialog(restoreRes);
             }
           },
@@ -143,22 +139,20 @@ export class AddEditProgramActionComponent implements OnInit {
     });
   }
 
-  // Utility to mark all fields as touched to trigger validation messages
   markFormGroupTouched(formGroup: FormGroup) {
     Object.values(formGroup.controls).forEach(control => {
       control.markAsTouched();
       if (control instanceof FormGroup) {
-        this.markFormGroupTouched(control); // Recursively check nested form groups
+        this.markFormGroupTouched(control);
       }
     });
   }
 
-  // Utility function to easily access form control status for display
   get f() {
     return this.form.controls;
   }
 
   get title(): string {
-    return this.data ? 'Edit Program Action' : 'Add Program Action';
+    return this.data ? 'Edit Issue Character Type' : 'Add Issue Character Type';
   }
 }

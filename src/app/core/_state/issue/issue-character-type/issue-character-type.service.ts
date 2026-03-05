@@ -8,7 +8,7 @@ import { ApiResponse, PaginatedData } from '../../../_models/api-response.model'
 import { apiConfig } from '../../../_config/apiConfig';
 
 @Injectable({ providedIn: 'root' })
-export class ProgramActionService {
+export class IssueCharacterTypeService {
   private base = environment.baseUrl;
 
   constructor(private http: HttpClient) { }
@@ -18,7 +18,7 @@ export class ProgramActionService {
       fromObject: queryParams
     });
     return this.http.get<ApiResponse<PaginatedData<IssueCharacterTypeModel>>>(
-      `${this.base}${apiConfig.programAction}`,
+      `${this.base}${apiConfig.issueCharacterType}`,
       { params }
     ).pipe(
       map(response => response.data)
@@ -27,34 +27,34 @@ export class ProgramActionService {
 
   create(data: any): Observable<ApiResponse<IssueCharacterTypeModel>> {
     return this.http.post<ApiResponse<IssueCharacterTypeModel>>(
-      `${this.base}${apiConfig.programAction}`,
+      `${this.base}${apiConfig.issueCharacterType}`,
       data
     )
   }
 
   update(id: number, data: Partial<IssueCharacterTypeModel>): Observable<ApiResponse<IssueCharacterTypeModel>> {
     return this.http.patch<ApiResponse<IssueCharacterTypeModel>>(
-      `${this.base}${apiConfig.programAction}/${id}`,
+      `${this.base}${apiConfig.issueCharacterType}/${id}`,
       data
     )
   }
 
   delete(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(
-      `${this.base}${apiConfig.programAction}/${id}`
+      `${this.base}${apiConfig.issueCharacterType}/${id}`
     );
   }
 
   restore(id: number): Observable<ApiResponse<void>> {
     return this.http.patch<ApiResponse<void>>(
-      `${this.base}${apiConfig.programActionRestore}/${id}`,
+      `${this.base}${apiConfig.issueCharacterTypeRestore}/${id}`,
       {}
     );
   }
 
   lookup(): Observable<ApiResponse<IssueCharacterTypeModel[]>> {
     return this.http.get<ApiResponse<IssueCharacterTypeModel[]>>(
-      `${this.base}${apiConfig.getProgramActionLookup}`
+      `${this.base}${apiConfig.getIssueCharacterTypeLookup}`
     );
   }
 

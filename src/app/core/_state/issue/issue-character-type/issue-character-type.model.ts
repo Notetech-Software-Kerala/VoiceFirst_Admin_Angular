@@ -1,6 +1,6 @@
 export interface IssueCharacterTypeModel {
-  actionId: number;
-  actionName: string;
+  issueCharacterTypeId: number;
+  issueCharacterType: string;
   active: boolean;
   deleted: boolean;
 
@@ -12,5 +12,4 @@ export interface IssueCharacterTypeModel {
 
   deletedUser: string;      // can be empty/space
   deletedDate: string | null;
-  actionLinkId?: number; // Optional linkage ID
 }

@@ -1,49 +1,49 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { adapter } from './issue-character-type.reducer';
-import { ProgramActionState } from './issue-character-type.state';
+import { IssueCharacterTypeState } from './issue-character-type.state';
 
-export const PROGRAM_ACTION_FEATURE_KEY = 'programActions';
+export const ISSUE_CHARACTER_TYPE_FEATURE_KEY = 'issueCharacterTypes';
 
-export const selectProgramActionState =
-  createFeatureSelector<ProgramActionState>(PROGRAM_ACTION_FEATURE_KEY);
+export const selectIssueCharacterTypeState =
+  createFeatureSelector<IssueCharacterTypeState>(ISSUE_CHARACTER_TYPE_FEATURE_KEY);
 
 const {
   selectAll,
   selectEntities,
   selectTotal,
-} = adapter.getSelectors(selectProgramActionState);
+} = adapter.getSelectors(selectIssueCharacterTypeState);
 
-export const selectAllProgramActions = selectAll;
+export const selectAllIssueCharacterTypes = selectAll;
 
-export const selectProgramActionLoading = createSelector(
-  selectProgramActionState,
+export const selectIssueCharacterTypeLoading = createSelector(
+  selectIssueCharacterTypeState,
   state => state.loading
 );
 
-export const selectProgramActionError = createSelector(
-  selectProgramActionState,
+export const selectIssueCharacterTypeError = createSelector(
+  selectIssueCharacterTypeState,
   state => state.error
 );
 
-export const selectProgramActionTotal = selectTotal;
+export const selectIssueCharacterTypeTotal = selectTotal;
 
 // Pagination selectors
-export const selectProgramActionTotalCount = createSelector(
-  selectProgramActionState,
+export const selectIssueCharacterTypeTotalCount = createSelector(
+  selectIssueCharacterTypeState,
   state => state.totalCount
 );
 
-export const selectProgramActionPageNumber = createSelector(
-  selectProgramActionState,
+export const selectIssueCharacterTypePageNumber = createSelector(
+  selectIssueCharacterTypeState,
   state => state.pageNumber
 );
 
-export const selectProgramActionPageSize = createSelector(
-  selectProgramActionState,
+export const selectIssueCharacterTypePageSize = createSelector(
+  selectIssueCharacterTypeState,
   state => state.pageSize
 );
 
-export const selectProgramActionTotalPages = createSelector(
-  selectProgramActionState,
+export const selectIssueCharacterTypeTotalPages = createSelector(
+  selectIssueCharacterTypeState,
   state => state.totalPages
 );

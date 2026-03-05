@@ -5,21 +5,21 @@ import { QueryParameterModel } from '../../../_models/query-parameter.model';
 
 
 
-export const ProgramActionActions = createActionGroup({
-  source: 'Program Action',
+export const IssueCharacterTypeActions = createActionGroup({
+  source: 'Issue Character Type',
 
   events: {
     'Load': props<{ queryParams: QueryParameterModel }>(),
     'Load Success': props<{
-      programActions: IssueCharacterTypeModel[];
+      issueCharacterTypes: IssueCharacterTypeModel[];
       totalCount: number;
       pageNumber: number;
       pageSize: number;
       totalPages: number;
     }>(),
     'Load Failure': props<{ error: string }>(),
-    'Add': props<{ programAction: IssueCharacterTypeModel }>(),
-    'Update': props<{ programAction: Update<IssueCharacterTypeModel> }>(),
+    'Add': props<{ issueCharacterType: IssueCharacterTypeModel }>(),
+    'Update': props<{ issueCharacterType: Update<IssueCharacterTypeModel> }>(),
     'Delete': props<{ id: number }>(),
   },
 });

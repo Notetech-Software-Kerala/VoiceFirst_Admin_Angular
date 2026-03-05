@@ -66,6 +66,10 @@ export const routes: Routes = [
                 loadComponent: () => import('./pages/program-action/program-action').then(m => m.ProgramAction)
             },
             {
+                path: 'issue-character-type',
+                loadComponent: () => import('./pages/issue/issue-character-type/issue-character-type').then(m => m.IssueCharacterTypeComponent)
+            },
+            {
                 path: 'post-office',
                 children: [
                     {

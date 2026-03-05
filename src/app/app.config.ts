@@ -38,6 +38,9 @@ import { PlaceEffects } from './core/_state/place/place.effects';
 import { employeeReducer } from './core/_state/employee/employee.reducer';
 import { EMPLOYEE_FEATURE_KEY } from './core/_state/employee/employee.selectors';
 import { EmployeeEffects } from './core/_state/employee/employee.effects';
+import { ISSUE_CHARACTER_TYPE_FEATURE_KEY } from './core/_state/issue/issue-character-type/issue-character-type.selectors';
+import { issueCharacterTypeReducer } from './core/_state/issue/issue-character-type/issue-character-type.reducer';
+import { IssueCharacterTypeEffects } from './core/_state/issue/issue-character-type/issue-character-type.effects';
 
 
 
@@ -60,7 +63,7 @@ export const appConfig: ApplicationConfig = {
       [MENU_FEATURE_KEY]: menuReducer,
       [PLACE_FEATURE_KEY]: placeReducer,
       [EMPLOYEE_FEATURE_KEY]: employeeReducer,
-
+      [ISSUE_CHARACTER_TYPE_FEATURE_KEY]: issueCharacterTypeReducer,
     }),
     provideEffects([
       BusinessActivityEffects,
@@ -73,6 +76,7 @@ export const appConfig: ApplicationConfig = {
       MenuEffects,
       PlaceEffects,
       EmployeeEffects,
+      IssueCharacterTypeEffects,
 
     ]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })
