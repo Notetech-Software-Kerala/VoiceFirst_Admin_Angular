@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
-
+import { AuthService } from '../../core/_auth/auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UtilityService {
+
+  constructor(private authService: AuthService) { }
 
   copy(text: string): void {
     if (!text) return;
@@ -42,6 +44,14 @@ export class UtilityService {
     if (!queryParams.SortOrder) {
       queryParams.SortOrder = defaultSortOrder;
     }
+  }
+
+  getUser(): any {
+    let user: any = null;
+    this.authService.user$.subscribe(res => {
+      user = res;
+    }).unsubscribe();
+    return user;
   }
 
 }

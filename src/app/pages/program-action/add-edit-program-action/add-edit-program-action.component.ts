@@ -111,7 +111,7 @@ export class AddEditProgramActionComponent implements OnInit {
       this.programActionService.update(this.data.actionId, updatedProgramAction).subscribe({
         next: (res) => {
           console.log("response", res);
-          if (res.statusCode === 200) {
+          if (!res || res.statusCode === 200 || res.statusCode === 204) {
             this.toastService.success('Program Action updated successfully', 'Success');
             this.closeDialog(res);
           }

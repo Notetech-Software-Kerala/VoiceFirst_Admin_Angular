@@ -37,6 +37,7 @@ export class IssueStatusComponent extends BaseListComponent implements OnInit, O
   issueStatuses: IssueStatusModel[] = [];
   loading$!: Observable<boolean>;
   totalCount$!: Observable<number>;
+  isLocalUpdate: boolean = false;
 
   constructor(
     private dialog: MatDialog,
@@ -90,6 +91,7 @@ export class IssueStatusComponent extends BaseListComponent implements OnInit, O
     this.store.select(selectAllIssueStatus)
       .pipe(takeUntil(this.destroy$))
       .subscribe(data => {
+        if (this.isLocalUpdate) return;
         this.issueStatuses = data;
         console.log("Issue Status", this.issueStatuses);
         this.cdr.markForCheck();
@@ -129,7 +131,14 @@ export class IssueStatusComponent extends BaseListComponent implements OnInit, O
                 this.toastService.success('Issue Status deleted successfully', 'Success');
                 const index = this.issueStatuses.findIndex(x => x.issueStatusId === item.issueStatusId);
                 if (index !== -1) {
-                  this.issueStatuses[index] = { ...this.issueStatuses[index], deleted: true };
+                  const userName = this.utilityService.getUser()?.firstName || 'Admin';
+                  this.issueStatuses[index] = {
+                    ...this.issueStatuses[index],
+                    ...((res as any)?.data),
+                    deletedUser: (res as any)?.data?.deletedUser || (res as any)?.data?.deletedBy || userName,
+                    deletedDate: (res as any)?.data?.deletedDate || new Date().toISOString(),
+                    deleted: true
+                  };
                   this.issueStatuses = [...this.issueStatuses];
                   this.cdr.markForCheck();
                 }
@@ -155,7 +164,14 @@ export class IssueStatusComponent extends BaseListComponent implements OnInit, O
                 this.toastService.success('Issue Status restored successfully', 'Success');
                 const index = this.issueStatuses.findIndex(x => x.issueStatusId === item.issueStatusId);
                 if (index !== -1) {
-                  this.issueStatuses[index] = { ...this.issueStatuses[index], deleted: false };
+                  const userName = this.utilityService.getUser()?.firstName || 'Admin';
+                  this.issueStatuses[index] = {
+                    ...this.issueStatuses[index],
+                    ...((res as any)?.data),
+                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy || userName,
+                    modifiedDate: (res as any)?.data?.modifiedDate || new Date().toISOString(),
+                    deleted: false
+                  };
                   this.issueStatuses = [...this.issueStatuses];
                   this.cdr.markForCheck();
                 }
@@ -185,7 +201,14 @@ export class IssueStatusComponent extends BaseListComponent implements OnInit, O
                 this.toastService.success(`Issue Status ${item.active ? 'Suspended' : 'Reinstated'} successfully`, 'Success');
                 const index = this.issueStatuses.findIndex(x => x.issueStatusId === item.issueStatusId);
                 if (index !== -1) {
-                  this.issueStatuses[index] = { ...this.issueStatuses[index], active: status };
+                  const userName = this.utilityService.getUser()?.firstName || 'Admin';
+                  this.issueStatuses[index] = {
+                    ...this.issueStatuses[index],
+                    ...((res as any)?.data),
+                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy || userName,
+                    modifiedDate: (res as any)?.data?.modifiedDate || new Date().toISOString(),
+                    active: status
+                  };
                   this.issueStatuses = [...this.issueStatuses];
                   this.cdr.markForCheck();
                 }
@@ -211,9 +234,11 @@ export class IssueStatusComponent extends BaseListComponent implements OnInit, O
       if (result) {
         if (result.statusCode === 201) {
           // Prepend to array exactly so it renders without reload
+          this.isLocalUpdate = true;
           this.issueStatuses = [result.data, ...this.issueStatuses];
           this.totalCount++;
           this.cdr.markForCheck();
+          setTimeout(() => this.isLocalUpdate = false, 100);
         } else if (result.statusCode === 200) {
           // Replace specific index so it renders without reload
           const index = this.issueStatuses.findIndex(x => x.issueStatusId === result.data.issueStatusId);

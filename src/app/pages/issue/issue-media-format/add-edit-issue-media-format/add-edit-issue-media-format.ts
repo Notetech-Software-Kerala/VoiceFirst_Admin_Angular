@@ -108,7 +108,7 @@ export class AddEditIssueMediaFormat {
           console.log("response", res);
           if (!res || res.statusCode === 200 || res.statusCode === 204) {
             this.toastService.success('Issue Media Format updated successfully', 'Success');
-            this.closeDialog(res || { statusCode: 200, data: { ...this.data, ...updatedIssueMediaFormat } });
+            this.closeDialog(res);
           }
           this.isSubmitting = false;
 

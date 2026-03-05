@@ -37,6 +37,7 @@ export class IssueMediaFormatComponent extends BaseListComponent implements OnIn
   issueMediaFormats: IssueMediaFormatModel[] = [];
   loading$!: Observable<boolean>;
   totalCount$!: Observable<number>;
+  isLocalUpdate: boolean = false;
 
   constructor(
     private dialog: MatDialog,
@@ -90,6 +91,7 @@ export class IssueMediaFormatComponent extends BaseListComponent implements OnIn
     this.store.select(selectAllIssueMediaFormats)
       .pipe(takeUntil(this.destroy$))
       .subscribe(data => {
+        if (this.isLocalUpdate) return;
         this.issueMediaFormats = data;
         console.log("Issue Media Formats", this.issueMediaFormats);
         this.cdr.markForCheck();
@@ -129,7 +131,14 @@ export class IssueMediaFormatComponent extends BaseListComponent implements OnIn
                 this.toastService.success('Issue Media Format deleted successfully', 'Success');
                 const index = this.issueMediaFormats.findIndex(x => x.issueMediaFormatId === item.issueMediaFormatId);
                 if (index !== -1) {
-                  this.issueMediaFormats[index] = { ...this.issueMediaFormats[index], deleted: true };
+                  const userName = this.utilityService.getUser()?.firstName || 'Admin';
+                  this.issueMediaFormats[index] = {
+                    ...this.issueMediaFormats[index],
+                    ...((res as any)?.data),
+                    deletedUser: (res as any)?.data?.deletedUser || (res as any)?.data?.deletedBy || userName,
+                    deletedDate: (res as any)?.data?.deletedDate || new Date().toISOString(),
+                    deleted: true
+                  };
                   this.issueMediaFormats = [...this.issueMediaFormats];
                   this.cdr.markForCheck();
                 }
@@ -155,7 +164,14 @@ export class IssueMediaFormatComponent extends BaseListComponent implements OnIn
                 this.toastService.success('Issue Media Format restored successfully', 'Success');
                 const index = this.issueMediaFormats.findIndex(x => x.issueMediaFormatId === item.issueMediaFormatId);
                 if (index !== -1) {
-                  this.issueMediaFormats[index] = { ...this.issueMediaFormats[index], deleted: false };
+                  const userName = this.utilityService.getUser()?.firstName || 'Admin';
+                  this.issueMediaFormats[index] = {
+                    ...this.issueMediaFormats[index],
+                    ...((res as any)?.data),
+                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy || userName,
+                    modifiedDate: (res as any)?.data?.modifiedDate || new Date().toISOString(),
+                    deleted: false
+                  };
                   this.issueMediaFormats = [...this.issueMediaFormats];
                   this.cdr.markForCheck();
                 }
@@ -185,7 +201,14 @@ export class IssueMediaFormatComponent extends BaseListComponent implements OnIn
                 this.toastService.success(`Issue Media Format ${item.active ? 'Suspended' : 'Reinstated'} successfully`, 'Success');
                 const index = this.issueMediaFormats.findIndex(x => x.issueMediaFormatId === item.issueMediaFormatId);
                 if (index !== -1) {
-                  this.issueMediaFormats[index] = { ...this.issueMediaFormats[index], active: status };
+                  const userName = this.utilityService.getUser()?.firstName || 'Admin';
+                  this.issueMediaFormats[index] = {
+                    ...this.issueMediaFormats[index],
+                    ...((res as any)?.data),
+                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy || userName,
+                    modifiedDate: (res as any)?.data?.modifiedDate || new Date().toISOString(),
+                    active: status
+                  };
                   this.issueMediaFormats = [...this.issueMediaFormats];
                   this.cdr.markForCheck();
                 }
@@ -211,9 +234,11 @@ export class IssueMediaFormatComponent extends BaseListComponent implements OnIn
       if (result) {
         if (result.statusCode === 201) {
           // Prepend to array exactly so it renders without reload
+          this.isLocalUpdate = true;
           this.issueMediaFormats = [result.data, ...this.issueMediaFormats];
           this.totalCount++;
           this.cdr.markForCheck();
+          setTimeout(() => this.isLocalUpdate = false, 100);
         } else if (result.statusCode === 200) {
           // Replace specific index so it renders without reload
           const index = this.issueMediaFormats.findIndex(x => x.issueMediaFormatId === result.data.issueMediaFormatId);

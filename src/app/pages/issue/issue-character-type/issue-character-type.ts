@@ -37,6 +37,7 @@ export class IssueCharacterTypeComponent extends BaseListComponent implements On
   issueCharacterTypes: IssueCharacterTypeModel[] = [];
   loading$!: Observable<boolean>;
   totalCount$!: Observable<number>;
+  isLocalUpdate: boolean = false;
 
   constructor(
     private dialog: MatDialog,
@@ -90,6 +91,7 @@ export class IssueCharacterTypeComponent extends BaseListComponent implements On
     this.store.select(selectAllIssueCharacterTypes)
       .pipe(takeUntil(this.destroy$))
       .subscribe(data => {
+        if (this.isLocalUpdate) return;
         this.issueCharacterTypes = data;
         console.log("Issue Character Types", this.issueCharacterTypes);
         this.cdr.markForCheck();
@@ -129,7 +131,14 @@ export class IssueCharacterTypeComponent extends BaseListComponent implements On
                 this.toastService.success('Issue Character Type deleted successfully', 'Success');
                 const index = this.issueCharacterTypes.findIndex(x => x.issueCharacterTypeId === item.issueCharacterTypeId);
                 if (index !== -1) {
-                  this.issueCharacterTypes[index] = { ...this.issueCharacterTypes[index], deleted: true };
+                  const userName = this.utilityService.getUser()?.firstName || 'Admin';
+                  this.issueCharacterTypes[index] = {
+                    ...this.issueCharacterTypes[index],
+                    ...((res as any)?.data),
+                    deletedUser: (res as any)?.data?.deletedUser || (res as any)?.data?.deletedBy || userName,
+                    deletedDate: (res as any)?.data?.deletedDate || new Date().toISOString(),
+                    deleted: true
+                  };
                   this.issueCharacterTypes = [...this.issueCharacterTypes];
                   this.cdr.markForCheck();
                 }
@@ -155,7 +164,14 @@ export class IssueCharacterTypeComponent extends BaseListComponent implements On
                 this.toastService.success('Issue Character Type restored successfully', 'Success');
                 const index = this.issueCharacterTypes.findIndex(x => x.issueCharacterTypeId === item.issueCharacterTypeId);
                 if (index !== -1) {
-                  this.issueCharacterTypes[index] = { ...this.issueCharacterTypes[index], deleted: false };
+                  const userName = this.utilityService.getUser()?.firstName || 'Admin';
+                  this.issueCharacterTypes[index] = {
+                    ...this.issueCharacterTypes[index],
+                    ...((res as any)?.data),
+                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy || userName,
+                    modifiedDate: (res as any)?.data?.modifiedDate || new Date().toISOString(),
+                    deleted: false
+                  };
                   this.issueCharacterTypes = [...this.issueCharacterTypes];
                   this.cdr.markForCheck();
                 }
@@ -185,7 +201,14 @@ export class IssueCharacterTypeComponent extends BaseListComponent implements On
                 this.toastService.success(`Issue Character Type ${item.active ? 'Suspended' : 'Reinstated'} successfully`, 'Success');
                 const index = this.issueCharacterTypes.findIndex(x => x.issueCharacterTypeId === item.issueCharacterTypeId);
                 if (index !== -1) {
-                  this.issueCharacterTypes[index] = { ...this.issueCharacterTypes[index], active: status };
+                  const userName = this.utilityService.getUser()?.firstName || 'Admin';
+                  this.issueCharacterTypes[index] = {
+                    ...this.issueCharacterTypes[index],
+                    ...((res as any)?.data),
+                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy || userName,
+                    modifiedDate: (res as any)?.data?.modifiedDate || new Date().toISOString(),
+                    active: status
+                  };
                   this.issueCharacterTypes = [...this.issueCharacterTypes];
                   this.cdr.markForCheck();
                 }
@@ -211,9 +234,11 @@ export class IssueCharacterTypeComponent extends BaseListComponent implements On
       if (result) {
         if (result.statusCode === 201) {
           // Prepend to array exactly so it renders without reload
+          this.isLocalUpdate = true;
           this.issueCharacterTypes = [result.data, ...this.issueCharacterTypes];
           this.totalCount++;
           this.cdr.markForCheck();
+          setTimeout(() => this.isLocalUpdate = false, 100);
         } else if (result.statusCode === 200) {
           // Replace specific index so it renders without reload
           const index = this.issueCharacterTypes.findIndex(x => x.issueCharacterTypeId === result.data.issueCharacterTypeId);

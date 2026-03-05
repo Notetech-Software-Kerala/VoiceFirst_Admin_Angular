@@ -33,16 +33,16 @@ export class AddEditBusinessActivity implements OnInit {
     if (this.data) {
       this.businessActivity = this.data;
       this.form.patchValue({
-        ActivityName: this.data.activityName,
-        Active: this.data.active
+        activityName: this.data.activityName,
+        active: this.data.active
       });
     }
   }
 
   formInItialize() {
     this.form = this.fb.group({
-      ActivityName: ['', Validators.required],
-      Active: [true],
+      activityName: ['', Validators.required],
+      active: [true],
     });
   }
 
@@ -60,8 +60,8 @@ export class AddEditBusinessActivity implements OnInit {
     const formValue = this.form.value;
 
     const payload: any = {
-      ActivityName: formValue.ActivityName,
-      Active: formValue.Active ?? true
+      activityName: formValue.activityName,
+      active: formValue.active ?? true
     };
 
     if (this.data) {
@@ -88,7 +88,7 @@ export class AddEditBusinessActivity implements OnInit {
           if (err.error.statusCode === 422) {
             const existingId = err.error.data?.activityId;
             if (existingId) {
-              this.restoreBusinessActivity(existingId, payload.ActivityName);
+              this.restoreBusinessActivity(existingId, payload.activityName);
             }
           }
         }
@@ -100,7 +100,7 @@ export class AddEditBusinessActivity implements OnInit {
       .pipe(finalize(() => this.isSubmitting = false))
       .subscribe({
         next: (res) => {
-          if (res.statusCode === 200) {
+          if (!res || res.statusCode === 200 || res.statusCode === 204) {
             this.toastService.success('Business Activity updated successfully', 'Success');
             this.closeDialog(res);
           }

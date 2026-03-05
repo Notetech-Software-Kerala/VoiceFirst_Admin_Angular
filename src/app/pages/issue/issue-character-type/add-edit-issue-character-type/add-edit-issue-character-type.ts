@@ -109,7 +109,7 @@ export class AddEditIssueCharacterTypeComponent implements OnInit {
           console.log("response", res);
           if (!res || res.statusCode === 200 || res.statusCode === 204) {
             this.toastService.success('Issue Character Type updated successfully', 'Success');
-            this.closeDialog(res || { statusCode: 200, data: { ...this.data, ...updatedIssueCharacterType } });
+            this.closeDialog(res);
           }
           this.isSubmitting = false;
 

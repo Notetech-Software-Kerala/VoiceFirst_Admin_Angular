@@ -37,6 +37,7 @@ export class IssueMediaTypeComponent extends BaseListComponent implements OnInit
   issueMediaTypes: IssueMediaTypeModel[] = [];
   loading$!: Observable<boolean>;
   totalCount$!: Observable<number>;
+  isLocalUpdate: boolean = false;
 
   constructor(
     private dialog: MatDialog,
@@ -90,6 +91,7 @@ export class IssueMediaTypeComponent extends BaseListComponent implements OnInit
     this.store.select(selectAllIssueMediaTypes)
       .pipe(takeUntil(this.destroy$))
       .subscribe(data => {
+        if (this.isLocalUpdate) return;
         this.issueMediaTypes = data;
         console.log("Issue Media Types", this.issueMediaTypes);
         this.cdr.markForCheck();
@@ -129,7 +131,14 @@ export class IssueMediaTypeComponent extends BaseListComponent implements OnInit
                 this.toastService.success('Issue Media Type deleted successfully', 'Success');
                 const index = this.issueMediaTypes.findIndex(x => x.issueMediaTypeId === item.issueMediaTypeId);
                 if (index !== -1) {
-                  this.issueMediaTypes[index] = { ...this.issueMediaTypes[index], deleted: true };
+                  const userName = this.utilityService.getUser()?.firstName || 'Admin';
+                  this.issueMediaTypes[index] = {
+                    ...this.issueMediaTypes[index],
+                    ...((res as any)?.data),
+                    deletedUser: (res as any)?.data?.deletedUser || (res as any)?.data?.deletedBy || userName,
+                    deletedDate: (res as any)?.data?.deletedDate || new Date().toISOString(),
+                    deleted: true
+                  };
                   this.issueMediaTypes = [...this.issueMediaTypes];
                   this.cdr.markForCheck();
                 }
@@ -155,7 +164,14 @@ export class IssueMediaTypeComponent extends BaseListComponent implements OnInit
                 this.toastService.success('Issue Media Type restored successfully', 'Success');
                 const index = this.issueMediaTypes.findIndex(x => x.issueMediaTypeId === item.issueMediaTypeId);
                 if (index !== -1) {
-                  this.issueMediaTypes[index] = { ...this.issueMediaTypes[index], deleted: false };
+                  const userName = this.utilityService.getUser()?.firstName || 'Admin';
+                  this.issueMediaTypes[index] = {
+                    ...this.issueMediaTypes[index],
+                    ...((res as any)?.data),
+                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy || userName,
+                    modifiedDate: (res as any)?.data?.modifiedDate || new Date().toISOString(),
+                    deleted: false
+                  };
                   this.issueMediaTypes = [...this.issueMediaTypes];
                   this.cdr.markForCheck();
                 }
@@ -185,7 +201,14 @@ export class IssueMediaTypeComponent extends BaseListComponent implements OnInit
                 this.toastService.success(`Issue Media Type ${item.active ? 'Suspended' : 'Reinstated'} successfully`, 'Success');
                 const index = this.issueMediaTypes.findIndex(x => x.issueMediaTypeId === item.issueMediaTypeId);
                 if (index !== -1) {
-                  this.issueMediaTypes[index] = { ...this.issueMediaTypes[index], active: status };
+                  const userName = this.utilityService.getUser()?.firstName || 'Admin';
+                  this.issueMediaTypes[index] = {
+                    ...this.issueMediaTypes[index],
+                    ...((res as any)?.data),
+                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy || userName,
+                    modifiedDate: (res as any)?.data?.modifiedDate || new Date().toISOString(),
+                    active: status
+                  };
                   this.issueMediaTypes = [...this.issueMediaTypes];
                   this.cdr.markForCheck();
                 }
@@ -211,9 +234,11 @@ export class IssueMediaTypeComponent extends BaseListComponent implements OnInit
       if (result) {
         if (result.statusCode === 201) {
           // Prepend to array exactly so it renders without reload
+          this.isLocalUpdate = true;
           this.issueMediaTypes = [result.data, ...this.issueMediaTypes];
           this.totalCount++;
           this.cdr.markForCheck();
+          setTimeout(() => this.isLocalUpdate = false, 100);
         } else if (result.statusCode === 200) {
           // Replace specific index so it renders without reload
           const index = this.issueMediaTypes.findIndex(x => x.issueMediaTypeId === result.data.issueMediaTypeId);
