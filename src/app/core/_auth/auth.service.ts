@@ -2,7 +2,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, map, tap, of } from 'rxjs';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { catchError, finalize, map, tap } from 'rxjs/operators';
 import { TokenStore } from './token.store';
 import { environment } from '../../environment/environment';
 import { ApiResponse, LoginData, LoginRequest, RefreshData, UserInfo } from './auth.model';
@@ -15,83 +16,108 @@ export class AuthService {
     private userSubject = new BehaviorSubject<UserInfo | null>(null);
     user$ = this.userSubject.asObservable();
 
-    constructor(private http: HttpClient, private tokenStore: TokenStore, private router: Router) {
-        const token = this.tokenStore.getToken();
-        const expiresAtMs = this.tokenStore.getExpiresAtUtcMs();
+    private refreshTokenTimeout: any;
 
-        if (token && expiresAtMs) {
-            // Restores the UserInfo subject and starts the background timer natively
-            this.setSession(token, new Date(expiresAtMs).toISOString());
+    // ✅ prevents multiple simultaneous refresh calls (timer + interceptor + guards)
+    private refreshInFlight?: Observable<string>;
+
+    constructor(
+        private http: HttpClient,
+        private tokenStore: TokenStore,
+        private router: Router
+    ) {
+        // Restore from localStorage (access token only)
+        const token = this.tokenStore.getToken();
+
+        if (token) {
+            this.restoreUserFromToken(token);
+
+            // If token is near expiry, try refresh immediately (cookie-based)
+            if (this.tokenStore.isExpiredOrNearExpiry()) {
+                this.refresh().subscribe({
+                    error: () => this.clearSession()
+                });
+            } else {
+                this.startRefreshTokenTimer();
+            }
         }
     }
 
+    /** -----------------------------
+     *  Session / User restore helpers
+     *  ----------------------------- */
 
-    private refreshTokenTimeout: any;
-
-    private setSession(accessToken: string, expiresAt: string) {
-        this.tokenStore.set(accessToken, expiresAt);
-
-        // Decode JWT payload to extract user info
-        let tokenData: any = {};
-        try {
-            const base64Url = accessToken.split('.')[1];
-            if (base64Url) {
-                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join(''));
-                tokenData = JSON.parse(jsonPayload);
-                console.log("Token Data", tokenData);
-
-            }
-        } catch (e) {
-            console.error('Failed to parse JWT token', e);
-        }
+    private restoreUserFromToken(accessToken: string) {
+        const tokenData = this.decodeJwt(accessToken);
 
         this.userSubject.next({
             userId: Number(tokenData.sub) || 0,
             firstName: tokenData.firstName || '',
             lastName: tokenData.lastName || '',
             email: tokenData.email || '',
-            mobileNo: tokenData.mobileNo || '',
+            mobileNo: tokenData.mobileNo || ''
         });
+    }
 
+    private setSession(accessToken: string, expiresAtUtcIso: string) {
+        // Persist token + expiry
+        this.tokenStore.set(accessToken, expiresAtUtcIso);
+
+        // Update user subject
+        this.restoreUserFromToken(accessToken);
+
+        // Restart proactive refresh timer
         this.startRefreshTokenTimer();
     }
 
+    private decodeJwt(token: string): any {
+        try {
+            const base64Url = token.split('.')[1];
+            if (!base64Url) return {};
+
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(
+                window
+                    .atob(base64)
+                    .split('')
+                    .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                    .join('')
+            );
+
+            return JSON.parse(jsonPayload);
+        } catch (e) {
+            console.error('[AuthService] Failed to decode JWT', e);
+            return {};
+        }
+    }
+
+    /** -----------------------------
+     *  Proactive refresh timer
+     *  ----------------------------- */
+
     private startRefreshTokenTimer() {
-        const expiresAt = this.tokenStore.getExpiresAtUtcMs();
-        if (!expiresAt) return;
+        const expiresAtMs = this.tokenStore.getExpiresAtUtcMs();
+        if (!expiresAtMs) return;
 
-        // Calculate time remaining until token expires
-        const expiresTime = expiresAt;
-        const currentTime = Date.now();
+        const now = Date.now();
+        // refresh 30 seconds before expiry
+        const timeoutMs = (expiresAtMs - now) - 30_000;
 
-        // Refresh 30 seconds before expiration
-        const timeout = (expiresTime - currentTime) - (30 * 1000);
-        console.log("Timeout", timeout);
-
-        // Clear any existing timeout
         this.stopRefreshTokenTimer();
 
-        if (timeout > 0) {
-
-            this.refreshTokenTimeout = setTimeout(() => {
-                console.log('[AuthService] Proactive token refresh triggered!', timeout);
-                // We subscribe here because setTimeout requires a trigger, we don't return the observable
-                this.refresh().subscribe({
-                    error: (err) => {
-                        console.error('[AuthService] Proactive token refresh failed', err);
-                        this.clearSession(); // Fallback if refresh fails
-                    }
-                });
-            }, timeout);
-        } else {
-            console.warn('[AuthService] Token is already expired or expiring very soon! Attempting immediate refresh.');
+        if (timeoutMs <= 0) {
+            // already expired / very close -> refresh now
             this.refresh().subscribe({
                 error: () => this.clearSession()
             });
+            return;
         }
+
+        this.refreshTokenTimeout = setTimeout(() => {
+            this.refresh().subscribe({
+                error: () => this.clearSession()
+            });
+        }, timeoutMs);
     }
 
     private stopRefreshTokenTimer() {
@@ -101,51 +127,71 @@ export class AuthService {
         }
     }
 
+    /** -----------------------------
+     *  Public API
+     *  ----------------------------- */
+
+    // ✅ must include withCredentials so refresh cookie can be stored
     login(req: LoginRequest): Observable<UserInfo> {
         return this.http
-            .post<ApiResponse<LoginData>>(`${this.base}${apiConfig.login}`, req)
+            .post<ApiResponse<LoginData>>(`${this.base}${apiConfig.login}`, req, {
+                withCredentials: true
+            })
             .pipe(
-                tap(res => {
-                    this.setSession(res.data.accessToken, res.data.accessTokenExpiresAtUtc);
-                }),
-                map(res => {
-                    const decodedUser = this.userSubject.value;
-                    return decodedUser as UserInfo;
+                tap(res => this.setSession(res.data.accessToken, res.data.accessTokenExpiresAtUtc)),
+                map(() => this.userSubject.value as UserInfo)
+            );
+    }
+
+    /**
+     * ✅ Refresh token call: backend validates HttpOnly cookie and returns new access token.
+     * Must use withCredentials so browser sends refresh cookie.
+     * Also guarded so multiple calls collapse into one.
+     */
+    refresh(): Observable<string> {
+        if (this.refreshInFlight) return this.refreshInFlight;
+
+        this.refreshInFlight = this.http
+            .post<ApiResponse<RefreshData>>(`${this.base}${apiConfig.refresh}`, {}, {
+                withCredentials: true
+            })
+            .pipe(
+                tap(res => this.setSession(res.data.accessToken, res.data.accessTokenExpiresAtUtc)),
+                map(res => res.data.accessToken),
+                finalize(() => (this.refreshInFlight = undefined))
+            );
+
+        return this.refreshInFlight;
+    }
+
+    // ✅ withCredentials so backend can clear/blacklist refresh cookie
+    logout(): Observable<void> {
+        return this.http
+            .post(`${this.base}${apiConfig.logout}`, {}, { withCredentials: true })
+            .pipe(
+                tap(() => this.clearSession()),
+                map(() => void 0),
+                catchError(err => {
+                    // Even if logout fails, clear local session (best-effort)
+                    this.clearSession();
+                    return throwError(() => err);
                 })
             );
     }
 
     /**
-     * Refresh token call: backend uses HttpOnly cookie to validate and returns new access token.
-     * Angular can't read cookie; just sends it via withCredentials.
-     */
-    refresh(): Observable<string> {
-        return this.http
-            .post<ApiResponse<RefreshData>>(`${this.base}${apiConfig.refresh}`, {})
-            .pipe(
-                tap(res => this.setSession(res.data.accessToken, res.data.accessTokenExpiresAtUtc)),
-                map(res => res.data.accessToken)
-            );
-    }
-
-    logout(): Observable<void> {
-        return this.http
-            .post(`${this.base}${apiConfig.logout}`, {}, { withCredentials: true })
-            .pipe(
-                tap(() => {
-                    this.clearSession(); // Let clearSession handle the store and routing
-                }),
-                map(() => void 0)
-            );
-    }
-
-    /**
-     * Call on app start:
-     * - Restores session from localStorage if present (handled in constructor).
-     * - No longer blindly forces an API refresh unless the token is already expired.
+     * Call on app start (e.g., APP_INITIALIZER):
+     * - If access token exists and not near expiry -> ok
+     * - Else try refresh once -> ok if cookie valid
      */
     bootstrapSession(): Observable<boolean> {
-        return of(!!this.getAccessToken());
+        const token = this.getAccessToken();
+        if (token && !this.isTokenExpiredOrNearExpiry()) return of(true);
+
+        return this.refresh().pipe(
+            map(() => true),
+            catchError(() => of(false))
+        );
     }
 
     getAccessToken(): string | null {
@@ -158,6 +204,7 @@ export class AuthService {
 
     clearSession() {
         this.stopRefreshTokenTimer();
+        this.refreshInFlight = undefined;
         this.tokenStore.clear();
         this.userSubject.next(null);
         this.router.navigate(['/login']);

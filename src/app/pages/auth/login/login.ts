@@ -65,14 +65,13 @@ export class Login {
       // 1. Collect OS/Browser/Device info
       const rawDevice = await this.deviceService.collect();
       console.log('rawDevice', rawDevice);
-      // 2. Map payload specifically matching the new LoginRequest format
       const payload = {
         email: this.loginForm.value.email,
         password: this.loginForm.value.password,
         clientType: 'Web',
         device: {
           deviceID: rawDevice.deviceID,
-          version: 1, // Fixed version for initial deployment parsing
+          version: 1,
           deviceName: rawDevice.deviceName,
           deviceType: rawDevice.deviceType,
           os: rawDevice.os,

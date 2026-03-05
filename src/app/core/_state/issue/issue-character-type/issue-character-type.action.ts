@@ -1,7 +1,8 @@
 import { createActionGroup, props } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
 import { IssueCharacterTypeModel } from './issue-character-type.model';
-import { QueryParameterModel } from '../../_models/query-parameter.model';
+import { QueryParameterModel } from '../../../_models/query-parameter.model';
+
 
 
 export const ProgramActionActions = createActionGroup({
