@@ -18,7 +18,7 @@ export class IssueMediaTypeService {
       fromObject: queryParams
     });
     return this.http.get<ApiResponse<PaginatedData<IssueMediaTypeModel>>>(
-      `${this.base}${apiConfig.issueMediaFormat}`,
+      `${this.base}${apiConfig.issueMediaType}`,
       { params }
     ).pipe(
       map(response => response.data)
@@ -27,34 +27,34 @@ export class IssueMediaTypeService {
 
   create(data: any): Observable<ApiResponse<IssueMediaTypeModel>> {
     return this.http.post<ApiResponse<IssueMediaTypeModel>>(
-      `${this.base}${apiConfig.issueMediaFormat}`,
+      `${this.base}${apiConfig.issueMediaType}`,
       data
     )
   }
 
   update(id: number, data: Partial<IssueMediaTypeModel>): Observable<ApiResponse<IssueMediaTypeModel>> {
     return this.http.patch<ApiResponse<IssueMediaTypeModel>>(
-      `${this.base}${apiConfig.issueMediaFormat}/${id}`,
+      `${this.base}${apiConfig.issueMediaType}/${id}`,
       data
     )
   }
 
   delete(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(
-      `${this.base}${apiConfig.issueMediaFormat}/${id}`
+      `${this.base}${apiConfig.issueMediaType}/${id}`
     );
   }
 
   restore(id: number): Observable<ApiResponse<void>> {
     return this.http.patch<ApiResponse<void>>(
-      `${this.base}${apiConfig.issueMediaFormatRestore}/${id}`,
+      `${this.base}${apiConfig.issueMediaTypeRestore}/${id}`,
       {}
     );
   }
 
   lookup(): Observable<ApiResponse<IssueMediaTypeModel[]>> {
     return this.http.get<ApiResponse<IssueMediaTypeModel[]>>(
-      `${this.base}${apiConfig.getIssueMediaFormatLookup}`
+      `${this.base}${apiConfig.getIssueMediaTypeLookup}`
     );
   }
 

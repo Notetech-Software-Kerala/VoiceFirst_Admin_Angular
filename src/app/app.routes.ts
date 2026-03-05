@@ -74,6 +74,10 @@ export const routes: Routes = [
                 loadComponent: () => import('./pages/issue/issue-media-type/issue-media-type').then(m => m.IssueMediaTypeComponent)
             },
             {
+                path: 'issue-status',
+                loadComponent: () => import('./pages/issue/issue-status/issue-status').then(m => m.IssueStatusComponent)
+            },
+            {
                 path: 'post-office',
                 children: [
                     {

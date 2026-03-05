@@ -6,7 +6,7 @@ import { IssueMediaTypeModel } from './issue-media-type.model';
 
 export const adapter: EntityAdapter<IssueMediaTypeModel> =
   createEntityAdapter<IssueMediaTypeModel>({
-    selectId: a => a.issueMediaFormatId,
+    selectId: a => a.issueMediaTypeId,
   });
 
 export const initialState: IssueMediaTypeState =

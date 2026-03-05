@@ -23,6 +23,7 @@ export const MENU_CONFIG: MenuItem[] = [
     children: [
       { id: 81, label: 'Issue Character Type', route: '/issue-character-type', icon: 'group' },
       { id: 82, label: 'Issue Media Type', route: '/issue-media-type', icon: 'perm_media' },
+      { id: 83, label: 'Issue Status', route: '/issue-status', icon: 'check_circle' },
     ],
   },
   {

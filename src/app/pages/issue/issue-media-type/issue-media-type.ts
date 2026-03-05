@@ -53,7 +53,7 @@ export class IssueMediaTypeComponent extends BaseListComponent implements OnInit
     super(router, route, encryptionService, cdr);
 
     this.searchByOptions = [
-      { label: 'Media Type', value: 'IssueMediaFormat' },
+      { label: 'Media Type', value: 'IssueMediaType' },
       { label: 'Created By', value: 'CreatedUser' },
       { label: 'Updated By', value: 'UpdatedUser' },
       { label: 'Deleted By', value: 'DeletedUser' }
@@ -118,11 +118,11 @@ export class IssueMediaTypeComponent extends BaseListComponent implements OnInit
   }
 
   onDelete(item: IssueMediaTypeModel) {
-    this.confirmationService.confirmDelete(item.issueMediaFormat)
+    this.confirmationService.confirmDelete(item.issueMediaType)
       .pipe(takeUntil(this.destroy$))
       .subscribe(confirmed => {
         if (confirmed) {
-          this.issueMediaTypeService.delete(item.issueMediaFormatId).subscribe({
+          this.issueMediaTypeService.delete(item.issueMediaTypeId).subscribe({
             next: (res) => {
               console.log("response", res);
               if (res.statusCode === 200) {
@@ -139,11 +139,11 @@ export class IssueMediaTypeComponent extends BaseListComponent implements OnInit
   }
 
   onRestore(item: IssueMediaTypeModel) {
-    this.confirmationService.confirmRestore(item.issueMediaFormat)
+    this.confirmationService.confirmRestore(item.issueMediaType)
       .pipe(takeUntil(this.destroy$))
       .subscribe(confirmed => {
         if (confirmed) {
-          this.issueMediaTypeService.restore(item.issueMediaFormatId).subscribe({
+          this.issueMediaTypeService.restore(item.issueMediaTypeId).subscribe({
             next: (res) => {
               console.log("response", res);
               if (res.statusCode === 200) {
@@ -161,21 +161,21 @@ export class IssueMediaTypeComponent extends BaseListComponent implements OnInit
 
   onSuspend(item: IssueMediaTypeModel) {
     const status = item.active ? false : true;
-    this.confirmationService.confirmSuspend(item.issueMediaFormat, status)
+    this.confirmationService.confirmSuspend(item.issueMediaType, status)
       .pipe(takeUntil(this.destroy$))
       .subscribe(confirmed => {
         if (confirmed) {
           const updatedIssueMediaType = {
             active: status,
           }
-          this.issueMediaTypeService.update(item.issueMediaFormatId, updatedIssueMediaType).subscribe({
+          this.issueMediaTypeService.update(item.issueMediaTypeId, updatedIssueMediaType).subscribe({
             next: (res) => {
               console.log("response", res);
               if (res.statusCode === 200) {
                 this.toastService.success(`Issue Media Type ${item.active ? 'Suspended' : 'Reinstated'} successfully`, 'Success');
                 this.store.dispatch(IssueMediaTypeActions.update({
                   issueMediaType: {
-                    id: item.issueMediaFormatId,
+                    id: item.issueMediaTypeId,
                     changes: updatedIssueMediaType
                   }
                 }));
@@ -206,7 +206,7 @@ export class IssueMediaTypeComponent extends BaseListComponent implements OnInit
           this.cdr.markForCheck();
         } else if (result.statusCode === 200) {
           // Replace specific index so it renders without reload
-          const index = this.issueMediaTypes.findIndex(x => x.issueMediaFormatId === result.data.issueMediaFormatId);
+          const index = this.issueMediaTypes.findIndex(x => x.issueMediaTypeId === result.data.issueMediaTypeId);
           if (index !== -1) {
             this.issueMediaTypes[index] = { ...this.issueMediaTypes[index], ...result.data };
           }
@@ -227,7 +227,7 @@ export class IssueMediaTypeComponent extends BaseListComponent implements OnInit
       console.log('Dialog Result in Parent:', result);
       if (result) {
         // Replace specific index so it renders without reload
-        const index = this.issueMediaTypes.findIndex(x => x.issueMediaFormatId === result.data.issueMediaFormatId);
+        const index = this.issueMediaTypes.findIndex(x => x.issueMediaTypeId === result.data.issueMediaTypeId);
         if (index !== -1) {
           this.issueMediaTypes[index] = { ...this.issueMediaTypes[index], ...result.data };
         }

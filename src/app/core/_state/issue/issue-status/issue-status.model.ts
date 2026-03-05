@@ -1,6 +1,6 @@
-export interface IssueMediaTypeModel {
-  issueMediaTypeId: number;
-  issueMediaType: string;
+export interface IssueStatusModel {
+  issueStatusId: number;
+  issueStatus: string;
   active: boolean;
   deleted: boolean;
 

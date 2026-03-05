@@ -58,7 +58,7 @@
         <table class="table align-middle">
             <thead class="table-light">
                 <tr>
-                    <th appSortableColumn="issueMediaFormat" [sortBy]="queryParams.SortBy"
+                    <th appSortableColumn="issueMediaType" [sortBy]="queryParams.SortBy"
                         [sortOrder]="queryParams.SortOrder" (sortChange)="onSortChange($event)">
                         Media Type
                     </th>
@@ -73,9 +73,9 @@
             </thead>
 
             <tbody>
-                @for (item of issueMediaTypes; track item.issueMediaFormatId) {
+                @for (item of issueMediaTypes; track item.issueMediaTypeId) {
                 <tr>
-                    <td>{{ item.issueMediaFormat }}</td>
+                    <td>{{ item.issueMediaType }}</td>
 
                     <td><app-status-badge [item]="item"></app-status-badge></td>
 

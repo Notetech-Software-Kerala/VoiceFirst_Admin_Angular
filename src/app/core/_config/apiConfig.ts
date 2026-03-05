@@ -90,4 +90,14 @@ export const apiConfig = {
     getIssueMediaFormatLookup: '/issue-media-format/lookup',
     issueMediaFormatRestore: '/issue-media-format/recover',
 
+    //Issue Media Type
+    issueMediaType: '/issue-media-type',
+    getIssueMediaTypeLookup: '/issue-media-type/lookup',
+    issueMediaTypeRestore: '/issue-media-type/recover',
+
+    //Issue Status
+    issueStatus: '/issue-status',
+    getIssueStatusLookup: '/issue-status/lookup',
+    issueStatusRestore: '/issue-status/recover',
+
 };
