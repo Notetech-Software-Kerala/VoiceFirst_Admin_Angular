@@ -82,6 +82,10 @@ export const routes: Routes = [
                 loadComponent: () => import('./pages/issue/issue-status/issue-status').then(m => m.IssueStatusComponent)
             },
             {
+                path: 'issue-type',
+                loadComponent: () => import('./pages/issue/issue-type/issue-type-list/issue-type-list').then(m => m.IssueTypeList)
+            },
+            {
                 path: 'post-office',
                 children: [
                     {

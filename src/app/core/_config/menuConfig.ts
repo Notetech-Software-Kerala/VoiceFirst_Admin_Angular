@@ -25,6 +25,7 @@ export const MENU_CONFIG: MenuItem[] = [
       { id: 82, label: 'Issue Media Type', route: '/issue-media-type', icon: 'perm_media' },
       { id: 83, label: 'Issue Status', route: '/issue-status', icon: 'check_circle' },
       { id: 84, label: 'Issue Media Format', route: '/issue-media-format', icon: 'perm_media' },
+      { id: 85, label: 'Issue Type', route: '/issue-type', icon: 'question_mark' },
     ],
   },
   {

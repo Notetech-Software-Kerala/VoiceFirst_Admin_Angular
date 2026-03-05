@@ -1,40 +1,40 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { IssueStatusActions } from '../../../core/_state/issue/issue-status/issue-status.action';
-import { IssueStatusModel } from '../../../core/_state/issue/issue-status/issue-status.model';
+import { IssueTypeActions } from '../../../../core/_state/issue/issue-type/issue-type.action';
+import { IssueTypeModel } from '../../../../core/_state/issue/issue-type/issue-type.model';
 import {
-  selectAllIssueStatus,
-  selectIssueStatusLoading,
-  selectIssueStatusTotalCount,
-  selectIssueStatusTotalPages
-} from '../../../core/_state/issue/issue-status/issue-status.selectors';
-import { SearchBar } from '../../../partials/shared_modules/search-bar/search-bar';
-import { Pagination } from '../../../partials/shared_modules/pagination/pagination';
-import { StatusBadge } from '../../../partials/shared_modules/status-badge/status-badge';
-import { SortableColumnDirective } from '../../../partials/shared_directives/sortable-column';
-import { MaterialModule } from '../../../material.module';
+  selectAllIssueType,
+  selectIssueTypeLoading,
+  selectIssueTypeTotalCount,
+  selectIssueTypeTotalPages
+} from '../../../../core/_state/issue/issue-type/issue-type.selectors';
+import { SearchBar } from '../../../../partials/shared_modules/search-bar/search-bar';
+import { Pagination } from '../../../../partials/shared_modules/pagination/pagination';
+import { StatusBadge } from '../../../../partials/shared_modules/status-badge/status-badge';
+import { SortableColumnDirective } from '../../../../partials/shared_directives/sortable-column';
+import { MaterialModule } from '../../../../material.module';
 import { takeUntil, Observable } from 'rxjs';
-import { ConfirmationService } from '../../../partials/shared_directives/confirmation';
-import { AddEditIssueStatus } from './add-edit-issue-status/add-edit-issue-status';
-import { FilterBy, FilterOption } from '../../../partials/shared_modules/filter-by/filter-by';
-import { UtilityService } from '../../../partials/shared_services/utility.service';
-import { IssueStatusService } from '../../../core/_state/issue/issue-status/issue-status.service';
-import { ToastService } from '../../../partials/shared_services/toast.service';
+import { ConfirmationService } from '../../../../partials/shared_directives/confirmation';
+import { FilterBy, FilterOption } from '../../../../partials/shared_modules/filter-by/filter-by';
+import { UtilityService } from '../../../../partials/shared_services/utility.service';
+import { IssueTypeService } from '../../../../core/_state/issue/issue-type/issue-type.service';
+import { ToastService } from '../../../../partials/shared_services/toast.service';
 import { CommonModule } from '@angular/common';
-import { BaseListComponent } from '../../../core/base/base-list.component';
+import { BaseListComponent } from '../../../../core/base/base-list.component';
 import { ActivatedRoute, Router } from '@angular/router';
-import { EncryptionService } from '../../../partials/shared_services/encryption.service';
+import { EncryptionService } from '../../../../partials/shared_services/encryption.service';
+import { AddEditIssueType } from '../add-edit-issue-type/add-edit-issue-type';
 
 @Component({
-  selector: 'app-issue-status',
+  selector: 'app-issue-type-list',
   imports: [SearchBar, Pagination, StatusBadge, SortableColumnDirective, MaterialModule, FilterBy, CommonModule],
-  templateUrl: './issue-status.html',
-  styleUrl: './issue-status.css',
+  templateUrl: './issue-type-list.html',
+  styleUrl: './issue-type-list.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class IssueStatusComponent extends BaseListComponent implements OnInit, OnDestroy {
-  issueStatuses: IssueStatusModel[] = [];
+export class IssueTypeList extends BaseListComponent implements OnInit, OnDestroy {
+  issueTypes: IssueTypeModel[] = [];
   loading$!: Observable<boolean>;
   totalCount$!: Observable<number>;
   isLocalUpdate: boolean = false;
@@ -45,7 +45,7 @@ export class IssueStatusComponent extends BaseListComponent implements OnInit, O
     protected override cdr: ChangeDetectorRef,
     private confirmationService: ConfirmationService,
     public utilityService: UtilityService,
-    private issueStatusService: IssueStatusService,
+    private issueTypeService: IssueTypeService,
     private toastService: ToastService,
     protected override router: Router,
     protected override route: ActivatedRoute,
@@ -54,7 +54,7 @@ export class IssueStatusComponent extends BaseListComponent implements OnInit, O
     super(router, route, encryptionService, cdr);
 
     this.searchByOptions = [
-      { label: 'Issue Status', value: 'IssueStatus' },
+      { label: 'Issue Type', value: 'IssueType' },
       { label: 'Created By', value: 'CreatedUser' },
       { label: 'Updated By', value: 'UpdatedUser' },
       { label: 'Deleted By', value: 'DeletedUser' }
@@ -71,29 +71,28 @@ export class IssueStatusComponent extends BaseListComponent implements OnInit, O
   }
 
   override ngOnInit() {
-    this.loading$ = this.store.select(selectIssueStatusLoading);
-    this.totalCount$ = this.store.select(selectIssueStatusTotalCount);
+    this.loading$ = this.store.select(selectIssueTypeLoading);
+    this.totalCount$ = this.store.select(selectIssueTypeTotalCount);
 
-    this.store.select(selectIssueStatusTotalCount)
+    this.store.select(selectIssueTypeTotalCount)
       .pipe(takeUntil(this.destroy$))
       .subscribe(count => {
         this.totalCount = count;
         this.cdr.markForCheck();
       });
 
-    this.store.select(selectIssueStatusTotalPages)
+    this.store.select(selectIssueTypeTotalPages)
       .pipe(takeUntil(this.destroy$))
       .subscribe(pages => {
         this.totalPages = pages;
         this.cdr.markForCheck();
       });
 
-    this.store.select(selectAllIssueStatus)
+    this.store.select(selectAllIssueType)
       .pipe(takeUntil(this.destroy$))
       .subscribe(data => {
         if (this.isLocalUpdate) return;
-        this.issueStatuses = data;
-        console.log("Issue Status", this.issueStatuses);
+        this.issueTypes = data;
         this.cdr.markForCheck();
       });
 
@@ -114,31 +113,28 @@ export class IssueStatusComponent extends BaseListComponent implements OnInit, O
       PageNumber: this.currentPage
     };
 
-    console.log("Query Params IssueStatus", params);
-
-    this.store.dispatch(IssueStatusActions.load({ queryParams: params }));
+    this.store.dispatch(IssueTypeActions.load({ queryParams: params }));
   }
 
-  onDelete(item: IssueStatusModel) {
-    this.confirmationService.confirmDelete(item.issueStatus)
+  onDelete(item: IssueTypeModel) {
+    this.confirmationService.confirmDelete(item.issueType)
       .pipe(takeUntil(this.destroy$))
       .subscribe(confirmed => {
         if (confirmed) {
-          this.issueStatusService.delete(item.issueStatusId).subscribe({
+          this.issueTypeService.delete(item.issueTypeId).subscribe({
             next: (res) => {
-              console.log("response", res);
               if (res.statusCode === 200) {
-                this.toastService.success('Issue Status deleted successfully', 'Success');
-                const index = this.issueStatuses.findIndex(x => x.issueStatusId === item.issueStatusId);
+                this.toastService.success('Issue Type deleted successfully', 'Success');
+                const index = this.issueTypes.findIndex(x => x.issueTypeId === item.issueTypeId);
                 if (index !== -1) {
-                  this.issueStatuses[index] = {
-                    ...this.issueStatuses[index],
+                  this.issueTypes[index] = {
+                    ...this.issueTypes[index],
                     ...((res as any)?.data),
                     deletedUser: (res as any)?.data?.deletedUser || (res as any)?.data?.deletedBy,
                     deletedDate: (res as any)?.data?.deletedDate || new Date().toISOString(),
                     deleted: true
                   };
-                  this.issueStatuses = [...this.issueStatuses];
+                  this.issueTypes = [...this.issueTypes];
                   this.cdr.markForCheck();
                 }
               }
@@ -151,26 +147,25 @@ export class IssueStatusComponent extends BaseListComponent implements OnInit, O
       });
   }
 
-  onRestore(item: IssueStatusModel) {
-    this.confirmationService.confirmRestore(item.issueStatus)
+  onRestore(item: IssueTypeModel) {
+    this.confirmationService.confirmRestore(item.issueType)
       .pipe(takeUntil(this.destroy$))
       .subscribe(confirmed => {
         if (confirmed) {
-          this.issueStatusService.restore(item.issueStatusId).subscribe({
+          this.issueTypeService.restore(item.issueTypeId).subscribe({
             next: (res) => {
-              console.log("response", res);
               if (res.statusCode === 200) {
-                this.toastService.success('Issue Status restored successfully', 'Success');
-                const index = this.issueStatuses.findIndex(x => x.issueStatusId === item.issueStatusId);
+                this.toastService.success('Issue Type restored successfully', 'Success');
+                const index = this.issueTypes.findIndex(x => x.issueTypeId === item.issueTypeId);
                 if (index !== -1) {
-                  this.issueStatuses[index] = {
-                    ...this.issueStatuses[index],
+                  this.issueTypes[index] = {
+                    ...this.issueTypes[index],
                     ...((res as any)?.data),
                     modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy,
                     modifiedDate: (res as any)?.data?.modifiedDate || new Date().toISOString(),
                     deleted: false
                   };
-                  this.issueStatuses = [...this.issueStatuses];
+                  this.issueTypes = [...this.issueTypes];
                   this.cdr.markForCheck();
                 }
               }
@@ -183,30 +178,27 @@ export class IssueStatusComponent extends BaseListComponent implements OnInit, O
       });
   }
 
-  onSuspend(item: IssueStatusModel) {
+  onSuspend(item: IssueTypeModel) {
     const status = item.active ? false : true;
-    this.confirmationService.confirmSuspend(item.issueStatus, status)
+    this.confirmationService.confirmSuspend(item.issueType, status)
       .pipe(takeUntil(this.destroy$))
       .subscribe(confirmed => {
         if (confirmed) {
-          const updatedIssueStatus = {
-            active: status,
-          }
-          this.issueStatusService.update(item.issueStatusId, updatedIssueStatus).subscribe({
+          const payload = { active: status };
+          this.issueTypeService.update(item.issueTypeId, payload).subscribe({
             next: (res) => {
-              console.log("response", res);
               if (!res || res.statusCode === 200 || res.statusCode === 204) {
-                this.toastService.success(`Issue Status ${item.active ? 'Suspended' : 'Reinstated'} successfully`, 'Success');
-                const index = this.issueStatuses.findIndex(x => x.issueStatusId === item.issueStatusId);
+                this.toastService.success(`Issue Type ${item.active ? 'Suspended' : 'Reinstated'} successfully`, 'Success');
+                const index = this.issueTypes.findIndex(x => x.issueTypeId === item.issueTypeId);
                 if (index !== -1) {
-                  this.issueStatuses[index] = {
-                    ...this.issueStatuses[index],
+                  this.issueTypes[index] = {
+                    ...this.issueTypes[index],
                     ...((res as any)?.data),
                     modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy,
                     modifiedDate: (res as any)?.data?.modifiedDate || new Date().toISOString(),
                     active: status
                   };
-                  this.issueStatuses = [...this.issueStatuses];
+                  this.issueTypes = [...this.issueTypes];
                   this.cdr.markForCheck();
                 }
               }
@@ -220,26 +212,25 @@ export class IssueStatusComponent extends BaseListComponent implements OnInit, O
   }
 
   openAddDialog() {
-    const dialogRef = this.dialog.open(AddEditIssueStatus, {
-      width: '500px',
+    const dialogRef = this.dialog.open(AddEditIssueType, {
+      width: '700px',
+      maxWidth: '95vw',
       disableClose: true,
       data: null
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('Dialog Result in Parent:', result);
       if (result) {
         if (result.statusCode === 201) {
-          // Prepend to array exactly so it renders without reload
           this.isLocalUpdate = true;
-          this.issueStatuses = [result.data, ...this.issueStatuses];
+          this.issueTypes = [result.data, ...this.issueTypes];
           this.totalCount++;
           this.cdr.markForCheck();
           setTimeout(() => this.isLocalUpdate = false, 100);
         } else if (result.statusCode === 200) {
-          const index = this.issueStatuses.findIndex(x => x.issueStatusId === result.data.issueStatusId);
+          const index = this.issueTypes.findIndex(x => x.issueTypeId === result.data.issueTypeId);
           if (index !== -1) {
-            this.issueStatuses[index] = { ...this.issueStatuses[index], ...result.data };
+            this.issueTypes[index] = { ...this.issueTypes[index], ...result.data };
           }
           this.cdr.markForCheck();
         }
@@ -247,20 +238,19 @@ export class IssueStatusComponent extends BaseListComponent implements OnInit, O
     });
   }
 
-  openEditDialog(item: IssueStatusModel) {
-    const dialogRef = this.dialog.open(AddEditIssueStatus, {
-      width: '500px',
+  openEditDialog(item: IssueTypeModel) {
+    const dialogRef = this.dialog.open(AddEditIssueType, {
+      width: '700px',
+      maxWidth: '95vw',
       disableClose: true,
       data: item
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('Dialog Result in Parent:', result);
       if (result) {
-        // Replace specific index so it renders without reload
-        const index = this.issueStatuses.findIndex(x => x.issueStatusId === result.data.issueStatusId);
+        const index = this.issueTypes.findIndex(x => x.issueTypeId === result.data.issueTypeId);
         if (index !== -1) {
-          this.issueStatuses[index] = { ...this.issueStatuses[index], ...result.data };
+          this.issueTypes[index] = { ...this.issueTypes[index], ...result.data };
         }
         this.cdr.markForCheck();
       }

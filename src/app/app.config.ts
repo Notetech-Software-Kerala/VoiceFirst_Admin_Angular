@@ -50,6 +50,9 @@ import { IssueStatusEffects } from './core/_state/issue/issue-status/issue-statu
 import { ISSUE_MEDIA_FORMAT_FEATURE_KEY } from './core/_state/issue/issue-media-format/issue-media-format.selectors';
 import { issueMediaFormatReducer } from './core/_state/issue/issue-media-format/issue-media-format.reducer';
 import { IssueMediaFormatEffects } from './core/_state/issue/issue-media-format/issue-media-format.effects';
+import { ISSUE_TYPE_FEATURE_KEY } from './core/_state/issue/issue-type/issue-type.selectors';
+import { issueTypeReducer } from './core/_state/issue/issue-type/issue-type.reducer';
+import { IssueTypeEffects } from './core/_state/issue/issue-type/issue-type.effects';
 
 
 
@@ -76,6 +79,7 @@ export const appConfig: ApplicationConfig = {
       [ISSUE_MEDIA_TYPE_FEATURE_KEY]: issueMediaTypeReducer,
       [ISSUE_STATUS_FEATURE_KEY]: issueStatusReducer,
       [ISSUE_MEDIA_FORMAT_FEATURE_KEY]: issueMediaFormatReducer,
+      [ISSUE_TYPE_FEATURE_KEY]: issueTypeReducer,
     }),
     provideEffects([
       BusinessActivityEffects,
@@ -92,6 +96,7 @@ export const appConfig: ApplicationConfig = {
       IssueMediaTypeEffects,
       IssueStatusEffects,
       IssueMediaFormatEffects,
+      IssueTypeEffects,
 
     ]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })

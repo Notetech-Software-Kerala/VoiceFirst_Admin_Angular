@@ -100,4 +100,9 @@ export const apiConfig = {
     getIssueStatusLookup: '/issue-status/lookup',
     issueStatusRestore: '/issue-status/recover',
 
+    //Issue Type
+    issueType: '/issue-type',
+    getIssueTypeLookup: '/issue-type/lookup',
+    issueTypeRestore: '/issue-type/recover',
+
 };
