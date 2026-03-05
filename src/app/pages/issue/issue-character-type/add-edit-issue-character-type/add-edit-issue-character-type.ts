@@ -107,9 +107,9 @@ export class AddEditIssueCharacterTypeComponent implements OnInit {
       this.issueCharacterTypeService.update(this.data.issueCharacterTypeId, updatedIssueCharacterType).subscribe({
         next: (res) => {
           console.log("response", res);
-          if (res.statusCode === 200) {
+          if (!res || res.statusCode === 200 || res.statusCode === 204) {
             this.toastService.success('Issue Character Type updated successfully', 'Success');
-            this.closeDialog(res);
+            this.closeDialog(res || { statusCode: 200, data: { ...this.data, ...updatedIssueCharacterType } });
           }
           this.isSubmitting = false;
 

@@ -127,7 +127,12 @@ export class IssueCharacterTypeComponent extends BaseListComponent implements On
               console.log("response", res);
               if (res.statusCode === 200) {
                 this.toastService.success('Issue Character Type deleted successfully', 'Success');
-                this.loadData();
+                const index = this.issueCharacterTypes.findIndex(x => x.issueCharacterTypeId === item.issueCharacterTypeId);
+                if (index !== -1) {
+                  this.issueCharacterTypes[index] = { ...this.issueCharacterTypes[index], deleted: true };
+                  this.issueCharacterTypes = [...this.issueCharacterTypes];
+                  this.cdr.markForCheck();
+                }
               }
             },
             error: (error) => {
@@ -148,7 +153,12 @@ export class IssueCharacterTypeComponent extends BaseListComponent implements On
               console.log("response", res);
               if (res.statusCode === 200) {
                 this.toastService.success('Issue Character Type restored successfully', 'Success');
-                this.loadData();
+                const index = this.issueCharacterTypes.findIndex(x => x.issueCharacterTypeId === item.issueCharacterTypeId);
+                if (index !== -1) {
+                  this.issueCharacterTypes[index] = { ...this.issueCharacterTypes[index], deleted: false };
+                  this.issueCharacterTypes = [...this.issueCharacterTypes];
+                  this.cdr.markForCheck();
+                }
               }
             },
             error: (error) => {
@@ -171,14 +181,14 @@ export class IssueCharacterTypeComponent extends BaseListComponent implements On
           this.issueCharacterTypeService.update(item.issueCharacterTypeId, updatedIssueCharacterType).subscribe({
             next: (res) => {
               console.log("response", res);
-              if (res.statusCode === 200) {
+              if (!res || res.statusCode === 200 || res.statusCode === 204) {
                 this.toastService.success(`Issue Character Type ${item.active ? 'Suspended' : 'Reinstated'} successfully`, 'Success');
-                this.store.dispatch(IssueCharacterTypeActions.update({
-                  issueCharacterType: {
-                    id: item.issueCharacterTypeId,
-                    changes: updatedIssueCharacterType
-                  }
-                }));
+                const index = this.issueCharacterTypes.findIndex(x => x.issueCharacterTypeId === item.issueCharacterTypeId);
+                if (index !== -1) {
+                  this.issueCharacterTypes[index] = { ...this.issueCharacterTypes[index], active: status };
+                  this.issueCharacterTypes = [...this.issueCharacterTypes];
+                  this.cdr.markForCheck();
+                }
               }
             },
             error: (error) => {

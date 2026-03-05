@@ -1,46 +1,46 @@
 import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IssueMediaTypeModel } from '../../../../core/_state/issue/issue-media-type/issue-media-type.model';
+import { IssueMediaFormatModel } from '../../../../core/_state/issue/issue-media-format/issue-media-format.model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { IssueMediaTypeService } from '../../../../core/_state/issue/issue-media-type/issue-media-type.service';
+import { IssueMediaFormatService } from '../../../../core/_state/issue/issue-media-format/issue-media-format.service';
 import { UtilityService } from '../../../../partials/shared_services/utility.service';
 import { ToastService } from '../../../../partials/shared_services/toast.service';
 import { ConfirmationService } from '../../../../partials/shared_directives/confirmation';
 import { MaterialModule } from '../../../../material.module';
 
 @Component({
-  selector: 'app-add-edit-issue-media-type',
+  selector: 'app-add-edit-issue-media-format',
   imports: [MaterialModule, ReactiveFormsModule],
-  templateUrl: './add-edit-issue-media-type.html',
-  styleUrl: './add-edit-issue-media-type.css',
+  templateUrl: './add-edit-issue-media-format.html',
+  styleUrl: './add-edit-issue-media-format.css',
 })
-export class AddEditIssueMediaType {
+export class AddEditIssueMediaFormat {
   form!: FormGroup;
-  issueMediaType !: IssueMediaTypeModel;
+  issueMediaFormatData !: IssueMediaFormatModel;
 
   constructor(
     private fb: FormBuilder,
-    private dialogRef: MatDialogRef<AddEditIssueMediaType>,
+    private dialogRef: MatDialogRef<AddEditIssueMediaFormat>,
     private store: Store,
-    private issueMediaTypeService: IssueMediaTypeService,
+    private issueMediaFormatService: IssueMediaFormatService,
     private utilityService: UtilityService,
     private toastService: ToastService,
     private confirmationService: ConfirmationService,
-    @Inject(MAT_DIALOG_DATA) public data: IssueMediaTypeModel | null,
+    @Inject(MAT_DIALOG_DATA) public data: IssueMediaFormatModel | null,
   ) { }
 
   ngOnInit() {
     this.formInItialize();
     if (this.data) {
-      this.issueMediaType = this.data;
+      this.issueMediaFormatData = this.data;
       this.form.patchValue(this.data as Partial<Record<string, any>>);
     }
   }
 
   formInItialize() {
     this.form = this.fb.group({
-      issueMediaType: ['', Validators.required],
+      issueMediaFormat: ['', Validators.required],
     });
   }
 
@@ -56,9 +56,9 @@ export class AddEditIssueMediaType {
       console.log('Form Data:', this.form.value);
 
       if (this.data) {
-        this.updateIssueMediaType();
+        this.updateIssueMediaFormat();
       } else {
-        this.addIssueMediaType();
+        this.addIssueMediaFormat();
       }
 
     } else {
@@ -67,17 +67,17 @@ export class AddEditIssueMediaType {
     }
   }
 
-  addIssueMediaType() {
+  addIssueMediaFormat() {
     if (this.form.valid) {
-      const newIssueMediaType = {
-        issueMediaType: this.form.value.issueMediaType,
+      const newIssueMediaFormat = {
+        issueMediaFormat: this.form.value.issueMediaFormat,
       }
-      console.log("payload", newIssueMediaType);
-      this.issueMediaTypeService.create(newIssueMediaType).subscribe({
+      console.log("payload", newIssueMediaFormat);
+      this.issueMediaFormatService.create(newIssueMediaFormat).subscribe({
         next: (res) => {
           console.log("response", res);
           if (res.statusCode === 201) {
-            this.toastService.success('Issue Media Type added successfully', 'Success');
+            this.toastService.success('Issue Media Format added successfully', 'Success');
             this.closeDialog(res);
           }
           this.isSubmitting = false;
@@ -86,9 +86,9 @@ export class AddEditIssueMediaType {
           console.log("error", error.error);
           this.isSubmitting = false;
           if (error.error.statusCode === 422) {
-            const existingId = error.error.data?.issueMediaTypeId;
+            const existingId = error.error.data?.issueMediaFormatId;
             if (existingId) {
-              this.restoreIssueMediaType(existingId, this.form.value.issueMediaType);
+              this.restoreIssueMediaFormat(existingId, this.form.value.issueMediaFormat);
             }
           }
         }
@@ -96,19 +96,19 @@ export class AddEditIssueMediaType {
     }
   }
 
-  updateIssueMediaType() {
+  updateIssueMediaFormat() {
     if (this.form.valid && this.data) {
-      const updatedIssueMediaType = {
-        issueMediaType: this.form.value.issueMediaType,
+      const updatedIssueMediaFormat = {
+        issueMediaFormat: this.form.value.issueMediaFormat,
         active: this.data.active
       }
-      console.log("payload", updatedIssueMediaType);
-      this.issueMediaTypeService.update(this.data.issueMediaTypeId, updatedIssueMediaType).subscribe({
+      console.log("payload", updatedIssueMediaFormat);
+      this.issueMediaFormatService.update(this.data.issueMediaFormatId, updatedIssueMediaFormat).subscribe({
         next: (res) => {
           console.log("response", res);
           if (!res || res.statusCode === 200 || res.statusCode === 204) {
-            this.toastService.success('Issue Media Type updated successfully', 'Success');
-            this.closeDialog(res || { statusCode: 200, data: { ...this.data, ...updatedIssueMediaType } });
+            this.toastService.success('Issue Media Format updated successfully', 'Success');
+            this.closeDialog(res || { statusCode: 200, data: { ...this.data, ...updatedIssueMediaFormat } });
           }
           this.isSubmitting = false;
 
@@ -120,13 +120,13 @@ export class AddEditIssueMediaType {
     }
   }
 
-  restoreIssueMediaType(id: number, name: string) {
+  restoreIssueMediaFormat(id: number, name: string) {
     this.confirmationService.confirmRestore(name, `${name} already available, do you want to restore?`).subscribe(confirmed => {
       if (confirmed) {
-        this.issueMediaTypeService.restore(id).subscribe({
+        this.issueMediaFormatService.restore(id).subscribe({
           next: (restoreRes) => {
             if (restoreRes.statusCode === 200) {
-              this.toastService.success('Issue Media Type restored successfully', 'Success');
+              this.toastService.success('Issue Media Format restored successfully', 'Success');
               this.closeDialog(restoreRes);
             }
           },
@@ -152,6 +152,6 @@ export class AddEditIssueMediaType {
   }
 
   get title(): string {
-    return this.data ? 'Edit Issue Media Type' : 'Add Issue Media Type';
+    return this.data ? 'Edit Issue Media Format' : 'Add Issue Media Format';
   }
 }

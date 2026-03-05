@@ -106,9 +106,9 @@ export class AddEditIssueStatus {
       this.issueStatusService.update(this.data.issueStatusId, updatedIssueStatus).subscribe({
         next: (res) => {
           console.log("response", res);
-          if (res.statusCode === 200) {
+          if (!res || res.statusCode === 200 || res.statusCode === 204) {
             this.toastService.success('Issue Status updated successfully', 'Success');
-            this.closeDialog(res);
+            this.closeDialog(res || { statusCode: 200, data: { ...this.data, ...updatedIssueStatus } });
           }
           this.isSubmitting = false;
 

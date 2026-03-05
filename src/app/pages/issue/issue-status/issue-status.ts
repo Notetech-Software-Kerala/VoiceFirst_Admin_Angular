@@ -127,7 +127,12 @@ export class IssueStatusComponent extends BaseListComponent implements OnInit, O
               console.log("response", res);
               if (res.statusCode === 200) {
                 this.toastService.success('Issue Status deleted successfully', 'Success');
-                this.loadData();
+                const index = this.issueStatuses.findIndex(x => x.issueStatusId === item.issueStatusId);
+                if (index !== -1) {
+                  this.issueStatuses[index] = { ...this.issueStatuses[index], deleted: true };
+                  this.issueStatuses = [...this.issueStatuses];
+                  this.cdr.markForCheck();
+                }
               }
             },
             error: (error) => {
@@ -148,7 +153,12 @@ export class IssueStatusComponent extends BaseListComponent implements OnInit, O
               console.log("response", res);
               if (res.statusCode === 200) {
                 this.toastService.success('Issue Status restored successfully', 'Success');
-                this.loadData();
+                const index = this.issueStatuses.findIndex(x => x.issueStatusId === item.issueStatusId);
+                if (index !== -1) {
+                  this.issueStatuses[index] = { ...this.issueStatuses[index], deleted: false };
+                  this.issueStatuses = [...this.issueStatuses];
+                  this.cdr.markForCheck();
+                }
               }
             },
             error: (error) => {
@@ -171,14 +181,14 @@ export class IssueStatusComponent extends BaseListComponent implements OnInit, O
           this.issueStatusService.update(item.issueStatusId, updatedIssueStatus).subscribe({
             next: (res) => {
               console.log("response", res);
-              if (res.statusCode === 200) {
+              if (!res || res.statusCode === 200 || res.statusCode === 204) {
                 this.toastService.success(`Issue Status ${item.active ? 'Suspended' : 'Reinstated'} successfully`, 'Success');
-                this.store.dispatch(IssueStatusActions.update({
-                  issueStatus: {
-                    id: item.issueStatusId,
-                    changes: updatedIssueStatus
-                  }
-                }));
+                const index = this.issueStatuses.findIndex(x => x.issueStatusId === item.issueStatusId);
+                if (index !== -1) {
+                  this.issueStatuses[index] = { ...this.issueStatuses[index], active: status };
+                  this.issueStatuses = [...this.issueStatuses];
+                  this.cdr.markForCheck();
+                }
               }
             },
             error: (error) => {
