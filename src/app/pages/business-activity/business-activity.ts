@@ -190,11 +190,11 @@ export class BusinessActivity extends BaseListComponent implements OnInit, OnDes
                 this.toastService.success('Business Activity deleted successfully', 'Success');
                 const index = this.businessActivities.findIndex(x => x.activityId === item.activityId);
                 if (index !== -1) {
-                  const userName = this.utilityService.getUser()?.firstName || 'Admin';
+
                   this.businessActivities[index] = {
                     ...this.businessActivities[index],
                     ...((res as any)?.data),
-                    deletedUser: (res as any)?.data?.deletedUser || (res as any)?.data?.deletedBy || userName,
+                    deletedUser: (res as any)?.data?.deletedUser || (res as any)?.data?.deletedBy,
                     deletedDate: (res as any)?.data?.deletedDate || new Date().toISOString(),
                     deleted: true
                   };
@@ -224,11 +224,11 @@ export class BusinessActivity extends BaseListComponent implements OnInit, OnDes
                 this.toastService.success('Business Activity restored successfully', 'Success');
                 const index = this.businessActivities.findIndex(x => x.activityId === item.activityId);
                 if (index !== -1) {
-                  const userName = this.utilityService.getUser()?.firstName || 'Admin';
+
                   this.businessActivities[index] = {
                     ...this.businessActivities[index],
                     ...((res as any)?.data),
-                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy || userName,
+                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy,
                     modifiedDate: (res as any)?.data?.modifiedDate || new Date().toISOString(),
                     deleted: false
                   };
@@ -264,11 +264,10 @@ export class BusinessActivity extends BaseListComponent implements OnInit, OnDes
                 this.toastService.success(`Business Activity ${msg} successfully`, 'Success');
                 const index = this.businessActivities.findIndex(x => x.activityId === item.activityId);
                 if (index !== -1) {
-                  const userName = this.utilityService.getUser()?.firstName || 'Admin';
                   this.businessActivities[index] = {
                     ...this.businessActivities[index],
                     ...((res as any)?.data),
-                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy || userName,
+                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy,
                     modifiedDate: (res as any)?.data?.modifiedDate || new Date().toISOString(),
                     active: active
                   };

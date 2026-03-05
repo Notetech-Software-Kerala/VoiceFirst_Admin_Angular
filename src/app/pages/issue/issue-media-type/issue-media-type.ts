@@ -131,11 +131,10 @@ export class IssueMediaTypeComponent extends BaseListComponent implements OnInit
                 this.toastService.success('Issue Media Type deleted successfully', 'Success');
                 const index = this.issueMediaTypes.findIndex(x => x.issueMediaTypeId === item.issueMediaTypeId);
                 if (index !== -1) {
-                  const userName = this.utilityService.getUser()?.firstName || 'Admin';
                   this.issueMediaTypes[index] = {
                     ...this.issueMediaTypes[index],
                     ...((res as any)?.data),
-                    deletedUser: (res as any)?.data?.deletedUser || (res as any)?.data?.deletedBy || userName,
+                    deletedUser: (res as any)?.data?.deletedUser || (res as any)?.data?.deletedBy,
                     deletedDate: (res as any)?.data?.deletedDate || new Date().toISOString(),
                     deleted: true
                   };
@@ -164,11 +163,10 @@ export class IssueMediaTypeComponent extends BaseListComponent implements OnInit
                 this.toastService.success('Issue Media Type restored successfully', 'Success');
                 const index = this.issueMediaTypes.findIndex(x => x.issueMediaTypeId === item.issueMediaTypeId);
                 if (index !== -1) {
-                  const userName = this.utilityService.getUser()?.firstName || 'Admin';
                   this.issueMediaTypes[index] = {
                     ...this.issueMediaTypes[index],
                     ...((res as any)?.data),
-                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy || userName,
+                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy,
                     modifiedDate: (res as any)?.data?.modifiedDate || new Date().toISOString(),
                     deleted: false
                   };
@@ -201,11 +199,10 @@ export class IssueMediaTypeComponent extends BaseListComponent implements OnInit
                 this.toastService.success(`Issue Media Type ${item.active ? 'Suspended' : 'Reinstated'} successfully`, 'Success');
                 const index = this.issueMediaTypes.findIndex(x => x.issueMediaTypeId === item.issueMediaTypeId);
                 if (index !== -1) {
-                  const userName = this.utilityService.getUser()?.firstName || 'Admin';
                   this.issueMediaTypes[index] = {
                     ...this.issueMediaTypes[index],
                     ...((res as any)?.data),
-                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy || userName,
+                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy,
                     modifiedDate: (res as any)?.data?.modifiedDate || new Date().toISOString(),
                     active: status
                   };

@@ -136,11 +136,10 @@ export class ProgramAction extends BaseListComponent implements OnInit, OnDestro
                 this.toastService.success('Program Action deleted successfully', 'Success');
                 const index = this.programActions.findIndex(x => x.actionId === item.actionId);
                 if (index !== -1) {
-                  const userName = this.utilityService.getUser()?.firstName || 'Admin';
                   this.programActions[index] = {
                     ...this.programActions[index],
                     ...((res as any)?.data),
-                    deletedUser: (res as any)?.data?.deletedUser || (res as any)?.data?.deletedBy || userName,
+                    deletedUser: (res as any)?.data?.deletedUser || (res as any)?.data?.deletedBy,
                     deletedDate: (res as any)?.data?.deletedDate || new Date().toISOString(),
                     deleted: true
                   };
@@ -169,11 +168,10 @@ export class ProgramAction extends BaseListComponent implements OnInit, OnDestro
                 this.toastService.success('Program Action restored successfully', 'Success');
                 const index = this.programActions.findIndex(x => x.actionId === item.actionId);
                 if (index !== -1) {
-                  const userName = this.utilityService.getUser()?.firstName || 'Admin';
                   this.programActions[index] = {
                     ...this.programActions[index],
                     ...((res as any)?.data),
-                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy || userName,
+                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy,
                     modifiedDate: (res as any)?.data?.modifiedDate || new Date().toISOString(),
                     deleted: false
                   };
@@ -206,11 +204,10 @@ export class ProgramAction extends BaseListComponent implements OnInit, OnDestro
                 this.toastService.success(`Program Action ${item.active ? 'Suspended' : 'Reinstated'} successfully`, 'Success');
                 const index = this.programActions.findIndex(x => x.actionId === item.actionId);
                 if (index !== -1) {
-                  const userName = this.utilityService.getUser()?.firstName || 'Admin';
                   this.programActions[index] = {
                     ...this.programActions[index],
                     ...((res as any)?.data),
-                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy || userName,
+                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy,
                     modifiedDate: (res as any)?.data?.modifiedDate || new Date().toISOString(),
                     active: status
                   };

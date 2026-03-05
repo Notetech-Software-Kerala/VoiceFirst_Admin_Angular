@@ -6,7 +6,6 @@ import { AuthService } from '../../core/_auth/auth.service';
 })
 export class UtilityService {
 
-  constructor(private authService: AuthService) { }
 
   copy(text: string): void {
     if (!text) return;
@@ -46,12 +45,5 @@ export class UtilityService {
     }
   }
 
-  getUser(): any {
-    let user: any = null;
-    this.authService.user$.subscribe(res => {
-      user = res;
-    }).unsubscribe();
-    return user;
-  }
 
 }
