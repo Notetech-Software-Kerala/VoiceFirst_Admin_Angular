@@ -85,4 +85,9 @@ export const apiConfig = {
     getIssueCharacterTypeLookup: '/issue-character-type/lookup',
     issueCharacterTypeRestore: '/issue-character-type/recover',
 
+    //Issue Media Format
+    issueMediaFormat: '/issue-media-format',
+    getIssueMediaFormatLookup: '/issue-media-format/lookup',
+    issueMediaFormatRestore: '/issue-media-format/recover',
+
 };

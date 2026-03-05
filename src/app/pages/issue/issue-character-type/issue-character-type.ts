@@ -197,16 +197,20 @@ export class IssueCharacterTypeComponent extends BaseListComponent implements On
     });
 
     dialogRef.afterClosed().subscribe(result => {
+      console.log('Dialog Result in Parent:', result);
       if (result) {
         if (result.statusCode === 201) {
-          this.store.dispatch(IssueCharacterTypeActions.add({ issueCharacterType: result.data }));
+          // Prepend to array exactly so it renders without reload
+          this.issueCharacterTypes = [result.data, ...this.issueCharacterTypes];
+          this.totalCount++;
+          this.cdr.markForCheck();
         } else if (result.statusCode === 200) {
-          this.store.dispatch(IssueCharacterTypeActions.update({
-            issueCharacterType: {
-              id: result.data.issueCharacterTypeId,
-              changes: result.data
-            }
-          }));
+          // Replace specific index so it renders without reload
+          const index = this.issueCharacterTypes.findIndex(x => x.issueCharacterTypeId === result.data.issueCharacterTypeId);
+          if (index !== -1) {
+            this.issueCharacterTypes[index] = { ...this.issueCharacterTypes[index], ...result.data };
+          }
+          this.cdr.markForCheck();
         }
       }
     });
@@ -220,13 +224,14 @@ export class IssueCharacterTypeComponent extends BaseListComponent implements On
     });
 
     dialogRef.afterClosed().subscribe(result => {
+      console.log('Dialog Result in Parent:', result);
       if (result) {
-        this.store.dispatch(IssueCharacterTypeActions.update({
-          issueCharacterType: {
-            id: result.data.issueCharacterTypeId,
-            changes: result.data
-          }
-        }));
+        // Replace specific index so it renders without reload
+        const index = this.issueCharacterTypes.findIndex(x => x.issueCharacterTypeId === result.data.issueCharacterTypeId);
+        if (index !== -1) {
+          this.issueCharacterTypes[index] = { ...this.issueCharacterTypes[index], ...result.data };
+        }
+        this.cdr.markForCheck();
       }
     });
   }

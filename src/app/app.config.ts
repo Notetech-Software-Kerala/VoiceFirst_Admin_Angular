@@ -41,6 +41,9 @@ import { EmployeeEffects } from './core/_state/employee/employee.effects';
 import { ISSUE_CHARACTER_TYPE_FEATURE_KEY } from './core/_state/issue/issue-character-type/issue-character-type.selectors';
 import { issueCharacterTypeReducer } from './core/_state/issue/issue-character-type/issue-character-type.reducer';
 import { IssueCharacterTypeEffects } from './core/_state/issue/issue-character-type/issue-character-type.effects';
+import { ISSUE_MEDIA_TYPE_FEATURE_KEY } from './core/_state/issue/issue-media-type/issue-media-type.selectors';
+import { issueMediaTypeReducer } from './core/_state/issue/issue-media-type/issue-media-type.reducer';
+import { IssueMediaTypeEffects } from './core/_state/issue/issue-media-type/issue-media-type.effects';
 
 
 
@@ -64,6 +67,7 @@ export const appConfig: ApplicationConfig = {
       [PLACE_FEATURE_KEY]: placeReducer,
       [EMPLOYEE_FEATURE_KEY]: employeeReducer,
       [ISSUE_CHARACTER_TYPE_FEATURE_KEY]: issueCharacterTypeReducer,
+      [ISSUE_MEDIA_TYPE_FEATURE_KEY]: issueMediaTypeReducer,
     }),
     provideEffects([
       BusinessActivityEffects,
@@ -77,6 +81,7 @@ export const appConfig: ApplicationConfig = {
       PlaceEffects,
       EmployeeEffects,
       IssueCharacterTypeEffects,
+      IssueMediaTypeEffects,
 
     ]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })
