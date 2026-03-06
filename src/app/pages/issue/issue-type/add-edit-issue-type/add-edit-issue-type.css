@@ -1,0 +1,99 @@
+.issue-type-dialog {
+    min-width: 300px;
+}
+
+.media-rule-card {
+    border: 1px solid var(--color-border-hr);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    background: var(--color-bg-primary);
+    box-shadow: 0 2px 8px var(--color-shadow);
+}
+
+.media-rule-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--color-border-hr);
+}
+
+.media-rule-title {
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.media-rule-title-badge {
+    background-color: var(--color-chip-more-bg);
+    color: var(--color-chip-more-text);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+
+
+.media-type-well {
+    background-color: var(--color-bg-sidebar);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--color-border-hr);
+}
+
+.border-dashed {
+    border-style: dashed !important;
+}
+
+.media-type-row-ui {
+    background: var(--color-bg-primary);
+    transition: all 0.2s;
+}
+
+.media-type-row-ui:hover {
+    border-color: var(--color-hover-secondary) !important;
+}
+
+.no-rules-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: var(--color-bg-primary);
+    border-radius: 12px;
+    border: 2px dashed var(--color-border-hr);
+    text-align: center;
+}
+
+.btn-xs {
+    padding: 2px 10px !important;
+    font-size: 12px !important;
+    height: 26px !important;
+}
+
+.delete-btn-card {
+    cursor: pointer;
+    color: #fa574b;
+    opacity: 0.9;
+    transition: opacity 0.2s;
+}
+
+.delete-btn-card:hover {
+    opacity: 1;
+    border-radius: 50%;
+}
+
+.msr-delete {
+    font-size: 1.2rem;
+    color: #fa574b !important;
+    margin-top: 6px !important;
+}

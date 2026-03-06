@@ -38,6 +38,21 @@ import { PlaceEffects } from './core/_state/place/place.effects';
 import { employeeReducer } from './core/_state/employee/employee.reducer';
 import { EMPLOYEE_FEATURE_KEY } from './core/_state/employee/employee.selectors';
 import { EmployeeEffects } from './core/_state/employee/employee.effects';
+import { ISSUE_CHARACTER_TYPE_FEATURE_KEY } from './core/_state/issue/issue-character-type/issue-character-type.selectors';
+import { issueCharacterTypeReducer } from './core/_state/issue/issue-character-type/issue-character-type.reducer';
+import { IssueCharacterTypeEffects } from './core/_state/issue/issue-character-type/issue-character-type.effects';
+import { ISSUE_MEDIA_TYPE_FEATURE_KEY } from './core/_state/issue/issue-media-type/issue-media-type.selectors';
+import { issueMediaTypeReducer } from './core/_state/issue/issue-media-type/issue-media-type.reducer';
+import { IssueMediaTypeEffects } from './core/_state/issue/issue-media-type/issue-media-type.effects';
+import { ISSUE_STATUS_FEATURE_KEY } from './core/_state/issue/issue-status/issue-status.selectors';
+import { issueStatusReducer } from './core/_state/issue/issue-status/issue-status.reducer';
+import { IssueStatusEffects } from './core/_state/issue/issue-status/issue-status.effects';
+import { ISSUE_MEDIA_FORMAT_FEATURE_KEY } from './core/_state/issue/issue-media-format/issue-media-format.selectors';
+import { issueMediaFormatReducer } from './core/_state/issue/issue-media-format/issue-media-format.reducer';
+import { IssueMediaFormatEffects } from './core/_state/issue/issue-media-format/issue-media-format.effects';
+import { ISSUE_TYPE_FEATURE_KEY } from './core/_state/issue/issue-type/issue-type.selectors';
+import { issueTypeReducer } from './core/_state/issue/issue-type/issue-type.reducer';
+import { IssueTypeEffects } from './core/_state/issue/issue-type/issue-type.effects';
 
 
 
@@ -60,7 +75,11 @@ export const appConfig: ApplicationConfig = {
       [MENU_FEATURE_KEY]: menuReducer,
       [PLACE_FEATURE_KEY]: placeReducer,
       [EMPLOYEE_FEATURE_KEY]: employeeReducer,
-
+      [ISSUE_CHARACTER_TYPE_FEATURE_KEY]: issueCharacterTypeReducer,
+      [ISSUE_MEDIA_TYPE_FEATURE_KEY]: issueMediaTypeReducer,
+      [ISSUE_STATUS_FEATURE_KEY]: issueStatusReducer,
+      [ISSUE_MEDIA_FORMAT_FEATURE_KEY]: issueMediaFormatReducer,
+      [ISSUE_TYPE_FEATURE_KEY]: issueTypeReducer,
     }),
     provideEffects([
       BusinessActivityEffects,
@@ -73,6 +92,11 @@ export const appConfig: ApplicationConfig = {
       MenuEffects,
       PlaceEffects,
       EmployeeEffects,
+      IssueCharacterTypeEffects,
+      IssueMediaTypeEffects,
+      IssueStatusEffects,
+      IssueMediaFormatEffects,
+      IssueTypeEffects,
 
     ]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })

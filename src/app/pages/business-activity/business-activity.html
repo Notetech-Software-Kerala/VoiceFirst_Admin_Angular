@@ -18,7 +18,7 @@
         <!-- Actions -->
         <div class="actions ms-auto d-flex flex-wrap gap-2">
 
-            <input #fileInput type="file" accept=".csv" class="d-none" />
+            <!-- <input #fileInput type="file" accept=".csv" class="d-none" />
             <label class="btn-action btn-outline" for="fileInput">
                 <mat-icon class="msr">file_upload</mat-icon>
                 <span class="btn-text">Import</span>
@@ -32,7 +32,7 @@
             <button type="button" class="btn-action btn-outline">
                 <mat-icon class="msr">insert_chart</mat-icon>
                 <span class="btn-text">Report</span>
-            </button>
+            </button> -->
 
             <button type="button" class="btn-action btn-primary" (click)="openAddDialog()">
                 <mat-icon class="msr">add</mat-icon>
@@ -71,7 +71,7 @@
         <table class="table align-middle">
             <thead class="table-light">
                 <tr>
-                    <th appSortableColumn="ActivityName" [sortBy]="queryParams.SortBy"
+                    <th appSortableColumn="activityName" [sortBy]="queryParams.SortBy"
                         [sortOrder]="queryParams.SortOrder" (sortChange)="onSortChange($event)">Activity Name</th>
 
                     <th>Status</th>

@@ -60,16 +60,11 @@ export class AddEditProgramActionComponent implements OnInit {
       this.isSubmitting = true;
       console.log('Form Data:', this.form.value);
 
-      // Simulate API call
-      setTimeout(() => {
-        if (this.data) {
-          this.updateProgramAction();
-        } else {
-          this.addProgramAction();
-        }
-        this.closeDialog();
-        this.isSubmitting = false;
-      }, 1500);
+      if (this.data) {
+        this.updateProgramAction();
+      } else {
+        this.addProgramAction();
+      }
 
     } else {
       this.form.markAllAsTouched();
@@ -116,7 +111,7 @@ export class AddEditProgramActionComponent implements OnInit {
       this.programActionService.update(this.data.actionId, updatedProgramAction).subscribe({
         next: (res) => {
           console.log("response", res);
-          if (res.statusCode === 200) {
+          if (!res || res.statusCode === 200 || res.statusCode === 204) {
             this.toastService.success('Program Action updated successfully', 'Success');
             this.closeDialog(res);
           }

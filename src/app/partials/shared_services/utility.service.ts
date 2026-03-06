@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-
+import { AuthService } from '../../core/_auth/auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UtilityService {
+
 
   copy(text: string): void {
     if (!text) return;
@@ -43,5 +44,6 @@ export class UtilityService {
       queryParams.SortOrder = defaultSortOrder;
     }
   }
+
 
 }

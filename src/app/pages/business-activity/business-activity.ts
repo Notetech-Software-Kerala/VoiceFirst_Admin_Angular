@@ -47,6 +47,7 @@ import { BaseListComponent } from '../../core/base/base-list.component';
 export class BusinessActivity extends BaseListComponent implements OnInit, OnDestroy {
   businessActivities: BusinessActivityModel[] = [];
   loading$!: Observable<boolean>;
+  isLocalUpdate: boolean = false;
 
   constructor(
     private dialog: MatDialog,
@@ -101,6 +102,7 @@ export class BusinessActivity extends BaseListComponent implements OnInit, OnDes
     this.store.select(selectAllBusinessActivities)
       .pipe(takeUntil(this.destroy$))
       .subscribe(data => {
+        if (this.isLocalUpdate) return;
         this.businessActivities = data;
         console.log(this.businessActivities);
 
@@ -111,6 +113,12 @@ export class BusinessActivity extends BaseListComponent implements OnInit, OnDes
   }
 
   loadData() {
+    if (!this.queryParams.SortBy) {
+      this.queryParams.SortBy = "createdAt";
+    }
+    if (!this.queryParams.SortOrder) {
+      this.queryParams.SortOrder = "Desc";
+    }
     // Merge queryParams with statusFilters (Active/Delete)
     const params = {
       ...this.queryParams,
@@ -135,13 +143,20 @@ export class BusinessActivity extends BaseListComponent implements OnInit, OnDes
     dialogRef.afterClosed().subscribe(result => {
       console.log("Add Result", result);
 
-      if (result && result.statusCode === 201) {
-        this.store.dispatch(BusinessActivityActions.add({ activity: result.data }));
-      }
-      else if (result && result.statusCode === 200) {
-        this.store.dispatch(BusinessActivityActions.update({
-          activity: { id: result.data.activityId, changes: result.data }
-        }));
+      if (result) {
+        if (result.statusCode === 201) {
+          this.isLocalUpdate = true;
+          this.businessActivities = [result.data, ...this.businessActivities];
+          this.totalCount++;
+          this.cdr.markForCheck();
+          setTimeout(() => this.isLocalUpdate = false, 100);
+        } else if (result.statusCode === 200) {
+          const index = this.businessActivities.findIndex(x => x.activityId === result.data.activityId);
+          if (index !== -1) {
+            this.businessActivities[index] = { ...this.businessActivities[index], ...result.data };
+          }
+          this.cdr.markForCheck();
+        }
       }
     });
   }
@@ -155,9 +170,11 @@ export class BusinessActivity extends BaseListComponent implements OnInit, OnDes
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && result.statusCode === 200) {
-        this.store.dispatch(BusinessActivityActions.update({
-          activity: { id: result.data.activityId, changes: result.data }
-        }));
+        const index = this.businessActivities.findIndex(x => x.activityId === result.data.activityId);
+        if (index !== -1) {
+          this.businessActivities[index] = { ...this.businessActivities[index], ...result.data };
+        }
+        this.cdr.markForCheck();
       }
     });
   }
@@ -171,7 +188,19 @@ export class BusinessActivity extends BaseListComponent implements OnInit, OnDes
             next: (res) => {
               if (res.statusCode === 200) {
                 this.toastService.success('Business Activity deleted successfully', 'Success');
-                this.loadData();
+                const index = this.businessActivities.findIndex(x => x.activityId === item.activityId);
+                if (index !== -1) {
+
+                  this.businessActivities[index] = {
+                    ...this.businessActivities[index],
+                    ...((res as any)?.data),
+                    deletedUser: (res as any)?.data?.deletedUser || (res as any)?.data?.deletedBy,
+                    deletedDate: (res as any)?.data?.deletedDate || new Date().toISOString(),
+                    deleted: true
+                  };
+                  this.businessActivities = [...this.businessActivities];
+                  this.cdr.markForCheck();
+                }
               } else {
                 this.toastService.error(res.message);
               }
@@ -193,7 +222,19 @@ export class BusinessActivity extends BaseListComponent implements OnInit, OnDes
             next: (res) => {
               if (res.statusCode === 200) {
                 this.toastService.success('Business Activity restored successfully', 'Success');
-                this.loadData();
+                const index = this.businessActivities.findIndex(x => x.activityId === item.activityId);
+                if (index !== -1) {
+
+                  this.businessActivities[index] = {
+                    ...this.businessActivities[index],
+                    ...((res as any)?.data),
+                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy,
+                    modifiedDate: (res as any)?.data?.modifiedDate || new Date().toISOString(),
+                    deleted: false
+                  };
+                  this.businessActivities = [...this.businessActivities];
+                  this.cdr.markForCheck();
+                }
               } else {
                 this.toastService.error(res.message);
               }
@@ -218,12 +259,21 @@ export class BusinessActivity extends BaseListComponent implements OnInit, OnDes
 
           this.businessActivityService.update(item.activityId, payload).subscribe({
             next: (res) => {
-              if (res.statusCode === 200) {
-                const msg = active ? 'Suspended' : 'Reinstated';
+              if (!res || res.statusCode === 200 || res.statusCode === 204) {
+                const msg = active ? 'Reinstated' : 'Suspended';
                 this.toastService.success(`Business Activity ${msg} successfully`, 'Success');
-                this.store.dispatch(BusinessActivityActions.update({
-                  activity: { id: item.activityId, changes: { active: active } }
-                }));
+                const index = this.businessActivities.findIndex(x => x.activityId === item.activityId);
+                if (index !== -1) {
+                  this.businessActivities[index] = {
+                    ...this.businessActivities[index],
+                    ...((res as any)?.data),
+                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy,
+                    modifiedDate: (res as any)?.data?.modifiedDate || new Date().toISOString(),
+                    active: active
+                  };
+                  this.businessActivities = [...this.businessActivities];
+                  this.cdr.markForCheck();
+                }
               } else {
                 this.toastService.error(res.message);
               }

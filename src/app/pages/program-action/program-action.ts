@@ -38,6 +38,7 @@ export class ProgramAction extends BaseListComponent implements OnInit, OnDestro
   programActions: ProgramActionModel[] = [];
   loading$!: Observable<boolean>;
   totalCount$!: Observable<number>;
+  isLocalUpdate: boolean = false;
 
   constructor(
     private dialog: MatDialog,
@@ -92,6 +93,7 @@ export class ProgramAction extends BaseListComponent implements OnInit, OnDestro
     this.store.select(selectAllProgramActions)
       .pipe(takeUntil(this.destroy$))
       .subscribe(data => {
+        if (this.isLocalUpdate) return;
         this.programActions = data;
         console.log("Program Actions", this.programActions);
         this.cdr.markForCheck();
@@ -132,7 +134,18 @@ export class ProgramAction extends BaseListComponent implements OnInit, OnDestro
               console.log("response", res);
               if (res.statusCode === 200) {
                 this.toastService.success('Program Action deleted successfully', 'Success');
-                this.loadData();
+                const index = this.programActions.findIndex(x => x.actionId === item.actionId);
+                if (index !== -1) {
+                  this.programActions[index] = {
+                    ...this.programActions[index],
+                    ...((res as any)?.data),
+                    deletedUser: (res as any)?.data?.deletedUser || (res as any)?.data?.deletedBy,
+                    deletedDate: (res as any)?.data?.deletedDate || new Date().toISOString(),
+                    deleted: true
+                  };
+                  this.programActions = [...this.programActions];
+                  this.cdr.markForCheck();
+                }
               }
             },
             error: (error) => {
@@ -152,8 +165,19 @@ export class ProgramAction extends BaseListComponent implements OnInit, OnDestro
             next: (res) => {
               console.log("response", res);
               if (res.statusCode === 200) {
-                this.toastService.success('Program Action deleted successfully', 'Success');
-                this.loadData();
+                this.toastService.success('Program Action restored successfully', 'Success');
+                const index = this.programActions.findIndex(x => x.actionId === item.actionId);
+                if (index !== -1) {
+                  this.programActions[index] = {
+                    ...this.programActions[index],
+                    ...((res as any)?.data),
+                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy,
+                    modifiedDate: (res as any)?.data?.modifiedDate || new Date().toISOString(),
+                    deleted: false
+                  };
+                  this.programActions = [...this.programActions];
+                  this.cdr.markForCheck();
+                }
               }
             },
             error: (error) => {
@@ -176,14 +200,20 @@ export class ProgramAction extends BaseListComponent implements OnInit, OnDestro
           this.programActionService.update(item.actionId, updatedProgramAction).subscribe({
             next: (res) => {
               console.log("response", res);
-              if (res.statusCode === 200) {
+              if (!res || res.statusCode === 200 || res.statusCode === 204) {
                 this.toastService.success(`Program Action ${item.active ? 'Suspended' : 'Reinstated'} successfully`, 'Success');
-                this.store.dispatch(ProgramActionActions.update({
-                  programAction: {
-                    id: item.actionId,
-                    changes: updatedProgramAction
-                  }
-                }));
+                const index = this.programActions.findIndex(x => x.actionId === item.actionId);
+                if (index !== -1) {
+                  this.programActions[index] = {
+                    ...this.programActions[index],
+                    ...((res as any)?.data),
+                    modifiedUser: (res as any)?.data?.modifiedUser || (res as any)?.data?.modifiedBy,
+                    modifiedDate: (res as any)?.data?.modifiedDate || new Date().toISOString(),
+                    active: status
+                  };
+                  this.programActions = [...this.programActions];
+                  this.cdr.markForCheck();
+                }
               }
             },
             error: (error) => {
@@ -205,16 +235,17 @@ export class ProgramAction extends BaseListComponent implements OnInit, OnDestro
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         if (result.statusCode === 201) {
-          // Add new item
-          this.store.dispatch(ProgramActionActions.add({ programAction: result.data }));
+          this.isLocalUpdate = true;
+          this.programActions = [result.data, ...this.programActions];
+          this.totalCount++;
+          this.cdr.markForCheck();
+          setTimeout(() => this.isLocalUpdate = false, 100);
         } else if (result.statusCode === 200) {
-          // Update existing item - use correct NgRx Entity format
-          this.store.dispatch(ProgramActionActions.update({
-            programAction: {
-              id: result.data.actionId,
-              changes: result.data
-            }
-          }));
+          const index = this.programActions.findIndex(x => x.actionId === result.data.actionId);
+          if (index !== -1) {
+            this.programActions[index] = { ...this.programActions[index], ...result.data };
+          }
+          this.cdr.markForCheck();
         }
       }
     });
@@ -230,13 +261,11 @@ export class ProgramAction extends BaseListComponent implements OnInit, OnDestro
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Dispatch update action
-        this.store.dispatch(ProgramActionActions.update({
-          programAction: {
-            id: result.data.actionId,
-            changes: result.data
-          }
-        }));
+        const index = this.programActions.findIndex(x => x.actionId === result.data.actionId);
+        if (index !== -1) {
+          this.programActions[index] = { ...this.programActions[index], ...result.data };
+        }
+        this.cdr.markForCheck();
       }
     });
   }

@@ -2,12 +2,14 @@ import { Routes } from '@angular/router';
 import { BaseLayout } from './layout/base-layout/base-layout';
 import { BlankLayout } from './layout/blank-layout/blank-layout';
 import { authGuard } from './core/_auth/auth.guard';
+import { guestGuard } from './core/_auth/guest.guard';
 
 
 export const routes: Routes = [
     {
         path: '',
         component: BlankLayout,
+        canActivate: [guestGuard],
         children: [
             {
                 path: '', redirectTo: 'login', pathMatch: 'full'
@@ -25,7 +27,7 @@ export const routes: Routes = [
     {
         path: '',
         component: BaseLayout,
-        // canActivate: [authGuard],
+        canActivate: [authGuard],
         children: [
             {
                 path: 'dashboard',
@@ -64,6 +66,43 @@ export const routes: Routes = [
             {
                 path: 'program-action',
                 loadComponent: () => import('./pages/program-action/program-action').then(m => m.ProgramAction)
+            },
+            {
+                path: 'issue-character-type',
+                loadComponent: () => import('./pages/issue/issue-character-type/issue-character-type').then(m => m.IssueCharacterTypeComponent)
+            },
+            {
+                path: 'issue-media-type',
+                loadComponent: () => import('./pages/issue/issue-media-type/issue-media-type').then(m => m.IssueMediaTypeComponent)
+            },
+            {
+                path: 'issue-media-format',
+                loadComponent: () => import('./pages/issue/issue-media-format/issue-media-format').then(m => m.IssueMediaFormatComponent)
+            },
+            {
+                path: 'issue-status',
+                loadComponent: () => import('./pages/issue/issue-status/issue-status').then(m => m.IssueStatusComponent)
+            },
+            {
+                path: 'issue-type',
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () => import('./pages/issue/issue-type/issue-type-list/issue-type-list').then(m => m.IssueTypeList)
+                    },
+                    {
+                        path: 'add',
+                        loadComponent: () => import('./pages/issue/issue-type/add-edit-issue-type/add-edit-issue-type').then(m => m.AddEditIssueType)
+                    },
+                    {
+                        path: 'edit/:id',
+                        loadComponent: () => import('./pages/issue/issue-type/add-edit-issue-type/add-edit-issue-type').then(m => m.AddEditIssueType)
+                    },
+                    {
+                        path: 'details/:id',
+                        loadComponent: () => import('./pages/issue/issue-type/issue-type-details/issue-type-details').then(m => m.IssueTypeDetails)
+                    }
+                ]
             },
             {
                 path: 'post-office',

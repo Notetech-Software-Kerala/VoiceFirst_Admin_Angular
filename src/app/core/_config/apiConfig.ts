@@ -80,4 +80,29 @@ export const apiConfig = {
     getEmployeeLookup: '/employee/lookup',
     employeeRestore: '/employee/recover',
 
+    //Issue Character Type
+    issueCharacterType: '/issue-character-type',
+    getIssueCharacterTypeLookup: '/issue-character-type/lookup',
+    issueCharacterTypeRestore: '/issue-character-type/recover',
+
+    //Issue Media Format
+    issueMediaFormat: '/issue-media-format',
+    getIssueMediaFormatLookup: '/issue-media-format/lookup',
+    issueMediaFormatRestore: '/issue-media-format/recover',
+
+    //Issue Media Type
+    issueMediaType: '/issue-media-type',
+    getIssueMediaTypeLookup: '/issue-media-type/lookup',
+    issueMediaTypeRestore: '/issue-media-type/recover',
+
+    //Issue Status
+    issueStatus: '/issue-status',
+    getIssueStatusLookup: '/issue-status/lookup',
+    issueStatusRestore: '/issue-status/recover',
+
+    //Issue Type
+    issueType: '/issue-type',
+    getIssueTypeLookup: '/issue-type/lookup',
+    issueTypeRestore: '/issue-type/recover',
+
 };
