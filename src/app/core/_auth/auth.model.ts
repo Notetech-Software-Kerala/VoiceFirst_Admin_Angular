@@ -4,7 +4,7 @@ export interface LoginRequest {
     clientType: string;
     device: {
         deviceID: string;
-        version: string;
+        version: number;
         deviceName: string;
         deviceType: string;
         os: string;

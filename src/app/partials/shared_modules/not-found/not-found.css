@@ -1,0 +1,126 @@
+.not-found-shell {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+    background: var(--color-bg-primary);
+}
+
+.not-found-card {
+    width: 100%;
+    max-width: 620px;
+    /* background: var(--color-bg-sidebar); */
+    /* border: 1px solid var(--color-border-hr); */
+    border-radius: 24px;
+    padding: 48px 36px;
+    text-align: center;
+    /* box-shadow: 0 16px 40px var(--color-shadow); */
+}
+
+.not-found-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 16px;
+    border-radius: 999px;
+    background: var(--color-bg-secondary);
+    color: var(--color-hover-primary);
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+
+.not-found-code {
+    font-size: clamp(4rem, 10vw, 7rem);
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -2px;
+    color: var(--color-hover-primary);
+    margin-bottom: 12px;
+}
+
+.not-found-title {
+    margin: 0 0 12px;
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.not-found-description {
+    max-width: 460px;
+    margin: 0 auto 30px;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--color-text-placeholder);
+}
+
+.not-found-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.btn-primary,
+.btn-secondary {
+    min-width: 160px;
+    height: 46px;
+    border-radius: 12px;
+    padding: 0 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    border: 1px solid var(--color-hover-primary);
+    background: var(--color-hover-primary);
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    opacity: 0.95;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    border: 1px solid var(--color-border-hr);
+    background: transparent;
+    color: var(--color-text-primary);
+}
+
+.btn-secondary:hover {
+    border-color: var(--color-hover-primary);
+    color: var(--color-hover-primary);
+    background: var(--color-bg-secondary);
+}
+
+@media (max-width: 768px) {
+    .not-found-card {
+        padding: 38px 24px;
+        border-radius: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .not-found-shell {
+        padding: 20px 16px;
+    }
+
+    .not-found-card {
+        padding: 30px 18px;
+        border-radius: 18px;
+    }
+
+    .not-found-actions {
+        flex-direction: column;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+    }
+}
