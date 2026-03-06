@@ -82,14 +82,13 @@
 
 .delete-btn-card {
     cursor: pointer;
-    color: var(--invalid-border-color);
-    opacity: 0.7;
+    color: #fa574b;
+    opacity: 0.9;
     transition: opacity 0.2s;
 }
 
 .delete-btn-card:hover {
     opacity: 1;
-    background-color: var(--color-status-error-bg);
     border-radius: 50%;
 }
 

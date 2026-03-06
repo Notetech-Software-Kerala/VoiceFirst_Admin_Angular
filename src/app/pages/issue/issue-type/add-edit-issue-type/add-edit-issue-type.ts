@@ -150,6 +150,18 @@ export class AddEditIssueType implements OnInit {
     this.getMediaTypes(ruleIndex).removeAt(typeIndex);
   }
 
+  getSelectedMediaTypeIds(ruleIndex: number, excludeTypeIndex: number): Set<number> {
+    const selected = new Set<number>();
+    const types = this.getMediaTypes(ruleIndex);
+    types.controls.forEach((ctrl, idx) => {
+      if (idx !== excludeTypeIndex) {
+        const val = ctrl.get('issueMediaTypeId')?.value;
+        if (val != null) selected.add(+val);
+      }
+    });
+    return selected;
+  }
+
   goBack(): void {
     this.router.navigate(['/issue-type']);
   }

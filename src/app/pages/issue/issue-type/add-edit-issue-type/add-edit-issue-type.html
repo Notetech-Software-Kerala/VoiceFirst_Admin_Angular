@@ -112,7 +112,9 @@
                                                 formControlName="issueMediaTypeId">
                                                 <option [value]="null" disabled>Select type</option>
                                                 @for (type of mediaTypes; track type.issueMediaTypeId) {
-                                                <option [value]="type.issueMediaTypeId">{{ type.issueMediaType }}
+                                                <option [value]="type.issueMediaTypeId"
+                                                    [disabled]="getSelectedMediaTypeIds(i, j).has(type.issueMediaTypeId)">
+                                                    {{ type.issueMediaType }}
                                                 </option>
                                                 }
                                             </select>

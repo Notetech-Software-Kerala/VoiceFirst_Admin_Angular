@@ -1,1 +1,161 @@
-<p>issue-type-details works!</p>
+<div class="card detail-card p-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+        <div class="d-flex flex-column gap-2">
+            <div class="d-flex align-items-center gap-3">
+                <h2 class="page-title m-0">{{ issueType?.issueType }}</h2>
+                @if(issueType) {
+                <app-status-badge [item]="issueType"></app-status-badge>
+                }
+            </div>
+            <!-- Meta Info Row -->
+            @if(issueType) {
+            <div class="row g-3 mt-1">
+                @if(issueType.createdDate) {
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2">
+                        <mat-icon class="tiny-icon">calendar_today</mat-icon>
+                        <span class="small">Created: <strong>{{ issueType.createdDate | date:'mediumDate'
+                                }}</strong> by <strong>{{ issueType.createdUser }}</strong></span>
+                    </div>
+                </div>
+                }
+
+                @if(issueType.modifiedDate) {
+                <div class="col-md-auto border-start ps-3 d-none d-md-block"></div>
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2">
+                        <mat-icon class="tiny-icon">edit</mat-icon>
+                        <span class="small">Modified: <strong>{{ issueType.modifiedDate | date:'mediumDate'
+                                }}</strong> by <strong>{{ issueType.modifiedUser }}</strong></span>
+                    </div>
+                </div>
+                }
+
+                @if(issueType.deleted) {
+                <div class="col-md-auto border-start ps-3 d-none d-md-block"></div>
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2 text-danger">
+                        <mat-icon class="tiny-icon">delete</mat-icon>
+                        <span class="small">Deleted: <strong>{{ issueType.deletedDate | date:'mediumDate' }}</strong> by
+                            <strong>{{ issueType.deletedUser }}</strong></span>
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2 flex-wrap">
+            @if(issueType) {
+            @if(!issueType.deleted) {
+            <button type="button" class="btn-action btn-outline-info" (click)="onEdit()">
+                <mat-icon class="msr">edit</mat-icon>
+                <span class="btn-text">Edit</span>
+            </button>
+            <button type="button" class="btn-action"
+                [ngClass]="issueType.active ? 'btn-outline-warning' : 'btn-outline-success'" (click)="onSuspend()">
+                <mat-icon class="msr">{{ issueType.active ? 'block' : 'check_circle' }}</mat-icon>
+                <span class="btn-text">{{ issueType.active ? 'Suspend' : 'Reinstate' }}</span>
+            </button>
+            }
+
+            @if(!issueType.deleted) {
+            <button type="button" class="btn-action btn-outline-danger" (click)="onDelete()">
+                <mat-icon class="msr">delete</mat-icon>
+                <span class="btn-text">Delete</span>
+            </button>
+            }
+            @else {
+            <button type="button" class="btn-action btn-outline-success" (click)="onRestore()">
+                <mat-icon class="msr">restore</mat-icon>
+                <span class="btn-text">Restore</span>
+            </button>
+            }
+
+            <button type="button" class="btn-action btn-outline" (click)="goBack()">
+                <mat-icon class="msr">arrow_back</mat-icon>
+                <span class="btn-text">Back</span>
+            </button>
+            }
+        </div>
+    </div>
+
+    @if(loading) {
+    <app-details-loader [rows]="2"></app-details-loader>
+    } @else if (issueType) {
+
+    <!-- Content Section -->
+    <div class="row">
+        <div class="col-12">
+            <h5 class="section-title mb-4">Media Rules</h5>
+
+            <div class="d-flex flex-column gap-3">
+                @for (rule of issueType.mediaRules; track rule.issueMediaRuleId) {
+                <div class="rule-card">
+                    <!-- Rule Header -->
+                    <div class="rule-header d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <!-- Left: Format Icon & Name -->
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="icon-box">
+                                <mat-icon>description</mat-icon>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <h6 class="rule-format-name mb-0">{{ rule.issueMediaFormat }}</h6>
+                                <span class="rule-sub-text">
+                                    Files: {{ rule.min }} – {{ rule.max }} &nbsp;|&nbsp; Max size: {{ rule.maxSizeMB }} MB
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Right: Active Badge -->
+                        <span class="status-mini" [class.active]="rule.active" [class.inactive]="!rule.active">
+                            <mat-icon class="status-dot-icon">{{rule.active ? 'check_circle' : 'cancel'}}</mat-icon>
+                            {{ rule.active ? 'Active' : 'Inactive' }}
+                        </span>
+                    </div>
+
+                    <!-- Media Types -->
+                    @if(rule.mediaTypes && rule.mediaTypes.length > 0) {
+                    <div class="media-types-container mt-3">
+                        <p class="media-types-label mb-2">
+                            <mat-icon class="label-icon">perm_media</mat-icon>
+                            Media Types
+                        </p>
+                        <div class="d-flex flex-wrap gap-2">
+                            @for (mt of rule.mediaTypes; track mt.issueMediaRuleTypeId) {
+                            <div class="media-type-chip" [class.mandatory]="mt.isMandatory">
+                                <mat-icon class="chip-icon">{{ mt.isMandatory ? 'star' : 'star_border' }}</mat-icon>
+                                <span>{{ mt.issueMediaType }}</span>
+                                @if(mt.isMandatory) {
+                                <span class="mandatory-badge">Required</span>
+                                }
+                            </div>
+                            }
+                        </div>
+                    </div>
+                    } @else {
+                    <div class="no-types-text mt-3">
+                        <mat-icon>info</mat-icon>
+                        <span>No media types configured for this rule.</span>
+                    </div>
+                    }
+                </div>
+                } @empty {
+                <div class="info-box">
+                    <mat-icon>info</mat-icon>
+                    <span>No media rules configured for this issue type.</span>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    } @else {
+    <div class="alert alert-warning">
+        Issue Type not found.
+    </div>
+    }
+
+</div>
