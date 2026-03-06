@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { PostOfficeModel, ZipCode } from './post-office.model';
 import { apiConfig } from '../../_config/apiConfig';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { environment } from '../../../environment/environment';
+import { environment } from '../../../../environments/environment';
 import { ApiResponse, PaginatedData } from '../../_models/api-response.model';
 import { map } from 'rxjs/operators';
 

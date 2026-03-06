@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { IssueMediaFormatModel } from './issue-media-format.model';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { map } from 'rxjs/operators';
-import { environment } from '../../../../environment/environment';
+import { environment } from '../../../../../environments/environment';
 import { ApiResponse, PaginatedData } from '../../../_models/api-response.model';
 import { apiConfig } from '../../../_config/apiConfig';
 
