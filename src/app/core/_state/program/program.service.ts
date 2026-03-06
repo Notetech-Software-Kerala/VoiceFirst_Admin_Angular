@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ProgramModel, ProgramLookupModel } from './program.model';
+import { ProgramModel, ProgramLookupModel, PagedProgramLookupModel } from './program.model';
 import { apiConfig } from '../../_config/apiConfig';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
@@ -58,10 +58,15 @@ export class ProgramService {
     );
   }
 
-  lookup(): Observable<ApiResponse<ProgramLookupModel[]>> {
-    return this.http.get<ApiResponse<ProgramLookupModel[]>>(
-      `${this.base}${apiConfig.getProgramLookup}`
-    )
+  lookup(queryParams: any = {}): Observable<ApiResponse<PagedProgramLookupModel>> {
+    const params = new HttpParams({
+      fromObject: queryParams
+    });
+
+    return this.http.get<ApiResponse<PagedProgramLookupModel>>(
+      `${this.base}${apiConfig.getProgramLookup}`,
+      { params }
+    );
   }
 
   lookupForPlan(queryParams: any = {}): Observable<ApiResponse<PaginatedData<ProgramLookupModel>>> {

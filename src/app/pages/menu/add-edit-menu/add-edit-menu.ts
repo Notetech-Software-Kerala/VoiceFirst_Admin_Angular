@@ -6,12 +6,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MenuService } from '../../../core/_state/menu/menu.service';
 import { PlatformModel, PlatformService } from '../../../core/_state/platform/platform.service';
 import { ProgramService } from '../../../core/_state/program/program.service';
-import { ProgramModel } from '../../../core/_state/program/program.model';
+import { ProgramLookupModel } from '../../../core/_state/program/program.model';
 import { ToastService } from '../../../partials/shared_services/toast.service';
-import { forkJoin, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { forkJoin, of, Subject } from 'rxjs';
+import { switchMap, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { MasterMenuModel } from '../../../core/_state/menu/menu.model';
-
 import { EncryptionService } from '../../../partials/shared_services/encryption.service';
 
 @Component({
@@ -26,11 +25,24 @@ export class AddEditMenu implements OnInit {
   isEditMode = false;
   menuId!: number;
   submitting = false;
-  originalData!: any; // Using any because MasterMenuModel might not strictly match the full response with programs
+  originalData!: any;
+  dataLoaded = false;
 
   platformList: PlatformModel[] = [];
-  programList: any[] = [];
+
+  // Paginated program list
+  programList: ProgramLookupModel[] = [];
   primaryProgramId: number | null = null;
+
+  searchProgramText: string = '';
+  searchSubject = new Subject<string>();
+
+  currentPage = 1;
+  pageSize = 10;
+  totalCount = 0;
+  totalPages = 1;
+
+  private programPageCache = new Map<string, { items: ProgramLookupModel[], totalCount: number, totalPages: number }>();
 
   constructor(
     private location: Location,
@@ -46,7 +58,36 @@ export class AddEditMenu implements OnInit {
 
   ngOnInit(): void {
     this.formInItialize();
-    this.loadLookups();
+
+    // Debounced search
+    this.searchSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged()
+    ).subscribe(searchText => {
+      this.searchProgramText = searchText;
+      this.currentPage = 1;
+      this.programPageCache.clear();
+      this.loadPrograms();
+    });
+
+    this.form.get('route')?.valueChanges.subscribe(val => {
+      const hasRoute = !!val?.trim();
+
+      if (hasRoute) {
+        if (this.programList.length === 0 && this.totalCount === 0) {
+          this.loadPrograms();
+        }
+      } else {
+        this.clearProgramAssociationState();
+      }
+    });
+
+    this.loadPlatformsAndPrograms();
+  }
+
+  get routeHasValue(): boolean {
+    const routeVal = this.form.get('route')?.value;
+    return routeVal && routeVal.trim() !== '';
   }
 
   formInItialize() {
@@ -57,41 +98,108 @@ export class AddEditMenu implements OnInit {
       plateFormId: [null, Validators.required],
       web: [false],
       app: [false],
-      programIds: this.fb.array([]) // Checkboxes for programs
+      programIds: this.fb.array([])
     });
   }
 
-  loadLookups() {
-    forkJoin({
-      platforms: this.platformService.lookup(),
-      programs: this.programService.lookup()
-    }).pipe(
-      switchMap(data => {
-        this.platformList = data.platforms.data;
-        this.programList = data.programs.data; // Assuming lookup returns list of programs
-        return this.route.params;
-      }),
-      switchMap(params => {
+  loadPlatformsAndPrograms() {
+    this.platformService.lookup().subscribe({
+      next: (res) => {
+        this.platformList = res.data;
+      },
+      error: () => { }
+    });
+
+    // We check route via subscription in ngOnInit. 
+    // Here we just handle the edit mode check.
+    if (!this.dataLoaded) {
+      this.route.params.subscribe(params => {
         if (params['id']) {
           const decryptedId = this.encryptionService.decryptFromRoute(params['id']);
           if (decryptedId) {
             this.isEditMode = true;
             this.menuId = +decryptedId;
-            return this.menuService.getById(this.menuId);
+            if (!this.dataLoaded) {
+              this.dataLoaded = true;
+              this.loadMenuForEdit();
+            }
           } else {
             this.toastService.error('Invalid Menu ID', 'Error');
             this.goBack();
-            return of(null);
           }
+        } else {
+          this.dataLoaded = true;
         }
-        return of(null);
-      })
-    ).subscribe({
+      });
+    }
+  }
+
+  loadPrograms() {
+    if (!this.routeHasValue) return;
+
+    const cacheKey = `${this.currentPage}_${this.searchProgramText}`;
+    const cached = this.programPageCache.get(cacheKey);
+
+    if (cached) {
+      this.programList = cached.items;
+      this.totalCount = cached.totalCount;
+      this.totalPages = cached.totalPages;
+      return;
+    }
+
+    const params: any = {
+      PageNumber: this.currentPage,
+      Limit: this.pageSize
+    };
+
+    if (this.searchProgramText) {
+      params.SearchText = this.searchProgramText;
+    }
+
+    this.programService.lookup(params).subscribe({
+      next: (res) => {
+        const pageData = res?.data;
+
+        const items = pageData?.items ?? [];
+        const totalCount = pageData?.totalCount ?? 0;
+        const totalPages = pageData?.totalPages ?? 1;
+
+        this.programPageCache.set(cacheKey, {
+          items,
+          totalCount,
+          totalPages
+        });
+
+        this.programList = items;
+        this.totalCount = totalCount;
+        this.totalPages = totalPages;
+      },
+      error: () => {
+        this.programList = [];
+        this.totalCount = 0;
+        this.totalPages = 1;
+      }
+    });
+  }
+
+  private clearProgramAssociationState() {
+    const programFormArray = this.form.get('programIds') as FormArray;
+    programFormArray.clear();
+
+    this.primaryProgramId = null;
+    this.programList = [];
+    this.searchProgramText = '';
+    this.currentPage = 1;
+    this.totalCount = 0;
+    this.totalPages = 1;
+    this.programPageCache.clear();
+  }
+
+  loadMenuForEdit() {
+    this.menuService.getById(this.menuId).subscribe({
       next: (response: any) => {
         if (response && response.data) {
           this.originalData = response.data;
-          console.log(this.originalData);
-
           this.patchForm(response.data);
         }
       },
@@ -99,6 +207,26 @@ export class AddEditMenu implements OnInit {
         console.error(error);
       }
     });
+  }
+
+  onSearchPrograms(event: Event) {
+    this.searchSubject.next((event.target as HTMLInputElement).value);
+  }
+
+  onPrevPage(event: Event) {
+    event.preventDefault();
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.loadPrograms();
+    }
+  }
+
+  onNextPage(event: Event) {
+    event.preventDefault();
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.loadPrograms();
+    }
   }
 
   patchForm(data: any) {
@@ -131,9 +259,12 @@ export class AddEditMenu implements OnInit {
   toggleProgram(programId: number, isChecked: boolean) {
     const programFormArray = this.form.get('programIds') as FormArray;
     if (isChecked) {
-      programFormArray.push(this.fb.control(programId));
-      if (programFormArray.length === 1) {
-        this.primaryProgramId = programId;
+      const exists = programFormArray.controls.some(x => x.value === programId);
+      if (!exists) {
+        programFormArray.push(this.fb.control(programId));
+        if (programFormArray.length === 1) {
+          this.primaryProgramId = programId;
+        }
       }
     } else {
       const index = programFormArray.controls.findIndex(x => x.value === programId);
@@ -157,7 +288,16 @@ export class AddEditMenu implements OnInit {
 
   isChecked(programId: number): boolean {
     const programFormArray = this.form.get('programIds') as FormArray;
-    return programFormArray.controls.some(x => x.value === programId);
+    return programFormArray.controls.some(control => control.value === programId);
+  }
+
+  toggleProgramCard(programId: number) {
+    const willSelect = !this.isChecked(programId);
+    this.toggleProgram(programId, willSelect);
+
+    if (!willSelect && this.primaryProgramId === programId) {
+      this.primaryProgramId = null;
+    }
   }
 
   goBack() {
@@ -192,10 +332,12 @@ export class AddEditMenu implements OnInit {
   addMenu() {
     const formValue = this.form.value;
 
-    const programsPayload = (formValue.programIds as number[]).map(id => ({
-      programId: id,
-      primary: id === this.primaryProgramId
-    }));
+    const programsPayload = this.routeHasValue
+      ? (formValue.programIds as number[]).map(id => ({
+        programId: id,
+        primary: id === this.primaryProgramId
+      }))
+      : [];
 
     const payload = {
       menuName: formValue.menuName,
@@ -206,8 +348,6 @@ export class AddEditMenu implements OnInit {
       app: formValue.app,
       programIds: programsPayload
     };
-
-    console.log('Add Payload:', payload);
 
     this.menuService.create(payload).subscribe({
       next: (res) => {
@@ -252,7 +392,6 @@ export class AddEditMenu implements OnInit {
     allIds.forEach(id => {
       const isSelected = currentIds.has(id);
       const isPrimary = id === this.primaryProgramId;
-
       const originalP = originalProgramMap.get(id);
 
       if (!originalP) {
@@ -278,8 +417,6 @@ export class AddEditMenu implements OnInit {
       this.submitting = false;
       return;
     }
-
-    console.log('Update Payload:', changes);
 
     this.menuService.update(this.menuId, changes).subscribe({
       next: (res) => {

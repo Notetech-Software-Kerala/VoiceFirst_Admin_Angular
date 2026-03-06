@@ -29,8 +29,13 @@ export interface ProgramModel {
 export interface ProgramLookupModel {
   programId: number;
   programName: string;
-  action: {
-    actionLinkId: number;
-    actionName: string;
-  }[];
+  action: ProgramActionModel[];
+}
+
+export interface PagedProgramLookupModel {
+  items: ProgramLookupModel[];
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
 }
