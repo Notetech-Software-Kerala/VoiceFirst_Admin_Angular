@@ -65,9 +65,9 @@
                     <th>
                         Status
                     </th>
-                    <th>Created By</th>
+                    <!-- <th>Created By</th>
                     <th>Modified By</th>
-                    <th>Deleted By</th>
+                    <th>Deleted By</th> -->
                     <th>Action</th>
                 </tr>
             </thead>
@@ -79,7 +79,7 @@
 
                     <td><app-status-badge [item]="item"></app-status-badge></td>
 
-                    <td>
+                    <!-- <td>
                         @if (item.createdUser || item.createdDate) {
                         <div class="d-flex flex-column">
                             <small>{{ item.createdUser || '-' }}</small>
@@ -110,7 +110,7 @@
                         } @else {
                         <span>-</span>
                         }
-                    </td>
+                    </td> -->
 
                     <td class="action-cell">
                         <button mat-icon-button class="menu-trigger" [matMenuTriggerFor]="rowMenu"
