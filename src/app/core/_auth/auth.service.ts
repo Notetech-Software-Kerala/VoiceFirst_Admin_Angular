@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, map, tap } from 'rxjs/operators';
 import { TokenStore } from './token.store';
-import { environment } from '../../environment/environment';
+import { environment } from '../../../environment/environment';
 import { ApiResponse, LoginData, LoginRequest, RefreshData, UserInfo } from './auth.model';
 import { apiConfig } from '../_config/apiConfig';
 

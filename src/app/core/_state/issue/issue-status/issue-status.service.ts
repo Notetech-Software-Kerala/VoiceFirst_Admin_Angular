@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { IssueStatusModel } from './issue-status.model';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { map } from 'rxjs/operators';
-import { environment } from '../../../../environment/environment';
+import { environment } from '../../../../../environment/environment';
 import { ApiResponse, PaginatedData } from '../../../_models/api-response.model';
 import { apiConfig } from '../../../_config/apiConfig';
 
