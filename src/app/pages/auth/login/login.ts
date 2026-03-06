@@ -74,7 +74,7 @@ export class Login {
         clientType: 'Web',
         device: {
           deviceID: rawDevice.deviceID,
-          version: 1,
+          version: this.APP_VERSION,
           deviceName: rawDevice.deviceName,
           deviceType: rawDevice.deviceType,
           os: rawDevice.os,
