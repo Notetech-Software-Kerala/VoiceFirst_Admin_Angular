@@ -81,42 +81,96 @@
                 </div>
 
                 <!-- Programs -->
-                @if(form.get('route')?.value != null && form.get('route')?.value != ''){
+                @if (routeHasValue) {
                 <div class="col-12">
-                    <label class="form-label fw-bold mb-2">Program Association</label>
-                    <div class="d-flex flex-wrap gap-3 p-3 rounded program-action-list">
-                        @for (program of programList; track program.programId) {
-                        <div class="program-item" [class.selected]="isChecked(program.programId)">
-                            <div class="form-check mb-0 d-flex align-items-center mx-3">
-                                <input class="form-check-input" type="checkbox" [value]="program.programId"
-                                    [id]="'prog-' + program.programId" [checked]="isChecked(program.programId)"
-                                    (change)="onProgramChange($event, program.programId)">
-                                <label class="form-check-label ms-2" [for]="'prog-' + program.programId">
-                                    {{ program.programName }}
-                                </label>
-                            </div>
+                    <div class="program-section-card">
 
-                            <div class="primary-select d-flex align-items-center">
-                                <div class="form-check mb-0 d-flex align-items-center">
-                                    <input class="form-check-input mt-0" type="radio" [name]="'primaryGroup'"
-                                        [id]="'primary-' + program.programId"
-                                        [checked]="primaryProgramId === program.programId"
-                                        [disabled]="!isChecked(program.programId)"
-                                        (change)="setPrimary(program.programId)">
-                                    <label class="form-check-label small"
-                                        [class.text-muted]="!isChecked(program.programId)"
-                                        [for]="'primary-' + program.programId">
-                                        Primary
-                                    </label>
+                        <!-- Section Header -->
+                        <div class="program-section-header">
+                            <div class="d-flex align-items-center gap-2">
+                                <mat-icon class="section-header-icon">account_tree</mat-icon>
+                                <div>
+                                    <span class="section-header-title">Program Association</span>
+                                    @if(form.get('programIds')?.value?.length > 0) {
+                                    <span class="selected-count-badge">{{ form.get('programIds')?.value?.length }}
+                                        selected</span>
+                                    }
                                 </div>
                             </div>
+
+                            <!-- Search -->
+                            <div class="prog-search-box position-relative">
+                                <mat-icon class="prog-search-icon">search</mat-icon>
+                                <input type="text" class="prog-search-input" placeholder="Search programs..."
+                                    (input)="onSearchPrograms($event)" [value]="searchProgramText">
+                            </div>
                         </div>
-                        }
-                        @if (programList.length === 0) {
-                        <div class="text-muted small">
-                            No programs available.
+
+                        <!-- Program Grid -->
+                        <div class="program-grid">
+                            @for (program of programList; track program.programId) {
+                            <div class="prog-card" [class.prog-card--selected]="isChecked(program.programId)"
+                                [class.prog-card--primary]="primaryProgramId === program.programId"
+                                (click)="toggleProgramCard(program.programId)">
+
+                                <!-- Selection Indicator -->
+                                <div class="prog-card-check">
+                                    <input class="form-check-input" type="checkbox" [value]="program.programId"
+                                        [id]="'prog-' + program.programId" [checked]="isChecked(program.programId)"
+                                        (click)="$event.stopPropagation()"
+                                        (change)="onProgramChange($event, program.programId)">
+                                </div>
+
+                                <!-- Icon & Name -->
+                                <div class="prog-card-body">
+                                    <label class="prog-name" [for]="'prog-' + program.programId"
+                                        (click)="$event.stopPropagation()">
+                                        {{ program.programName }}
+                                    </label>
+                                </div>
+
+                                <!-- Primary Badge / Button -->
+                                <div class="prog-card-footer" (click)="$event.stopPropagation()">
+                                    @if(isChecked(program.programId)) {
+                                    <button type="button" class="primary-btn"
+                                        [class.primary-btn--active]="primaryProgramId === program.programId"
+                                        (click)="setPrimary(program.programId)">
+                                        <mat-icon class="primary-btn-icon">
+                                            {{ primaryProgramId === program.programId ? 'star' : 'star_border' }}
+                                        </mat-icon>
+                                        <span>{{ primaryProgramId === program.programId ? 'Primary' : 'Set Primary'
+                                            }}</span>
+                                    </button>
+                                    }
+                                </div>
+                            </div>
+                            }
+
+                            @if (programList.length === 0) {
+                            <div class="prog-empty-state">
+                                <mat-icon class="prog-empty-icon">search_off</mat-icon>
+                                <p class="prog-empty-text">No programs found.</p>
+                            </div>
+                            }
                         </div>
-                        }
+
+                        <!-- Pagination -->
+                        <div class="prog-pagination">
+                            <button type="button" class="prog-page-btn" [disabled]="currentPage <= 1"
+                                (click)="onPrevPage($event)">
+                                <mat-icon style="font-size:18px;width:18px;height:18px;">chevron_left</mat-icon>
+                                Previous
+                            </button>
+                            <span class="prog-page-info">Page {{ currentPage }} of {{ totalPages || 1 }}
+                                <span class="prog-total-count">({{ totalCount }} total)</span>
+                            </span>
+                            <button type="button" class="prog-page-btn" [disabled]="currentPage >= totalPages"
+                                (click)="onNextPage($event)">
+                                Next
+                                <mat-icon style="font-size:18px;width:18px;height:18px;">chevron_right</mat-icon>
+                            </button>
+                        </div>
+
                     </div>
                 </div>
                 }

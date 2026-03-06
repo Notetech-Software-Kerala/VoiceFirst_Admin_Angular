@@ -5,6 +5,7 @@ import { ToastService } from '../../../partials/shared_services/toast.service';
 import { CommonModule } from '@angular/common';
 import { BrowserDeviceService } from '../../../core/_service/browser-device.service';
 import { AuthService } from '../../../core/_auth/auth.service';
+import { APP_VERSION } from '../../../../environments/version';
 
 
 @Component({
@@ -14,6 +15,8 @@ import { AuthService } from '../../../core/_auth/auth.service';
   styleUrl: './login.css',
 })
 export class Login {
+  APP_VERSION = APP_VERSION;
+
   hidePassword = true;
   submitting = false;
   loginForm!: FormGroup;

@@ -6,6 +6,7 @@ import { filter, map, shareReplay, Subject, takeUntil } from 'rxjs';
 import { ConfirmDialog } from '../../partials/shared_modules/confirm-dialog/confirm-dialog';
 import { MENU_CONFIG, MenuItem } from '../../core/_config/menuConfig';
 import { AuthService } from '../../core/_auth/auth.service';
+import { APP_VERSION, BUILD_TIME } from '../../../environments/version';
 
 @Component({
   selector: 'app-base-layout',
@@ -14,6 +15,8 @@ import { AuthService } from '../../core/_auth/auth.service';
   styleUrl: './base-layout.css',
 })
 export class BaseLayout {
+  APP_VERSION = APP_VERSION;
+  BUILD_TIME = BUILD_TIME;
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
   private router = inject(Router);
   private bpo = inject(BreakpointObserver);
