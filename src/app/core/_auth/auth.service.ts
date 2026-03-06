@@ -149,6 +149,8 @@ export class AuthService {
      * Also guarded so multiple calls collapse into one.
      */
     refresh(): Observable<string> {
+        console.log("Refresh token working");
+
         if (this.refreshInFlight) return this.refreshInFlight;
 
         this.refreshInFlight = this.http
@@ -160,6 +162,9 @@ export class AuthService {
                 map(res => res.data.accessToken),
                 finalize(() => (this.refreshInFlight = undefined))
             );
+
+        console.log("Refresh In flight", this.refreshInFlight);
+
 
         return this.refreshInFlight;
     }

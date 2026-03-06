@@ -23,7 +23,7 @@
                 </div>
 
                 <!-- Media Rules Section -->
-                <div class="col-md-12 mt-2">
+                <div class="col-md-12 mt-4">
                     <div class="d-flex align-items-center justify-content-between mb-2">
                         <label class="form-label mb-0 fw-semibold">Media Rules</label>
                         <button type="button"
@@ -39,16 +39,18 @@
                         @for (rule of mediaRules.controls; track $index; let i = $index) {
                         <div class="media-rule-card" [formGroupName]="i">
                             <div class="media-rule-header">
-                                <span class="media-rule-title">Rule #{{ i + 1 }}</span>
-                                <button type="button" mat-icon-button class="remove-rule-btn"
-                                    (click)="removeMediaRule(i)" title="Remove Rule">
-                                    <mat-icon class="msr">delete</mat-icon>
-                                </button>
+                                <span class="media-rule-title">
+                                    <span class="media-rule-title-badge">{{ i + 1 }}</span>
+                                    Rule Configuration
+                                </span>
+
+                                <mat-icon class="msr-delete" (click)="removeMediaRule(i)">delete</mat-icon>
+
                             </div>
 
-                            <div class="row g-2 mt-1">
+                            <div class="row g-3">
                                 <!-- Media Format -->
-                                <div class="col-md-6">
+                                <div class="col-12 col-md-6 col-xl-3">
                                     <label class="form-label small">Media Format <span
                                             class="text-danger">*</span></label>
                                     <select class="form-select form-select-sm" formControlName="issueMediaFormatId">
@@ -60,7 +62,7 @@
                                 </div>
 
                                 <!-- Max Size MB -->
-                                <div class="col-md-6">
+                                <div class="col-12 col-md-6 col-xl-3">
                                     <label class="form-label small">Max Size (MB) <span
                                             class="text-danger">*</span></label>
                                     <input type="number" class="form-control form-control-sm"
@@ -68,14 +70,14 @@
                                 </div>
 
                                 <!-- Min -->
-                                <div class="col-md-6">
+                                <div class="col-6 col-md-6 col-xl-3">
                                     <label class="form-label small">Min Count <span class="text-danger">*</span></label>
                                     <input type="number" class="form-control form-control-sm" formControlName="min"
                                         min="0" placeholder="0" />
                                 </div>
 
                                 <!-- Max -->
-                                <div class="col-md-6">
+                                <div class="col-6 col-md-6 col-xl-3">
                                     <label class="form-label small">Max Count <span class="text-danger">*</span></label>
                                     <input type="number" class="form-control form-control-sm" formControlName="max"
                                         min="1" placeholder="1" />
@@ -83,9 +85,15 @@
                             </div>
 
                             <!-- Media Types Sub-section -->
-                            <div class="mt-3">
-                                <div class="d-flex align-items-center justify-content-between mb-1">
-                                    <label class="form-label mb-0 small fw-semibold">Media Types</label>
+                            <div class="mt-4 media-type-well">
+                                <div class="d-flex align-items-center justify-content-between mb-3 pb-2"
+                                    style="border-bottom: 1px solid var(--color-border-hr);">
+                                    <h6 class="mb-0 fs-14 fw-semibold d-flex align-items-center gap-2"
+                                        style="color: var(--color-text-primary);">
+                                        <mat-icon class="msr"
+                                            style="font-size:18px;width:18px;height:18px;">attachment</mat-icon>
+                                        Allowed Media Types
+                                    </h6>
                                     <button type="button"
                                         class="btn-action btn-outline btn-xs d-flex align-items-center justify-content-center gap-1"
                                         (click)="addMediaType(i)">
@@ -97,28 +105,44 @@
 
                                 <div formArrayName="mediaTypes">
                                     @for (mt of getMediaTypes(i).controls; track $index; let j = $index) {
-                                    <div [formGroupName]="j" class="media-type-row">
-                                        <select class="form-select form-select-sm flex-grow-1"
-                                            formControlName="issueMediaTypeId">
-                                            <option [value]="null" disabled>Select type</option>
-                                            @for (type of mediaTypes; track type.issueMediaTypeId) {
-                                            <option [value]="type.issueMediaTypeId">{{ type.issueMediaType }}</option>
-                                            }
-                                        </select>
-                                        <div class="d-flex align-items-center gap-2 ms-2">
-                                            <input type="checkbox" class="form-check-input mt-0"
-                                                formControlName="isMandatory" [id]="'mandatory-' + i + '-' + j" />
-                                            <label class="form-check-label small mb-0"
-                                                [for]="'mandatory-' + i + '-' + j">Mandatory</label>
+                                    <div [formGroupName]="j"
+                                        class="row g-2 align-items-center mb-2 media-type-row-ui rounded p-2">
+                                        <div class="col-12 col-sm-6 col-md-6">
+                                            <select class="form-select form-select-sm shadow-none w-100"
+                                                formControlName="issueMediaTypeId">
+                                                <option [value]="null" disabled>Select type</option>
+                                                @for (type of mediaTypes; track type.issueMediaTypeId) {
+                                                <option [value]="type.issueMediaTypeId">{{ type.issueMediaType }}
+                                                </option>
+                                                }
+                                            </select>
                                         </div>
-                                        <button type="button" mat-icon-button class="remove-type-btn"
-                                            (click)="removeMediaType(i, j)">
-                                            <mat-icon class="msr">close</mat-icon>
-                                        </button>
+                                        <div class="col-8 col-sm-4 col-md-4">
+                                            <div class="form-check d-flex align-items-center gap-2 mt-1">
+                                                <input class="form-check-input mt-0" style="cursor: pointer;"
+                                                    type="checkbox" formControlName="isMandatory"
+                                                    [id]="'mandatory-' + i + '-' + j" />
+                                                <label class="form-check-label small mb-0 mt-1 user-select-none"
+                                                    style="cursor: pointer;"
+                                                    [for]="'mandatory-' + i + '-' + j">Mandatory</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-sm-2 col-md-2 text-end">
+                                            <mat-icon class="delete-btn-card"
+                                                style="font-size: 1.2rem; width: 1.2rem; height: 1.2rem;"
+                                                (click)="removeMediaType(i, j)">close</mat-icon>
+                                        </div>
                                     </div>
                                     }
                                     @if (getMediaTypes(i).length === 0) {
-                                    <small class="text-muted">No media types added. Click "Add Type" to add one.</small>
+                                    <div class="text-center p-3 rounded border border-dashed"
+                                        style="border-color: var(--color-border-hr) !important;">
+                                        <mat-icon class="msr"
+                                            style="color: var(--color-text-placeholder);">attach_file</mat-icon>
+                                        <small class="d-block mt-1" style="color: var(--color-text-primary);">No media
+                                            types added. Click "Add Type" to
+                                            include one.</small>
+                                    </div>
                                     }
                                 </div>
                             </div>
@@ -127,9 +151,13 @@
 
                         @if (mediaRules.length === 0) {
                         <div class="no-rules-hint">
-                            <mat-icon class="msr" style="opacity:0.4;">image</mat-icon>
-                            <small class="text-muted">No media rules defined. Click "Add Rule" to configure allowed
-                                formats.</small>
+                            <mat-icon class="msr opacity-50"
+                                style="font-size:40px;width:40px;height:40px; color: var(--color-hover-primary);">collections</mat-icon>
+                            <h6 class="mt-3 mb-1 fw-semibold" style="color: var(--color-text-primary);">No Media Rules
+                                Added</h6>
+                            <small style="color: var(--color-text-placeholder);">Click the "Add Rule" button above to
+                                configure allowed formats and
+                                limits.</small>
                         </div>
                         }
                     </div>

@@ -97,6 +97,10 @@ export const routes: Routes = [
                     {
                         path: 'edit/:id',
                         loadComponent: () => import('./pages/issue/issue-type/add-edit-issue-type/add-edit-issue-type').then(m => m.AddEditIssueType)
+                    },
+                    {
+                        path: 'details/:id',
+                        loadComponent: () => import('./pages/issue/issue-type/issue-type-details/issue-type-details').then(m => m.IssueTypeDetails)
                     }
                 ]
             },

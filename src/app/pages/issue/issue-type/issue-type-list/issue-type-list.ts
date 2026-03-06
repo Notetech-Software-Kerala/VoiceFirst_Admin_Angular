@@ -210,12 +210,17 @@ export class IssueTypeList extends BaseListComponent implements OnInit, OnDestro
       });
   }
 
-  openAddDialog() {
+  navigateToAdd() {
     this.router.navigate(['/issue-type/add']);
   }
 
-  openEditDialog(item: IssueTypeModel) {
+  navigateToEdit(item: IssueTypeModel) {
     const encryptedId = this.encryptionService.encryptForRoute(item.issueTypeId);
     this.router.navigate(['/issue-type/edit', encryptedId]);
+  }
+
+  navigateToDetails(item: IssueTypeModel) {
+    const encryptedId = this.encryptionService.encryptForRoute(item.issueTypeId);
+    this.router.navigate(['/issue-type/details', encryptedId]);
   }
 }

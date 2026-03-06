@@ -22,7 +22,7 @@
                 <span class="btn-text">Export</span>
             </button> -->
 
-            <button type="button" class="btn-action btn-primary" (click)="openAddDialog()">
+            <button type="button" class="btn-action btn-primary" (click)="navigateToAdd()">
                 <mat-icon class="msr">add</mat-icon>
                 <span class="btn-text">Add</span>
             </button>
@@ -75,7 +75,7 @@
             <tbody>
                 @for (item of issueTypes; track item.issueTypeId) {
                 <tr>
-                    <td>{{ item.issueType }}</td>
+                    <td><a class="list-link" (click)="navigateToDetails(item)">{{ item.issueType }}</a></td>
 
                     <td><app-status-badge [item]="item"></app-status-badge></td>
 
@@ -120,7 +120,7 @@
 
                         <mat-menu #rowMenu="matMenu" class="row-menu" xPosition="before" yPosition="below">
                             @if (!item.deleted) {
-                            <button mat-menu-item (click)="openEditDialog(item)">
+                            <button mat-menu-item (click)="navigateToEdit(item)">
                                 <mat-icon class="msr-edit">edit</mat-icon>
                                 <span>Edit</span>
                             </button>
