@@ -45,6 +45,12 @@ export class IssueTypeService {
     );
   }
 
+  getById(id: number): Observable<ApiResponse<IssueTypeModel>> {
+    return this.http.get<ApiResponse<IssueTypeModel>>(
+      `${this.base}${apiConfig.issueType}/${id}`
+    );
+  }
+
   restore(id: number): Observable<ApiResponse<void>> {
     return this.http.patch<ApiResponse<void>>(
       `${this.base}${apiConfig.issueTypeRestore}/${id}`,

@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+
 import { Store } from '@ngrx/store';
 import { IssueTypeActions } from '../../../../core/_state/issue/issue-type/issue-type.action';
 import { IssueTypeModel } from '../../../../core/_state/issue/issue-type/issue-type.model';
@@ -24,7 +24,7 @@ import { CommonModule } from '@angular/common';
 import { BaseListComponent } from '../../../../core/base/base-list.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EncryptionService } from '../../../../partials/shared_services/encryption.service';
-import { AddEditIssueType } from '../add-edit-issue-type/add-edit-issue-type';
+
 
 @Component({
   selector: 'app-issue-type-list',
@@ -40,7 +40,6 @@ export class IssueTypeList extends BaseListComponent implements OnInit, OnDestro
   isLocalUpdate: boolean = false;
 
   constructor(
-    private dialog: MatDialog,
     private store: Store,
     protected override cdr: ChangeDetectorRef,
     private confirmationService: ConfirmationService,
@@ -212,48 +211,11 @@ export class IssueTypeList extends BaseListComponent implements OnInit, OnDestro
   }
 
   openAddDialog() {
-    const dialogRef = this.dialog.open(AddEditIssueType, {
-      width: '700px',
-      maxWidth: '95vw',
-      disableClose: true,
-      data: null
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        if (result.statusCode === 201) {
-          this.isLocalUpdate = true;
-          this.issueTypes = [result.data, ...this.issueTypes];
-          this.totalCount++;
-          this.cdr.markForCheck();
-          setTimeout(() => this.isLocalUpdate = false, 100);
-        } else if (result.statusCode === 200) {
-          const index = this.issueTypes.findIndex(x => x.issueTypeId === result.data.issueTypeId);
-          if (index !== -1) {
-            this.issueTypes[index] = { ...this.issueTypes[index], ...result.data };
-          }
-          this.cdr.markForCheck();
-        }
-      }
-    });
+    this.router.navigate(['/issue-type/add']);
   }
 
   openEditDialog(item: IssueTypeModel) {
-    const dialogRef = this.dialog.open(AddEditIssueType, {
-      width: '700px',
-      maxWidth: '95vw',
-      disableClose: true,
-      data: item
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        const index = this.issueTypes.findIndex(x => x.issueTypeId === result.data.issueTypeId);
-        if (index !== -1) {
-          this.issueTypes[index] = { ...this.issueTypes[index], ...result.data };
-        }
-        this.cdr.markForCheck();
-      }
-    });
+    const encryptedId = this.encryptionService.encryptForRoute(item.issueTypeId);
+    this.router.navigate(['/issue-type/edit', encryptedId]);
   }
 }

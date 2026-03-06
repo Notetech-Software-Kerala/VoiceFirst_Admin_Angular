@@ -85,7 +85,20 @@ export const routes: Routes = [
             },
             {
                 path: 'issue-type',
-                loadComponent: () => import('./pages/issue/issue-type/issue-type-list/issue-type-list').then(m => m.IssueTypeList)
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () => import('./pages/issue/issue-type/issue-type-list/issue-type-list').then(m => m.IssueTypeList)
+                    },
+                    {
+                        path: 'add',
+                        loadComponent: () => import('./pages/issue/issue-type/add-edit-issue-type/add-edit-issue-type').then(m => m.AddEditIssueType)
+                    },
+                    {
+                        path: 'edit/:id',
+                        loadComponent: () => import('./pages/issue/issue-type/add-edit-issue-type/add-edit-issue-type').then(m => m.AddEditIssueType)
+                    }
+                ]
             },
             {
                 path: 'post-office',

@@ -1,7 +1,8 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IssueTypeModel } from '../../../../core/_state/issue/issue-type/issue-type.model';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { ActivatedRoute, Router } from '@angular/router';
+import { EncryptionService } from '../../../../partials/shared_services/encryption.service';
 import { Store } from '@ngrx/store';
 import { IssueTypeService } from '../../../../core/_state/issue/issue-type/issue-type.service';
 import { UtilityService } from '../../../../partials/shared_services/utility.service';
@@ -25,9 +26,10 @@ export class AddEditIssueType implements OnInit {
   mediaFormats: any[] = [];
   mediaTypes: any[] = [];
 
+  issueTypeId: number | null = null;
+
   constructor(
     private fb: FormBuilder,
-    private dialogRef: MatDialogRef<AddEditIssueType>,
     private store: Store,
     private issueTypeService: IssueTypeService,
     private issueMediaFormatService: IssueMediaFormatService,
@@ -35,14 +37,59 @@ export class AddEditIssueType implements OnInit {
     private utilityService: UtilityService,
     private toastService: ToastService,
     private confirmationService: ConfirmationService,
-    @Inject(MAT_DIALOG_DATA) public data: IssueTypeModel | null,
+    private route: ActivatedRoute,
+    private router: Router,
+    private encryptionService: EncryptionService
   ) { }
 
   ngOnInit() {
     this.formInitialize();
     this.loadLookups();
-    if (this.data) {
-      this.form.patchValue({ issueType: this.data.issueType });
+
+    this.route.paramMap.subscribe(params => {
+      const encryptedId = params.get('id');
+      if (encryptedId) {
+        this.issueTypeId = Number(this.encryptionService.decryptFromRoute(encryptedId));
+        this.loadIssueTypeForEdit();
+      }
+    });
+  }
+
+  loadIssueTypeForEdit() {
+    if (this.issueTypeId) {
+      this.issueTypeService.getById(this.issueTypeId).subscribe({
+        next: (res: any) => {
+          if (res.statusCode === 200 && res.data) {
+            this.form.patchValue({ issueType: res.data.issueType });
+
+            // Populate media rules if available
+            if (res.data.mediaRules && res.data.mediaRules.length > 0) {
+              res.data.mediaRules.forEach((rule: any, ruleIndex: number) => {
+                this.addMediaRule();
+                const ruleGroup = this.mediaRules.at(ruleIndex);
+                ruleGroup.patchValue({
+                  issueMediaFormatId: rule.issueMediaFormatId,
+                  min: rule.min,
+                  max: rule.max,
+                  maxSizeMB: rule.maxSizeMB
+                });
+
+                if (rule.mediaTypes && rule.mediaTypes.length > 0) {
+                  rule.mediaTypes.forEach((type: any, typeIndex: number) => {
+                    this.addMediaType(ruleIndex);
+                    const typeGroup = this.getMediaTypes(ruleIndex).at(typeIndex);
+                    typeGroup.patchValue({
+                      issueMediaTypeId: type.issueMediaTypeId,
+                      isMandatory: type.isMandatory
+                    });
+                  });
+                }
+              });
+            }
+          }
+        },
+        error: (err: any) => console.log(err)
+      });
     }
   }
 
@@ -103,8 +150,8 @@ export class AddEditIssueType implements OnInit {
     this.getMediaTypes(ruleIndex).removeAt(typeIndex);
   }
 
-  closeDialog(response?: any): void {
-    this.dialogRef.close(response);
+  goBack(): void {
+    this.router.navigate(['/issue-type']);
   }
 
   onSubmit() {
@@ -113,7 +160,7 @@ export class AddEditIssueType implements OnInit {
       return;
     }
     this.isSubmitting = true;
-    if (this.data) {
+    if (this.issueTypeId) {
       this.updateIssueType();
     } else {
       this.addIssueType();
@@ -128,7 +175,7 @@ export class AddEditIssueType implements OnInit {
         next: (res) => {
           if (res.statusCode === 201) {
             this.toastService.success('Issue Type added successfully', 'Success');
-            this.closeDialog(res);
+            this.goBack();
           }
         },
         error: (err) => {
@@ -148,13 +195,13 @@ export class AddEditIssueType implements OnInit {
     if (this.mediaRules.length > 0) {
       payload.mediaRules = this.buildMediaRulesPayload();
     }
-    this.issueTypeService.update(this.data!.issueTypeId, payload)
+    this.issueTypeService.update(this.issueTypeId as number, payload)
       .pipe(finalize(() => this.isSubmitting = false))
       .subscribe({
         next: (res) => {
           if (!res || res.statusCode === 200 || res.statusCode === 204) {
             this.toastService.success('Issue Type updated successfully', 'Success');
-            this.closeDialog(res);
+            this.goBack();
           }
         },
         error: (err) => {
@@ -170,7 +217,7 @@ export class AddEditIssueType implements OnInit {
           next: (res: any) => {
             if (res.statusCode === 200) {
               this.toastService.success('Issue Type restored successfully', 'Success');
-              this.closeDialog(res);
+              this.goBack();
             }
           },
           error: (err) => console.log('error', err)
@@ -204,6 +251,6 @@ export class AddEditIssueType implements OnInit {
   }
 
   get title(): string {
-    return this.data ? 'Edit Issue Type' : 'Add Issue Type';
+    return this.issueTypeId ? 'Edit Issue Type' : 'Add Issue Type';
   }
 }
