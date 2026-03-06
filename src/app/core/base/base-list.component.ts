@@ -39,11 +39,11 @@ export abstract class BaseListComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         // Initial load handled by route subscription
-        this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
+        this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(async params => {
             if (params['q']) {
-                const decrypted = this.encryptionService.decrypt(params['q']);
+                const decrypted = await this.encryptionService.decrypt(params['q']);
                 if (decrypted) {
-                    this.queryParams = decrypted;
+                    this.queryParams = decrypted as QueryParameterModel;
 
                     // Restore pagination state
                     if (this.queryParams.PageNumber) this.currentPage = Number(this.queryParams.PageNumber);
@@ -188,8 +188,8 @@ export abstract class BaseListComponent implements OnInit, OnDestroy {
         this.onFilterChange({});
     }
 
-    updateUrl() {
-        const encrypted = this.encryptionService.encrypt(this.queryParams);
+    async updateUrl() {
+        const encrypted = await this.encryptionService.encrypt(this.queryParams);
         this.router.navigate([], {
             relativeTo: this.route,
             queryParams: { q: encrypted }

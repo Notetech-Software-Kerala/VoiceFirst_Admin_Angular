@@ -97,6 +97,8 @@ export class AddEditPlan implements OnInit {
     const cached = this.actionPageCache.get(cacheKey as any);
     if (cached) {
       this.actionList = cached.items;
+      console.log("ActionList");
+      
       this.totalCount = cached.totalCount;
       this.totalPages = cached.totalPages;
       return;
@@ -192,12 +194,15 @@ export class AddEditPlan implements OnInit {
     }
   }
 
-  onActionChange(event: Event, actionId: number) {
+  onActionChange(event: Event, actionId?: number) {
     const isChecked = (event.target as HTMLInputElement).checked;
     this.toggleAction(actionId, isChecked);
   }
 
-  toggleAction(actionId: number, isChecked: boolean) {
+  toggleAction(actionId: number | undefined, isChecked: boolean) {
+    if (actionId == null) {
+      return;
+    }
     const actionFormArray = this.form.get('actionIds') as FormArray;
     if (isChecked) {
       const exists = actionFormArray.controls.some(x => x.value === actionId);
@@ -212,7 +217,10 @@ export class AddEditPlan implements OnInit {
     }
   }
 
-  isChecked(actionId: number): boolean {
+  isChecked(actionId: number | undefined): boolean {
+    if (actionId == null) {
+      return false;
+    }
     const actionFormArray = this.form.get('actionIds') as FormArray;
     return actionFormArray.controls.some(x => x.value === actionId);
   }

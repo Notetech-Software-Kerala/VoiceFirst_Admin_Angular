@@ -1,63 +1,158 @@
 import { Injectable } from '@angular/core';
-import * as CryptoJS from 'crypto-js';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class EncryptionService {
-    // Hardcoded secret key as per current project structure constraints
-    // In a real production env, this should be in environment files or fetched securely
-    private readonly SECRET_KEY = 'VoiceFirstAdminSecretKey';
+  // Not truly secret if shipped in frontend code.
+  private readonly SECRET_KEY = 'VoiceFirstAdminSecretKey';
 
-    constructor() { }
+  private encoder = new TextEncoder();
+  private decoder = new TextDecoder();
 
-    encrypt(data: any): string {
-        try {
-            if (!data) return '';
-            const jsonString = JSON.stringify(data);
-            const encrypted = CryptoJS.AES.encrypt(jsonString, this.SECRET_KEY).toString();
-            // URL safe replacement if needed, but Angular router usually handles encoding
-            return encrypted;
-        } catch (e) {
-            console.error('Encryption failed', e);
-            return '';
-        }
+  constructor() {}
+
+  private async getKey(): Promise<CryptoKey> {
+    const keyMaterial = await crypto.subtle.digest(
+      'SHA-256',
+      this.encoder.encode(this.SECRET_KEY)
+    );
+
+    return crypto.subtle.importKey(
+      'raw',
+      keyMaterial,
+      { name: 'AES-GCM' },
+      false,
+      ['encrypt', 'decrypt']
+    );
+  }
+
+  private toBase64(bytes: Uint8Array): string {
+    let binary = '';
+    for (const b of bytes) binary += String.fromCharCode(b);
+    return btoa(binary);
+  }
+
+  private fromBase64(base64: string): Uint8Array {
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
     }
+    return bytes;
+  }
 
-    decrypt(ciphertext: string): any {
-        try {
-            if (!ciphertext) return null;
-            const bytes = CryptoJS.AES.decrypt(ciphertext, this.SECRET_KEY);
-            const decryptedString = bytes.toString(CryptoJS.enc.Utf8);
-            if (!decryptedString) return null;
-            return JSON.parse(decryptedString);
-        } catch (e) {
-            console.error('Decryption failed', e);
-            return null;
-        }
+  private toBase64Url(bytes: Uint8Array): string {
+    return this.toBase64(bytes)
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/g, '');
+  }
+
+  private fromBase64Url(base64Url: string): Uint8Array {
+    let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    while (base64.length % 4) base64 += '=';
+    return this.fromBase64(base64);
+  }
+
+  async encrypt(data: unknown): Promise<string> {
+    try {
+      if (data == null) return '';
+
+      const key = await this.getKey();
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const plaintext = this.encoder.encode(JSON.stringify(data));
+
+      const encryptedBuffer = await crypto.subtle.encrypt(
+        { name: 'AES-GCM', iv },
+        key,
+        plaintext
+      );
+
+      const encryptedBytes = new Uint8Array(encryptedBuffer);
+
+      // prepend IV to ciphertext
+      const combined = new Uint8Array(iv.length + encryptedBytes.length);
+      combined.set(iv, 0);
+      combined.set(encryptedBytes, iv.length);
+
+      return this.toBase64(combined);
+    } catch (e) {
+      console.error('Encryption failed', e);
+      return '';
     }
+  }
 
-    encryptForRoute(id: string | number): string {
-        if (!id) return '';
-        const encrypted = CryptoJS.AES.encrypt(id.toString(), this.SECRET_KEY).toString();
-        // Make URL safe: replace + with -, / with _, and remove =
-        return encrypted.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  async decrypt(ciphertext: string): Promise<any> {
+    try {
+      if (!ciphertext) return null;
+
+      const key = await this.getKey();
+      const combined = this.fromBase64(ciphertext);
+
+      const iv = combined.slice(0, 12);
+      const encryptedBytes = combined.slice(12);
+
+      const decryptedBuffer = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv },
+        key,
+        encryptedBytes
+      );
+
+      const decryptedString = this.decoder.decode(decryptedBuffer);
+      return JSON.parse(decryptedString);
+    } catch (e) {
+      console.error('Decryption failed', e);
+      return null;
     }
+  }
 
-    decryptFromRoute(encryptedId: string | null): string | null {
-        if (!encryptedId) return null;
-        // Restore from URL safe: replace - with +, _ with /, and pad with =
-        let restored = encryptedId.replace(/-/g, '+').replace(/_/g, '/');
-        while (restored.length % 4) {
-            restored += '=';
-        }
+  async encryptForRoute(id: string | number): Promise<string> {
+    try {
+      if (id == null || id === '') return '';
 
-        try {
-            const bytes = CryptoJS.AES.decrypt(restored, this.SECRET_KEY);
-            return bytes.toString(CryptoJS.enc.Utf8);
-        } catch (e) {
-            console.error('Route decryption failed', e);
-            return null;
-        }
+      const key = await this.getKey();
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const plaintext = this.encoder.encode(String(id));
+
+      const encryptedBuffer = await crypto.subtle.encrypt(
+        { name: 'AES-GCM', iv },
+        key,
+        plaintext
+      );
+
+      const encryptedBytes = new Uint8Array(encryptedBuffer);
+      const combined = new Uint8Array(iv.length + encryptedBytes.length);
+      combined.set(iv, 0);
+      combined.set(encryptedBytes, iv.length);
+
+      return this.toBase64Url(combined);
+    } catch (e) {
+      console.error('Route encryption failed', e);
+      return '';
     }
+  }
+
+  async decryptFromRoute(encryptedId: string | null): Promise<string | null> {
+    try {
+      if (!encryptedId) return null;
+
+      const key = await this.getKey();
+      const combined = this.fromBase64Url(encryptedId);
+
+      const iv = combined.slice(0, 12);
+      const encryptedBytes = combined.slice(12);
+
+      const decryptedBuffer = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv },
+        key,
+        encryptedBytes
+      );
+
+      return this.decoder.decode(decryptedBuffer);
+    } catch (e) {
+      console.error('Route decryption failed', e);
+      return null;
+    }
+  }
 }
