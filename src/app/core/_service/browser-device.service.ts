@@ -69,21 +69,21 @@ export class BrowserDeviceService {
   }
 
   private generateDeviceId(): string {
-    // Preferred path
-    if (typeof globalThis !== 'undefined' && globalThis.crypto?.randomUUID) {
-      return globalThis.crypto.randomUUID();
+    const c = globalThis?.crypto;
+
+    if (c?.randomUUID) {
+      return c.randomUUID();
     }
 
-    // Fallback using crypto.getRandomValues
-    if (typeof globalThis !== 'undefined' && globalThis.crypto?.getRandomValues) {
+    if (c?.getRandomValues) {
       const bytes = new Uint8Array(16);
-      globalThis.crypto.getRandomValues(bytes);
+      c.getRandomValues(bytes);
 
-      // RFC4122 v4 adjustment
       bytes[6] = (bytes[6] & 0x0f) | 0x40;
       bytes[8] = (bytes[8] & 0x3f) | 0x80;
 
-      const hex = [...bytes].map(b => b.toString(16).padStart(2, '0'));
+      const hex = Array.from(bytes, b => b.toString(16).padStart(2, '0'));
+
       return [
         hex.slice(0, 4).join(''),
         hex.slice(4, 6).join(''),
@@ -93,8 +93,7 @@ export class BrowserDeviceService {
       ].join('-');
     }
 
-    // Last-resort fallback
-    return `dev-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+    return `dev-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
   }
 
   private detectDeviceType(ua: string): DeviceType {
