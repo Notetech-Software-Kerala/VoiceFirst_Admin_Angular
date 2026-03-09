@@ -38,7 +38,7 @@ export class Login {
 
 
   ngOnInit() {
-    this.theme = localStorage.getItem('theme');
+    this.theme = localStorage.getItem('theme') || 'light';
 
     this.loginForm = this.fb.group({
       email: ['richardantony737@gmail.com', [Validators.required, Validators.email]],
@@ -97,6 +97,11 @@ export class Login {
           model: rawDevice.model
         }
       };
+
+      console.log("App version:::::::", this.APP_VERSION);
+      console.log("payload:::::::", payload);
+
+
 
       this.authService.login(payload).subscribe({
         next: () => {
