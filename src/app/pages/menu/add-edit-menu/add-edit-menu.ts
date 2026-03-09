@@ -164,6 +164,12 @@ export class AddEditMenu implements OnInit {
         const totalCount = pageData?.totalCount ?? 0;
         const totalPages = pageData?.totalPages ?? 1;
 
+        if (items.length === 0 && totalPages > 0 && this.currentPage > totalPages) {
+          this.currentPage = totalPages;
+          this.loadPrograms();
+          return;
+        }
+
         this.programPageCache.set(cacheKey, {
           items,
           totalCount,

@@ -98,7 +98,7 @@ export class AddEditPlan implements OnInit {
     if (cached) {
       this.actionList = cached.items;
       console.log("ActionList");
-      
+
       this.totalCount = cached.totalCount;
       this.totalPages = cached.totalPages;
       return;
@@ -115,11 +115,17 @@ export class AddEditPlan implements OnInit {
     this.programService.lookupForPlan(params).subscribe({
       next: (res) => {
 
-        console.log("API Calling");
+        console.log("API Calling To load Action :::::::::");
 
         const items = res?.data?.items || [];
         const totalCount = res?.data?.totalCount || 0;
         const totalPages = res?.data?.totalPages || 1;
+
+        if (items.length === 0 && totalPages > 0 && this.currentPage > totalPages) {
+          this.currentPage = totalPages;
+          this.loadActions();
+          return;
+        }
 
         this.actionPageCache.set(cacheKey as any, { items, totalCount, totalPages });
 
