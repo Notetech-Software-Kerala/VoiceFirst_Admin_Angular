@@ -10,7 +10,7 @@ export class EncryptionService {
 
   constructor() {}
 
-  async encrypt(data: unknown): Promise<string> {
+  encrypt(data: unknown): string {
     try {
       if (data == null) return '';
       const stringData = JSON.stringify(data);
@@ -21,7 +21,7 @@ export class EncryptionService {
     }
   }
 
-  async decrypt(ciphertext: string): Promise<any> {
+  decrypt(ciphertext: string): any {
     try {
       if (!ciphertext) return null;
       const bytes = CryptoJS.AES.decrypt(ciphertext, this.SECRET_KEY);
@@ -38,7 +38,7 @@ export class EncryptionService {
     }
   }
 
-  async encryptForRoute(id: string | number): Promise<string> {
+  encryptForRoute(id: string | number): string {
     try {
       if (id == null || id === '') return '';
       const encrypted = CryptoJS.AES.encrypt(String(id), this.SECRET_KEY).toString();
@@ -53,7 +53,7 @@ export class EncryptionService {
     }
   }
 
-  async decryptFromRoute(encryptedId: string | null): Promise<string | null> {
+  decryptFromRoute(encryptedId: string | null): string | null {
     try {
       if (!encryptedId) return null;
       
@@ -68,4 +68,5 @@ export class EncryptionService {
       return null;
     }
   }
-}
+}
+

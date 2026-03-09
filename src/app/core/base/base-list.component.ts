@@ -50,9 +50,9 @@ export abstract class BaseListComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         // Initial load handled by route subscription
-        this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(async params => {
+        this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
             if (params['q']) {
-                const decrypted = await this.encryptionService.decrypt(params['q']);
+                const decrypted = this.encryptionService.decrypt(params['q']);
                 if (decrypted) {
                     this.queryParams = decrypted as QueryParameterModel;
 
@@ -199,8 +199,8 @@ export abstract class BaseListComponent implements OnInit, OnDestroy {
         this.onFilterChange({});
     }
 
-    async updateUrl() {
-        const encrypted = await this.encryptionService.encrypt(this.queryParams);
+    updateUrl() {
+        const encrypted = this.encryptionService.encrypt(this.queryParams);
         this.router.navigate([], {
             relativeTo: this.route,
             queryParams: { q: encrypted }
