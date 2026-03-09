@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { BehaviorSubject } from 'rxjs';
 import { ToastOptions } from '../shared_modules/toast/toast';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ export class ToastService {
   toasts$ = this._toasts$.asObservable();
 
   show(opts: ToastOptions) {
-    const id = opts.id ?? crypto.randomUUID();
+    const id = opts.id ?? uuidv4();
     const toast: ToastOptions = {
       duration: 2500,
       dismissible: true,

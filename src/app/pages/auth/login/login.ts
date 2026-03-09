@@ -15,7 +15,7 @@ import { APP_VERSION } from '../../../../environments/version';
   styleUrl: './login.css',
 })
 export class Login {
-  APP_VERSION = APP_VERSION;
+  APP_VERSION = '1';
 
   hidePassword = true;
   submitting = false;
