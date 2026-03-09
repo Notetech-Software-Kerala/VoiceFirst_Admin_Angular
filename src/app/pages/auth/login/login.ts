@@ -70,7 +70,7 @@ export class Login {
       try {
         rawDevice = await this.deviceService.collect();
       } catch (err) {
-        console.warn('Device collection failed, using fallback device payload', err);
+        console.warn('Device collection failed, continuing with fallback device info', err);
         rawDevice = {
           deviceID: `dev-${Date.now()}`,
           deviceName: 'Unknown Device',
@@ -102,15 +102,15 @@ export class Login {
         next: () => {
           this.submitting = false;
           this.router.navigate(['/dashboard']);
-          this.toast.success(`Welcome to Voice First`, 'Login Success');
+          this.toast.success('Welcome to Voice First', 'Login Success');
         },
-        error: () => {
+        error: (err) => {
+          console.error('Login failed', err);
           this.submitting = false;
         }
       });
-
     } catch (e) {
-      console.error('Failed to prepare device payload prior to login', e);
+      console.error('Failed before login request', e);
       this.submitting = false;
     }
   }
