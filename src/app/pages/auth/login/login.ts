@@ -98,11 +98,6 @@ export class Login {
         }
       };
 
-      console.log("App version:::::::", this.APP_VERSION);
-      console.log("payload:::::::", payload);
-
-
-
       this.authService.login(payload).subscribe({
         next: () => {
           this.submitting = false;
@@ -110,12 +105,10 @@ export class Login {
           this.toast.success('Welcome to Voice First', 'Login Success');
         },
         error: (err) => {
-          console.error('Login failed', err);
           this.submitting = false;
         }
       });
     } catch (e) {
-      console.error('Failed before login request', e);
       this.submitting = false;
     }
   }

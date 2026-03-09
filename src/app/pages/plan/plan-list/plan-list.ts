@@ -94,6 +94,8 @@ export class PlanList extends BaseListComponent implements OnInit, OnDestroy {
 
   // Load data with current query parameters
   loadData() {
+    console.log("API Calling");
+
     this.utilityService.applyDefaultSorting(this.queryParams);
     // Merge queryParams with statusFilters (Active/Delete)
     const params = {

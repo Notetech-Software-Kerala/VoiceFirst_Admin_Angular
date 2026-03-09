@@ -17,7 +17,18 @@ export abstract class BaseListComponent implements OnInit, OnDestroy {
     currentPage = 1;
     pageSize = 10;
     totalCount = 0;
-    totalPages = 0;
+    
+    private _totalPages = 0;
+    get totalPages(): number { return this._totalPages; }
+    set totalPages(val: number) {
+        this._totalPages = val;
+        if (this._totalPages > 0 && this.currentPage > this._totalPages) {
+            requestAnimationFrame(() => {
+                this.onPaginationChange({ page: this._totalPages, size: this.pageSize });
+            });
+        }
+    }
+
     pageSizes = [5, 10, 20, 50];
     isSearching = false;
 
