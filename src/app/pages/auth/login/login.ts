@@ -65,9 +65,23 @@ export class Login {
     this.submitting = true;
 
     try {
-      // 1. Collect OS/Browser/Device info
-      const rawDevice = await this.deviceService.collect();
-      console.log('rawDevice', rawDevice);
+      let rawDevice;
+
+      try {
+        rawDevice = await this.deviceService.collect();
+      } catch (err) {
+        console.warn('Device collection failed, using fallback device payload', err);
+        rawDevice = {
+          deviceID: `dev-${Date.now()}`,
+          deviceName: 'Unknown Device',
+          deviceType: 'Unknown',
+          os: 'Unknown',
+          osVersion: 'Unknown',
+          manufacturer: 'Unknown',
+          model: 'Unknown'
+        };
+      }
+
       const payload = {
         email: this.loginForm.value.email,
         password: this.loginForm.value.password,
@@ -84,16 +98,13 @@ export class Login {
         }
       };
 
-      console.log('Login Payload:', payload);
-
-      // 3. Make the API Call
       this.authService.login(payload).subscribe({
-        next: (res) => {
+        next: () => {
           this.submitting = false;
           this.router.navigate(['/dashboard']);
           this.toast.success(`Welcome to Voice First`, 'Login Success');
         },
-        error: (err) => {
+        error: () => {
           this.submitting = false;
         }
       });
