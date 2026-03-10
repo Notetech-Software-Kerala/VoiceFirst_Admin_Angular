@@ -1,0 +1,32 @@
+    <div class="link-expired-page">
+    <div class="link-expired-card">
+      <div class="status-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="8"/>
+          <path d="M12 8v4"/>
+          <path d="M12 16h.01"/>
+        </svg>
+      </div>
+
+      <div class="content">
+        <p class="eyebrow">Password Recovery</p>
+        <h1>Link Expired</h1>
+        <p class="description">
+          Your password reset link has expired or has already been used.
+          Request a new one to continue.
+        </p>
+
+        <div class="info-box">
+          <p>Reset links are valid for a limited time for your <strong>security</strong>.</p>
+          <p>If you keep having trouble, contact <strong>support</strong>.</p>
+        </div>
+
+        <div class="action-group">
+          <button type="button" class="primary-btn" (click)="requestLink()">Request New Link</button>
+          <button type="button" class="secondary-btn" (click)="backToLogin()">Back to Login</button>
+        </div>
+
+        <p class="footer-text">Make sure you use the link right after receiving it.</p>
+      </div>
+    </div>
+  </div>

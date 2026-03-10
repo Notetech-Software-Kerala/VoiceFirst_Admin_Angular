@@ -19,7 +19,6 @@ export class App {
   ngOnInit() {
 
     this.theme = localStorage.getItem('theme');
-    console.log("Theme", this.theme);
     if (!this.theme) {
       this.theme = 'light';
       localStorage.setItem('theme', this.theme);

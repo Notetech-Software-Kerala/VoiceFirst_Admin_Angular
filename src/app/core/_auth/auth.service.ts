@@ -214,4 +214,20 @@ export class AuthService {
         this.userSubject.next(null);
         this.router.navigate(['/login']);
     }
+
+    forgotPassword(data:any): Observable<void> {
+        return this.http.post(`${this.base}${apiConfig.forgotPassword}`, data).pipe(map((res:any) => res));
+    }
+
+    validateResetToken(token: string): Observable<void> {
+        return this.http.get(`${this.base}${apiConfig.validateResetToken}`, { params: { token } }).pipe(map((res:any) => res));
+    }
+    
+    resetPassword(data:any): Observable<void> {
+        return this.http.post(`${this.base}${apiConfig.resetPassword}`, data).pipe(map((res:any) => res));
+    }
+
+    changePassword(data:any): Observable<void> {
+        return this.http.post(`${this.base}${apiConfig.changePassword}`, data).pipe(map((res:any) => res));
+    }
 }
