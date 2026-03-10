@@ -12,10 +12,18 @@ import { catchError, of } from 'rxjs';
 })
 export class App {
   protected title = 'voicefirst_admin';
+  theme!: any;
 
   constructor(private auth: AuthService) { }
 
   ngOnInit() {
+
+    this.theme = localStorage.getItem('theme');
+    console.log("Theme", this.theme);
+    if (!this.theme) {
+      this.theme = 'light';
+      localStorage.setItem('theme', this.theme);
+    }
     this.auth.bootstrapSession().pipe(
       catchError(() => of(false))
     ).subscribe();

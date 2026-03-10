@@ -28,6 +28,8 @@ export class AddEditIssueType implements OnInit {
 
   issueTypeId: number | null = null;
 
+  originalData: any = {};
+
   constructor(
     private fb: FormBuilder,
     private store: Store,
@@ -60,6 +62,7 @@ export class AddEditIssueType implements OnInit {
       this.issueTypeService.getById(this.issueTypeId).subscribe({
         next: (res: any) => {
           if (res.statusCode === 200 && res.data) {
+            this.originalData = res.data;
             this.form.patchValue({ issueType: res.data.issueType });
 
             // Populate media rules if available
@@ -203,11 +206,15 @@ export class AddEditIssueType implements OnInit {
   }
 
   updateIssueType() {
-    const payload: any = { issueType: this.form.value.issueType };
-    if (this.mediaRules.length > 0) {
-      payload.mediaRules = this.buildMediaRulesPayload();
+    const changes = this.getChangedValues(this.form.value, this.originalData);
+
+    if (Object.keys(changes).length === 0) {
+      this.toastService.info('No changes detected', 'Info');
+      this.isSubmitting = false;
+      return;
     }
-    this.issueTypeService.update(this.issueTypeId as number, payload)
+
+    this.issueTypeService.update(this.issueTypeId as number, changes)
       .pipe(finalize(() => this.isSubmitting = false))
       .subscribe({
         next: (res) => {
@@ -220,6 +227,125 @@ export class AddEditIssueType implements OnInit {
           console.error(err);
         }
       });
+  }
+
+  getChangedValues(formValue: any, original: any): any {
+    const changes: any = {};
+
+    if (formValue.issueType !== original.issueType) {
+      changes.issueType = formValue.issueType;
+    }
+
+    const currentMediaRules = this.buildMediaRulesPayload();
+    const originalRules = original.mediaRules || [];
+
+    const updateMediaRules: any[] = [];
+    const insertMediaRules: any[] = [];
+
+    // Assuming issueMediaFormatId is the unique identifier for a rule within an issueType
+    currentMediaRules.forEach((currentRule: any) => {
+      const originalRule = originalRules.find((r: any) => r.issueMediaFormatId === currentRule.issueMediaFormatId);
+
+      if (originalRule) {
+        // Exists in original. Need to check if anything changed.
+        const ruleUpdate: any = {};
+        let hasChanges = false;
+
+        // Compare top level stats map only changed properties
+        if (currentRule.min !== originalRule.min) ruleUpdate.min = currentRule.min;
+        if (currentRule.max !== originalRule.max) ruleUpdate.max = currentRule.max;
+        if (currentRule.maxSizeMB !== originalRule.maxSizeMB) ruleUpdate.maxSizeMB = currentRule.maxSizeMB;
+
+        if (Object.keys(ruleUpdate).length > 0) {
+          hasChanges = true;
+        }
+
+        // Compare media types deeply
+        const currentTypes = currentRule.mediaTypes || [];
+        const originalTypes = originalRule.mediaTypes || [];
+        const mediaTypeUpdates: any[] = [];
+
+        // Check if any specific media type was added or modified
+        currentTypes.forEach((ct: any) => {
+          const ot = originalTypes.find((t: any) => t.issueMediaTypeId === ct.issueMediaTypeId);
+          
+          if (!ot) {
+            // New type inside an existing rule
+            mediaTypeUpdates.push({
+              issueMediaTypeId: ct.issueMediaTypeId,
+              isMandatory: ct.isMandatory
+            });
+            hasChanges = true;
+          } else if (ot.isMandatory !== ct.isMandatory) {
+            // Existing type changed
+            mediaTypeUpdates.push({
+              issueMediaTypeId: ct.issueMediaTypeId,
+              isMandatory: ct.isMandatory
+            });
+            hasChanges = true;
+          }
+        });
+
+        // Find media types that were in original but are missing in current
+        const removedTypes = originalTypes.filter((ot: any) => 
+          !currentTypes.some((ct: any) => ct.issueMediaTypeId === ot.issueMediaTypeId)
+        );
+
+        removedTypes.forEach((rt: any) => {
+          mediaTypeUpdates.push({
+            issueMediaTypeId: rt.issueMediaTypeId,
+            active: false
+          });
+          hasChanges = true;
+        });
+
+        if (hasChanges) {
+          // Add the ID so backend knows *which* rule to apply these partial updates to
+          ruleUpdate.issueMediaFormatId = currentRule.issueMediaFormatId;
+          
+          if (mediaTypeUpdates.length > 0) {
+            ruleUpdate.mediaTypes = mediaTypeUpdates;
+          }
+
+          updateMediaRules.push(ruleUpdate);
+        }
+      } else {
+        // Entirely new rule
+        insertMediaRules.push({
+          issueMediaFormatId: currentRule.issueMediaFormatId,
+          min: currentRule.min,
+          max: currentRule.max,
+          maxSizeMB: currentRule.maxSizeMB,
+          mediaTypes: currentRule.mediaTypes.map((t: any) => ({
+            issueMediaTypeId: t.issueMediaTypeId,
+            isMandatory: t.isMandatory
+          }))
+        });
+      }
+    });
+
+    // Check for completely deleted rules (exist in original, not in current form)
+    const deletedRules = originalRules.filter((or: any) => 
+      !currentMediaRules.some((cr: any) => cr.issueMediaFormatId === or.issueMediaFormatId)
+    );
+
+    deletedRules.forEach((dr: any) => {
+      // Send as update with active: false to soft delete
+      updateMediaRules.push({
+        issueMediaFormatId: dr.issueMediaFormatId,
+        active: false
+      });
+    });
+
+    if (updateMediaRules.length > 0) {
+      changes.updateMediaRules = updateMediaRules;
+    }
+    
+    if (insertMediaRules.length > 0) {
+      changes.insertMediaRules = insertMediaRules;
+    }
+
+    return changes;
   }
 
   restoreIssueType(id: number, name: string) {

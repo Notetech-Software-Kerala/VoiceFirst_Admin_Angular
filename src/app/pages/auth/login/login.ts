@@ -38,11 +38,16 @@ export class Login {
 
 
   ngOnInit() {
-    this.theme = localStorage.getItem('theme') || 'light';
+    this.theme = localStorage.getItem('theme');
+    console.log("Theme", this.theme);
+    if (!this.theme) {
+      this.theme = 'light';
+      localStorage.setItem('theme', this.theme);
+    }
 
     this.loginForm = this.fb.group({
       email: ['richardantony737@gmail.com', [Validators.required, Validators.email]],
-      password: ['123456', [Validators.required, Validators.minLength(6)]],
+      password: ['123456', [Validators.required]],
       remember: [false]
     });
   }
