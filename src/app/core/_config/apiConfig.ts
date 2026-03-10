@@ -105,4 +105,10 @@ export const apiConfig = {
     getIssueTypeLookup: '/issue-type/lookup',
     issueTypeRestore: '/issue-type/recover',
 
+    //password reset
+    forgotPassword: '/password/forgot',
+    resetPassword: '/password/reset',
+    validateResetToken: '/password/validate-reset-token',
+    changePassword: '/password/change',
+
 };

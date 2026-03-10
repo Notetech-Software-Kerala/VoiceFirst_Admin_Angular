@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { ToastService } from '../../../partials/shared_services/toast.service';
+import { AuthService } from '../../../core/_auth/auth.service';
 
 @Component({
   selector: 'app-forgot-paassword',
@@ -11,21 +12,17 @@ import { ToastService } from '../../../partials/shared_services/toast.service';
   styleUrl: './forgot-paassword.css',
 })
 export class ForgotPaassword implements OnInit {
-  step = 1;
   submitting = false;
 
   emailForm!: FormGroup;
-  otpForm!: FormGroup;
-  resetForm!: FormGroup;
 
-  hidePassword = true;
-  hideConfirmPassword = true;
   theme: any;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private toast: ToastService
+    private toast: ToastService,
+    private authService: AuthService
   ) { }
 
   ngOnInit() {
@@ -36,16 +33,8 @@ export class ForgotPaassword implements OnInit {
       email: ['', [Validators.required]] // Could add email/phone specific regex if needed, keeping simple for now
     });
 
-    // Step 2: OTP
-    this.otpForm = this.fb.group({
-      otp: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(6)]]
-    });
 
-    // Step 3: New Password
-    this.resetForm = this.fb.group({
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]]
-    }, { validators: this.passwordMatchValidator });
+
   }
 
   get src() {
@@ -54,71 +43,36 @@ export class ForgotPaassword implements OnInit {
   }
 
   get fEmail() { return this.emailForm.controls; }
-  get fOtp() { return this.otpForm.controls; }
-  get fReset() { return this.resetForm.controls; }
 
-  passwordMatchValidator(g: FormGroup) {
-    return g.get('password')?.value === g.get('confirmPassword')?.value
-      ? null : { mismatch: true };
-  }
-
-  togglePassword() {
-    this.hidePassword = !this.hidePassword;
-  }
-
-  toggleConfirmPassword() {
-    this.hideConfirmPassword = !this.hideConfirmPassword;
-  }
-
-  // Step 1 Submit
   onSubmitEmail() {
     if (this.emailForm.invalid) {
       this.emailForm.markAllAsTouched();
       return;
     }
     this.submitting = true;
-
-    // Simulate API
-    setTimeout(() => {
-      this.submitting = false;
-      this.step = 2;
-      this.toast.success('OTP sent to your email/phone', 'OTP Sent');
-    }, 1000);
-  }
-
-  // Step 2 Submit
-  onSubmitOtp() {
-    if (this.otpForm.invalid) {
-      this.otpForm.markAllAsTouched();
-      return;
+    
+    const payload = {
+      email: this.fEmail['email'].value
     }
-    this.submitting = true;
-
-    // Simulate API
-    setTimeout(() => {
-      this.submitting = false;
-      this.step = 3;
-      this.toast.success('OTP Verified', 'Success');
-    }, 1000);
+    this.authService.forgotPassword(payload).subscribe({
+      next: (res:any) => {
+        console.log(res);
+        
+        this.submitting = false;
+        if(res.statusCode === 200){
+          this.toast.success('Password reset email sent', 'Success');
+          this.router.navigate(['/reset-password'], { queryParams: { email: this.fEmail['email'].value } });
+        }
+        else {
+          this.toast.error(res.message || 'Failed to send reset email', 'Error');
+        }
+      },
+      error: (err) => {
+        this.submitting = false;
+      }
+    });
   }
 
-  // Step 3 Submit
-  onSubmitReset() {
-    if (this.resetForm.invalid) {
-      this.resetForm.markAllAsTouched();
-      return;
-    }
-    this.submitting = true;
 
-    // Simulate API
-    setTimeout(() => {
-      this.submitting = false;
-      this.toast.success('Password reset successfully. Please login.', 'Success');
-      this.router.navigate(['/login']);
-    }, 1500);
-  }
 
-  resendOtp() {
-    this.toast.success('OTP has been resent', 'Resent');
-  }
 }
