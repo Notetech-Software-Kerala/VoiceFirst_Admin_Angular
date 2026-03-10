@@ -54,17 +54,18 @@ export class ResetPassword {
     this.activatedRoute.queryParams.subscribe(params => {
       const token = params['reset-token'];
       const email = params['email'];
-      
-      console.log("TOKEN::",token);
-      
+
+      console.log("TOKEN::", token);
+      console.log("EMAIL::", email);
+
       if (email) {
         this.emailForResend = email;
       }
-      
+
       if (token) {
         this.resetToken = token;
         this.checkTokenValidity(token);
-      } 
+      }
     });
   }
 
@@ -76,7 +77,7 @@ export class ResetPassword {
   get fReset() { return this.resetForm.controls; }
 
   backToLogin() {
-   this.router.navigate(['/login']);
+    this.router.navigate(['/login']);
   }
 
   resendEmail() {
@@ -87,8 +88,8 @@ export class ResetPassword {
     }
 
     this.authService.forgotPassword({ email: this.emailForResend }).subscribe({
-      next: (res:any) => {
-        if(res.statusCode === 200) {
+      next: (res: any) => {
+        if (res.statusCode === 200) {
           this.toast.success('Email resent successfully', 'Success');
         } else {
           this.toast.error(res.message || 'Failed to resend email', 'Error');
@@ -101,7 +102,7 @@ export class ResetPassword {
   }
 
   requestLink() {
-      this.router.navigate(['/forgot-password']);
+    this.router.navigate(['/forgot-password']);
   }
 
   passwordMatchValidator(g: FormGroup) {
@@ -119,12 +120,12 @@ export class ResetPassword {
 
   checkTokenValidity(token: string) {
     this.authService.validateResetToken(token).subscribe({
-      next: (res:any) => {
-        if(res.statusCode === 200) {
+      next: (res: any) => {
+        if (res.statusCode === 200) {
           this.resetVisible = true;
 
         }
-        else{
+        else {
           this.resetVisible = false;
           this.router.navigate(['/link-expired']);
         }
@@ -132,7 +133,7 @@ export class ResetPassword {
       },
       error: () => {
         this.resetVisible = false;
-this.router.navigate(['/link-expired']);
+        this.router.navigate(['/link-expired']);
       }
     });
   }
@@ -150,10 +151,10 @@ this.router.navigate(['/link-expired']);
     };
 
     this.authService.resetPassword(payload).subscribe({
-      next: (res:any) => {
+      next: (res: any) => {
         console.log(res);
         this.submitting = false;
-        if(res.statusCode === 200) {
+        if (res.statusCode === 200) {
           this.toast.success('Password reset successfully', 'Success');
           this.router.navigate(['/login']);
         } else {
