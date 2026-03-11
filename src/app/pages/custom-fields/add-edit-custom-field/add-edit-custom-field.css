@@ -1,0 +1,108 @@
+:host {
+    display: block;
+}
+
+.ls-1 {
+    letter-spacing: 0.5px;
+}
+
+/* Compact headers */
+h6 {
+    font-size: 0.9rem;
+    color: var(--color-text-primary);
+}
+
+.fs-7 {
+    font-size: 0.8rem !important;
+}
+
+.text-secondary {
+    color: var(--color-text-placeholder) !important;
+}
+
+.icon-sm {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+/* Plan Card - Compact & Themed */
+.plan-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: var(--color-bg-sidebar);
+    border: 1px solid var(--color-border-hr);
+}
+
+.plan-card:hover {
+    box-shadow: 0 4px 12px var(--color-shadow) !important;
+    transform: translateY(-1px);
+}
+
+/* Empty State Styling */
+.empty-state {
+    padding: 20px;
+    text-align: center;
+    color: var(--color-text-placeholder);
+    background-color: color-mix(in srgb, var(--color-bg-primary) 50%, transparent);
+    border-radius: 8px;
+    border: 1px dashed var(--color-border-hr);
+}
+
+.empty-state mat-icon {
+    opacity: 0.5;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+.card-body {
+    padding: 0;
+}
+
+/* Buttons */
+.btn-sm {
+    font-size: 0.8rem;
+    padding: 4px 10px;
+}
+
+.btn-outline-primary {
+    color: var(--color-hover-primary);
+    border: 1px solid var(--color-hover-primary);
+    background: transparent;
+    transition: all 0.2s;
+}
+
+.btn-outline-primary:hover {
+    background: var(--color-hover-primary);
+    color: #fff;
+}
+
+.btn-clear {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.btn-clear:hover {
+    background-color: var(--color-status-error-bg);
+}
+
+.btn-clear mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}

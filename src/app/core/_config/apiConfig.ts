@@ -111,4 +111,9 @@ export const apiConfig = {
     validateResetToken: '/password/validate-reset-token',
     changePassword: '/password/change',
 
+    //custom-field
+    customField: '/user-custom-field',
+    getCustomFieldLookup: '/user-custom-field/lookup',
+    customFieldRestore: '/user-custom-field/recover',
+
 };

@@ -1,6 +1,6 @@
 export const environment = {
     production: false,
-    baseUrl: 'https://voicefirst.admin.notetech.com/api',
+    baseUrl: 'https://voicefirst.adminapi.notetech.com/api',
 };
 
 
