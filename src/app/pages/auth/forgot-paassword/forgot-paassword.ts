@@ -30,9 +30,9 @@ export class ForgotPaassword implements OnInit {
   ngOnInit() {
     this.theme = localStorage.getItem('theme');
 
-    // Step 1: Email/Phone
+    // Step 1: Email
     this.emailForm = this.fb.group({
-      email: ['', [Validators.required]] // Could add email/phone specific regex if needed, keeping simple for now
+      email: ['', [Validators.required, Validators.email]]
     });
 
 

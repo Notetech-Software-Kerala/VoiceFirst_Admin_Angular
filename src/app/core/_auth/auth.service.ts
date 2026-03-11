@@ -220,7 +220,7 @@ export class AuthService {
     }
 
     validateResetToken(token: string): Observable<void> {
-        return this.http.get(`${this.base}${apiConfig.validateResetToken}?ResetToken=${token}`).pipe(map((res: any) => res));
+        return this.http.get(`${this.base}${apiConfig.validateResetToken}/${token}`).pipe(map((res: any) => res));
     }
 
     resetPassword(data: any): Observable<void> {

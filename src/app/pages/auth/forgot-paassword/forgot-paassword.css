@@ -46,7 +46,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 29px;
 }
 
 /* Logo Image */
@@ -85,4 +85,9 @@
     .title {
         font-size: 1.25rem;
     }
+}
+
+.small {
+    font-size: 0.8rem;
+    color: var(--color-text-placeholder);
 }

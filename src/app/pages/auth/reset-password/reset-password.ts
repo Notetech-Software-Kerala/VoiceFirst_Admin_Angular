@@ -13,22 +13,20 @@ import { EncryptionService } from '../../../partials/shared_services/encryption.
   styleUrl: './reset-password.css',
 })
 export class ResetPassword {
-
   resetForm!: FormGroup;
 
   hidePassword = true;
   hideConfirmPassword = true;
+  theme!: string;
 
-  theme!: any;
+  submitting = false;
+  resetVisible = false;
 
-  submitting: boolean = false;
+  resetToken = '';
+  emailForResend = '';
 
-  resetVisible: boolean = false;
-
-
-  resetToken: string = '';
-
-  emailForResend: string = '';
+  emailMode = false;
+  tokenMode = false;
 
   constructor(
     private fb: FormBuilder,
@@ -40,46 +38,56 @@ export class ResetPassword {
   ) { }
 
   ngOnInit() {
+    this.theme = localStorage.getItem('theme') || 'light';
+    localStorage.setItem('theme', this.theme);
 
-    this.theme = localStorage.getItem('theme');
-    if (!this.theme) {
-      this.theme = 'light';
-      localStorage.setItem('theme', this.theme);
-    }
+    this.resetForm = this.fb.group(
+      {
+        password: ['', [Validators.required, Validators.minLength(6)]],
+        confirmPassword: ['', [Validators.required]],
+      },
+      { validators: this.passwordMatchValidator }
+    );
 
-    this.resetForm = this.fb.group({
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]]
-    }, { validators: this.passwordMatchValidator });
+    this.activatedRoute.paramMap.subscribe(pathParams => {
+      const token = pathParams.get('token');
 
-    // Check for token in query params
-    this.activatedRoute.queryParams.subscribe(params => {
-      const token = params['reset-token'];
-      const encryptedEmail = params['email'];
+      console.log("TOKEN", token);
 
-      console.log("TOKEN::", token);
 
-      if (encryptedEmail) {
-        const decryptedEmail = this.encryptionService.decryptFromRoute(encryptedEmail);
-        console.log("EMAIL::", decryptedEmail);
-        if (decryptedEmail) {
-          this.emailForResend = decryptedEmail;
+      this.activatedRoute.queryParamMap.subscribe(queryParams => {
+        const encryptedEmail = queryParams.get('email');
+
+        this.emailMode = false;
+        this.tokenMode = false;
+        this.resetVisible = false;
+
+        if (encryptedEmail) {
+          const decryptedEmail = this.encryptionService.decryptFromRoute(encryptedEmail);
+          if (decryptedEmail) {
+            this.emailForResend = decryptedEmail;
+            this.emailMode = true;
+          }
         }
-      }
 
-      if (token) {
-        this.resetToken = token;
-        this.checkTokenValidity(token);
-      }
+        if (token) {
+          this.resetToken = token;
+          this.tokenMode = true;
+          this.checkTokenValidity(token);
+        }
+      });
     });
   }
 
   get src() {
-    if (this.theme === 'dark') return '/images/logos/voicefirst_logo_light.png';
-    return '/images/logos/voicefirst_logo.png';
+    return this.theme === 'dark'
+      ? '/images/logos/voicefirst_logo_light.png'
+      : '/images/logos/voicefirst_logo.png';
   }
 
-  get fReset() { return this.resetForm.controls; }
+  get fReset() {
+    return this.resetForm.controls;
+  }
 
   backToLogin() {
     this.router.navigate(['/login']);
@@ -112,7 +120,8 @@ export class ResetPassword {
 
   passwordMatchValidator(g: FormGroup) {
     return g.get('password')?.value === g.get('confirmPassword')?.value
-      ? null : { mismatch: true };
+      ? null
+      : { mismatch: true };
   }
 
   togglePassword() {
@@ -124,24 +133,19 @@ export class ResetPassword {
   }
 
   checkTokenValidity(token: string) {
-    console.log("check validity working");
-
     this.authService.validateResetToken(token).subscribe({
       next: (res: any) => {
-        console.log("VALIDITY::", res);
+        console.log("VALIDATION", res);
 
         if (res.statusCode === 200) {
           this.resetVisible = true;
-
-        }
-        else {
+        } else {
           this.resetVisible = false;
           this.router.navigate(['/link-expired']);
         }
-
       },
       error: (err) => {
-        console.log(err);
+        console.log("ERROR", err);
 
         this.resetVisible = false;
         this.router.navigate(['/link-expired']);
@@ -154,6 +158,7 @@ export class ResetPassword {
       this.resetForm.markAllAsTouched();
       return;
     }
+
     this.submitting = true;
 
     const payload = {
@@ -163,8 +168,8 @@ export class ResetPassword {
 
     this.authService.resetPassword(payload).subscribe({
       next: (res: any) => {
-        console.log(res);
         this.submitting = false;
+
         if (res.statusCode === 200) {
           this.toast.success('Password reset successfully', 'Success');
           this.router.navigate(['/login']);
@@ -177,8 +182,5 @@ export class ResetPassword {
         this.toast.error(err?.error?.message || 'Failed to reset password', 'Error');
       }
     });
-
   }
-
-
 }
