@@ -124,8 +124,12 @@ export class ResetPassword {
   }
 
   checkTokenValidity(token: string) {
+    console.log("check validity working");
+
     this.authService.validateResetToken(token).subscribe({
       next: (res: any) => {
+        console.log("VALIDITY::", res);
+
         if (res.statusCode === 200) {
           this.resetVisible = true;
 
@@ -136,7 +140,9 @@ export class ResetPassword {
         }
 
       },
-      error: () => {
+      error: (err) => {
+        console.log(err);
+
         this.resetVisible = false;
         this.router.navigate(['/link-expired']);
       }

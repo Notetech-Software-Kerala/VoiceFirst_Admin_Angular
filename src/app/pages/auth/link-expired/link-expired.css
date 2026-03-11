@@ -1,0 +1,135 @@
+.link-expired-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+}
+
+.link-expired-card {
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    animation: up 0.5s ease both;
+}
+
+.status-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-status-error-bg);
+    color: var(--color-status-error-text);
+    border: 1px solid var(--color-status-error-border);
+}
+
+.status-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.content .eyebrow {
+    margin: 0 0 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-placeholder);
+}
+
+.content h1 {
+    margin: 0 0 10px;
+    font-family: 'Instrument Serif', serif;
+    font-size: 26px;
+    font-weight: 400;
+    line-height: 1.25;
+    color: var(--color-text-primary);
+}
+
+.description {
+    margin: 0 0 20px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--color-text-primary);
+}
+
+.info-box {
+    text-align: center;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-hr);
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.info-box p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--color-text-primary);
+}
+
+.action-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.primary-btn,
+.secondary-btn {
+    width: 100%;
+    height: 44px;
+    border-radius: 10px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: none;
+}
+
+.primary-btn {
+    background: var(--color-hover-primary);
+    color: #fff;
+}
+
+.primary-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.secondary-btn {
+    background: transparent;
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-hr);
+}
+
+.secondary-btn:hover {
+    background: var(--color-hover-secondary);
+}
+
+.footer-text {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--footer-text-color);
+}
+
+@keyframes up {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
