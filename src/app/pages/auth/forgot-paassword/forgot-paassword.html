@@ -8,24 +8,30 @@
 
             <!-- Step 1: Email/Phone -->
 
-            <h6 class="title mb-4 fw-bold text-center">Forgot Password</h6>
-            <p class="muted mb-4 small text-center mb-0">Enter your email or phone number to receive an OTP.</p>
+            <h6 class="title mb-2 fw-bold text-center">Forgot Password</h6>
+            <!-- <p class="mb-4 small">Enter your email address to receive a password reset link.</p> -->
 
             <form [formGroup]="emailForm" (ngSubmit)="onSubmitEmail()">
                 <div class="mb-3">
-                    <label for="email" class="form-label">Email or Phone</label>
-                    <input id="email" type="text" class="form-control" formControlName="email"
-                        placeholder="Enter email or phone"
+                    <label for="email" class="form-label">Email</label>
+                    <input id="email" type="email" class="form-control" formControlName="email"
+                        placeholder="Enter your email"
                         [attr.aria-invalid]="fEmail['email'].invalid && fEmail['email'].touched">
                     @if (fEmail['email'].touched && fEmail['email'].errors?.['required']) {
                     <div class="text-danger small mt-1">
-                        This field is required.
+                        Email is required.
+                    </div>
+                    }
+                    @if (fEmail['email'].touched && fEmail['email'].errors?.['email']) {
+                    <div class="text-danger small mt-1">
+                        Please enter a valid email address.
                     </div>
                     }
                 </div>
 
-                <button class="button-primary w-100 mb-3" type="submit" [disabled]="emailForm.invalid || submitting">
-                    {{ submitting ? 'Sending...' : 'Send OTP' }}
+                <button class="button-primary w-100 mb-3 mt-3" type="submit"
+                    [disabled]="emailForm.invalid || submitting">
+                    {{ submitting ? 'Sending...' : 'Send Reset Link' }}
                 </button>
             </form>
 

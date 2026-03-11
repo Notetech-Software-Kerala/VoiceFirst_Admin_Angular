@@ -6,7 +6,7 @@
       <div class="logo-container">
         <img [src]="src" alt="Voice First Logo" class="logo-image">
       </div>
-      <h6 class="title mb-4 fw-bold">Login</h6>
+      <h6 class="title mb-4 fw-bold text-center">Login</h6>
 
       <div class="row g-3">
         <!-- Email -->
@@ -34,11 +34,10 @@
               formControlName="password" placeholder="••••••••" autocomplete="current-password"
               [attr.aria-invalid]="f['password'].invalid && f['password'].touched" />
             <button type="button"
-              class="btn btn-link p-0 position-absolute top-50 end-0 translate-middle-y me-2 text-decoration-none"
+              class="btn btn-link p-0 position-absolute top-50 end-0 translate-middle-y me-3 text-decoration-none d-flex align-items-center"
               (click)="togglePassword()" [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'">
-              <i class="fa-solid eye-icon" [ngClass]="hidePassword ? 'fa-eye' : 'fa-eye-slash'"></i>
-              <span class="visually-hidden">
-                {{ hidePassword ? 'Show password' : 'Hide password' }}
+              <span class="material-symbols-rounded" style="color: var(--color-text-placeholder); font-size: 22px;">
+                {{ hidePassword ? 'visibility' : 'visibility_off' }}
               </span>
             </button>
           </div>
