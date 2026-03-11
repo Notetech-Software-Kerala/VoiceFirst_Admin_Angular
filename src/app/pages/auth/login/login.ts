@@ -90,7 +90,7 @@ export class Login {
       const payload = {
         email: this.loginForm.value.email,
         password: this.loginForm.value.password,
-        clientType: 'Web',
+        clientType: 1,
         device: {
           deviceID: rawDevice.deviceID,
           version: this.APP_VERSION,
