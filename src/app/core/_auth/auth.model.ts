@@ -1,7 +1,7 @@
 export interface LoginRequest {
     email: string;
     password: string;
-    clientType: string;
+    clientType: number;
     device: {
         deviceID: string;
         version: string;
