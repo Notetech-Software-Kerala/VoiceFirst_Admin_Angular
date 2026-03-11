@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { ToastService } from '../../../partials/shared_services/toast.service';
 import { AuthService } from '../../../core/_auth/auth.service';
+import { EncryptionService } from '../../../partials/shared_services/encryption.service';
 
 @Component({
   selector: 'app-forgot-paassword',
@@ -22,7 +23,8 @@ export class ForgotPaassword implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private toast: ToastService,
-    private authService: AuthService
+    private authService: AuthService,
+    private encryptionService: EncryptionService
   ) { }
 
   ngOnInit() {
@@ -61,7 +63,8 @@ export class ForgotPaassword implements OnInit {
         this.submitting = false;
         if(res.statusCode === 200){
           this.toast.success('Password reset email sent', 'Success');
-          this.router.navigate(['/reset-password'], { queryParams: { email: this.fEmail['email'].value } });
+          const encryptedEmail = this.encryptionService.encryptForRoute(this.fEmail['email'].value);
+          this.router.navigate(['/reset-password'], { queryParams: { email: encryptedEmail } });
         }
         else {
           this.toast.error(res.message || 'Failed to send reset email', 'Error');

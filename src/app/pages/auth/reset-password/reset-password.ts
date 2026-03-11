@@ -4,6 +4,7 @@ import { ToastService } from '../../../partials/shared_services/toast.service';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/_auth/auth.service';
+import { EncryptionService } from '../../../partials/shared_services/encryption.service';
 
 @Component({
   selector: 'app-reset-password',
@@ -34,7 +35,8 @@ export class ResetPassword {
     private toast: ToastService,
     private router: Router,
     private authService: AuthService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private encryptionService: EncryptionService
   ) { }
 
   ngOnInit() {
@@ -53,13 +55,16 @@ export class ResetPassword {
     // Check for token in query params
     this.activatedRoute.queryParams.subscribe(params => {
       const token = params['reset-token'];
-      const email = params['email'];
+      const encryptedEmail = params['email'];
 
       console.log("TOKEN::", token);
-      console.log("EMAIL::", email);
 
-      if (email) {
-        this.emailForResend = email;
+      if (encryptedEmail) {
+        const decryptedEmail = this.encryptionService.decryptFromRoute(encryptedEmail);
+        console.log("EMAIL::", decryptedEmail);
+        if (decryptedEmail) {
+          this.emailForResend = decryptedEmail;
+        }
       }
 
       if (token) {
@@ -119,8 +124,12 @@ export class ResetPassword {
   }
 
   checkTokenValidity(token: string) {
+    console.log("check validity working");
+
     this.authService.validateResetToken(token).subscribe({
       next: (res: any) => {
+        console.log("VALIDITY::", res);
+
         if (res.statusCode === 200) {
           this.resetVisible = true;
 
@@ -131,7 +140,9 @@ export class ResetPassword {
         }
 
       },
-      error: () => {
+      error: (err) => {
+        console.log(err);
+
         this.resetVisible = false;
         this.router.navigate(['/link-expired']);
       }

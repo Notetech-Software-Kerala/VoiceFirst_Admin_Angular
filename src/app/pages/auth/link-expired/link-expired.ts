@@ -8,13 +8,13 @@ import { Router } from '@angular/router';
   styleUrl: './link-expired.css',
 })
 export class LinkExpired {
-constructor(private router:Router) { }
+  constructor(private router: Router) { }
 
   backToLogin() {
-   this.router.navigate(['/login']);
+    this.router.navigate(['/login']);
   }
 
   requestLink() {
-
+    this.router.navigate(['/forgot-password']);
   }
 }
