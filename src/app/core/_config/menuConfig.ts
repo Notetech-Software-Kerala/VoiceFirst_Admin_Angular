@@ -35,7 +35,7 @@ export const MENU_CONFIG: MenuItem[] = [
       { id: 86, label: 'Country', route: '/country', icon: 'globe' },
       { id: 87, label: 'Post Office', route: '/post-office', icon: 'post' },
       { id: 88, label: 'Place', route: '/place', icon: 'place' },
-
+      { id: 89, label: 'Custom Field', route: '/custom-field', icon: 'edit_note' },
     ],
   },
 

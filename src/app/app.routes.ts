@@ -76,6 +76,28 @@ export const routes: Routes = [
                 loadComponent: () => import('./pages/business-activity/business-activity').then(m => m.BusinessActivity)
             },
             {
+                path: 'custom-field',
+                loadComponent: () => import('./pages/custom-fields/custom-fields').then(m => m.CustomFields),
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () => import('./pages/custom-fields/custom-field-list/custom-field-list').then(m => m.CustomFieldList)
+                    },
+                    {
+                        path: 'add',
+                        loadComponent: () => import('./pages/custom-fields/add-edit-custom-field/add-edit-custom-field').then(m => m.AddEditCustomField)
+                    },
+                    {
+                        path: 'edit/:id',
+                        loadComponent: () => import('./pages/custom-fields/add-edit-custom-field/add-edit-custom-field').then(m => m.AddEditCustomField)
+                    },
+                    {
+                        path: 'details/:id',
+                        loadComponent: () => import('./pages/custom-fields/custom-field-details/custom-field-details').then(m => m.CustomFieldDetails)
+                    }
+                ]
+            },
+            {
                 path: 'program-action',
                 loadComponent: () => import('./pages/program-action/program-action').then(m => m.ProgramAction)
             },

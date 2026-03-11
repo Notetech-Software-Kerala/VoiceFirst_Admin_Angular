@@ -53,9 +53,9 @@ import { IssueMediaFormatEffects } from './core/_state/issue/issue-media-format/
 import { ISSUE_TYPE_FEATURE_KEY } from './core/_state/issue/issue-type/issue-type.selectors';
 import { issueTypeReducer } from './core/_state/issue/issue-type/issue-type.reducer';
 import { IssueTypeEffects } from './core/_state/issue/issue-type/issue-type.effects';
-
-
-
+import { customFieldReducer } from './core/_state/custom-field/custom-field.reducer';
+import { CustomFieldEffects } from './core/_state/custom-field/custom-field.effects';
+import { CUSTOM_FIELD_FEATURE_KEY } from './core/_state/custom-field/custom-field.selectors';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -80,6 +80,7 @@ export const appConfig: ApplicationConfig = {
       [ISSUE_STATUS_FEATURE_KEY]: issueStatusReducer,
       [ISSUE_MEDIA_FORMAT_FEATURE_KEY]: issueMediaFormatReducer,
       [ISSUE_TYPE_FEATURE_KEY]: issueTypeReducer,
+      [CUSTOM_FIELD_FEATURE_KEY]: customFieldReducer,
     }),
     provideEffects([
       BusinessActivityEffects,
@@ -97,7 +98,7 @@ export const appConfig: ApplicationConfig = {
       IssueStatusEffects,
       IssueMediaFormatEffects,
       IssueTypeEffects,
-
+      CustomFieldEffects
     ]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })
   ]
