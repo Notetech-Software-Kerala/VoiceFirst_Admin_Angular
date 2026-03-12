@@ -74,7 +74,8 @@ export class AddEditIssueType implements OnInit {
                   issueMediaFormatId: rule.issueMediaFormatId,
                   min: rule.min,
                   max: rule.max,
-                  maxSizeMB: rule.maxSizeMB
+                  maxSizeMB: rule.maxSizeMB,
+                  active: rule.active !== false
                 });
 
                 if (rule.mediaTypes && rule.mediaTypes.length > 0) {
@@ -83,7 +84,8 @@ export class AddEditIssueType implements OnInit {
                     const typeGroup = this.getMediaTypes(ruleIndex).at(typeIndex);
                     typeGroup.patchValue({
                       issueMediaTypeId: type.issueMediaTypeId,
-                      isMandatory: type.isMandatory
+                      isMandatory: type.isMandatory,
+                      active: type.active !== false
                     });
                   });
                 }
@@ -132,25 +134,56 @@ export class AddEditIssueType implements OnInit {
       min: [0, [Validators.required, Validators.min(0)]],
       max: [1, [Validators.required, Validators.min(1)]],
       maxSizeMB: [5, [Validators.required, Validators.min(0.1)]],
+      active: [true],
       mediaTypes: this.fb.array([])
     });
     this.mediaRules.push(ruleGroup);
   }
 
   removeMediaRule(index: number) {
-    this.mediaRules.removeAt(index);
+    const rule = this.mediaRules.at(index);
+    const hasOriginal = this.originalData?.mediaRules?.some((r: any) => 
+      rule.get('issueMediaFormatId')?.value && r.issueMediaFormatId === rule.get('issueMediaFormatId')?.value
+    );
+    if (hasOriginal) {
+      rule.patchValue({ active: false });
+    } else {
+      this.mediaRules.removeAt(index);
+    }
+  }
+
+  recoverMediaRule(index: number) {
+    this.mediaRules.at(index).patchValue({ active: true });
   }
 
   addMediaType(ruleIndex: number) {
     const typeGroup = this.fb.group({
       issueMediaTypeId: [null, Validators.required],
-      isMandatory: [false]
+      isMandatory: [false],
+      active: [true]
     });
     this.getMediaTypes(ruleIndex).push(typeGroup);
   }
 
   removeMediaType(ruleIndex: number, typeIndex: number) {
-    this.getMediaTypes(ruleIndex).removeAt(typeIndex);
+    const type = this.getMediaTypes(ruleIndex).at(typeIndex);
+    const rule = this.mediaRules.at(ruleIndex);
+    const originalRule = this.originalData?.mediaRules?.find((r: any) => 
+      rule.get('issueMediaFormatId')?.value && r.issueMediaFormatId === rule.get('issueMediaFormatId')?.value
+    );
+    const hasOriginal = originalRule?.mediaTypes?.some((t: any) => 
+      type.get('issueMediaTypeId')?.value && t.issueMediaTypeId === type.get('issueMediaTypeId')?.value
+    );
+
+    if (hasOriginal) {
+      type.patchValue({ active: false });
+    } else {
+      this.getMediaTypes(ruleIndex).removeAt(typeIndex);
+    }
+  }
+
+  recoverMediaType(ruleIndex: number, typeIndex: number) {
+    this.getMediaTypes(ruleIndex).at(typeIndex).patchValue({ active: true });
   }
 
   getSelectedMediaTypeIds(ruleIndex: number, excludeTypeIndex: number): Set<number> {
@@ -255,6 +288,7 @@ export class AddEditIssueType implements OnInit {
         if (currentRule.min !== originalRule.min) ruleUpdate.min = currentRule.min;
         if (currentRule.max !== originalRule.max) ruleUpdate.max = currentRule.max;
         if (currentRule.maxSizeMB !== originalRule.maxSizeMB) ruleUpdate.maxSizeMB = currentRule.maxSizeMB;
+        if (currentRule.active !== (originalRule.active !== false)) ruleUpdate.active = currentRule.active;
 
         if (Object.keys(ruleUpdate).length > 0) {
           hasChanges = true;
@@ -268,26 +302,30 @@ export class AddEditIssueType implements OnInit {
         // Check if any specific media type was added or modified
         currentTypes.forEach((ct: any) => {
           const ot = originalTypes.find((t: any) => t.issueMediaTypeId === ct.issueMediaTypeId);
-          
+
           if (!ot) {
-            // New type inside an existing rule
-            mediaTypeUpdates.push({
-              issueMediaTypeId: ct.issueMediaTypeId,
-              isMandatory: ct.isMandatory
-            });
-            hasChanges = true;
-          } else if (ot.isMandatory !== ct.isMandatory) {
+            // New type inside an existing rule, ignore if immediately deleted
+            if (ct.active !== false) {
+              mediaTypeUpdates.push({
+                issueMediaTypeId: ct.issueMediaTypeId,
+                isMandatory: ct.isMandatory,
+                active: true
+              });
+              hasChanges = true;
+            }
+          } else if (ot.isMandatory !== ct.isMandatory || (ot.active !== false) !== (ct.active !== false)) {
             // Existing type changed
             mediaTypeUpdates.push({
               issueMediaTypeId: ct.issueMediaTypeId,
-              isMandatory: ct.isMandatory
+              isMandatory: ct.isMandatory,
+              active: ct.active !== false
             });
             hasChanges = true;
           }
         });
 
-        // Find media types that were in original but are missing in current
-        const removedTypes = originalTypes.filter((ot: any) => 
+        // Find media types that were in original but are entirely missing in current form array output
+        const removedTypes = originalTypes.filter((ot: any) =>
           !currentTypes.some((ct: any) => ct.issueMediaTypeId === ot.issueMediaTypeId)
         );
 
@@ -302,7 +340,7 @@ export class AddEditIssueType implements OnInit {
         if (hasChanges) {
           // Add the ID so backend knows *which* rule to apply these partial updates to
           ruleUpdate.issueMediaFormatId = currentRule.issueMediaFormatId;
-          
+
           if (mediaTypeUpdates.length > 0) {
             ruleUpdate.mediaTypes = mediaTypeUpdates;
           }
@@ -310,22 +348,25 @@ export class AddEditIssueType implements OnInit {
           updateMediaRules.push(ruleUpdate);
         }
       } else {
-        // Entirely new rule
-        insertMediaRules.push({
-          issueMediaFormatId: currentRule.issueMediaFormatId,
-          min: currentRule.min,
-          max: currentRule.max,
-          maxSizeMB: currentRule.maxSizeMB,
-          mediaTypes: currentRule.mediaTypes.map((t: any) => ({
-            issueMediaTypeId: t.issueMediaTypeId,
-            isMandatory: t.isMandatory
-          }))
-        });
+        // Entirely new rule, ignore if immediately deleted before save
+        if (currentRule.active !== false) {
+          insertMediaRules.push({
+            issueMediaFormatId: currentRule.issueMediaFormatId,
+            min: currentRule.min,
+            max: currentRule.max,
+            maxSizeMB: currentRule.maxSizeMB,
+            mediaTypes: currentRule.mediaTypes.filter((t: any) => t.active !== false).map((t: any) => ({
+              issueMediaTypeId: t.issueMediaTypeId,
+              isMandatory: t.isMandatory,
+              active: true
+            }))
+          });
+        }
       }
     });
 
-    // Check for completely deleted rules (exist in original, not in current form)
-    const deletedRules = originalRules.filter((or: any) => 
+    // Check for completely deleted rules (exist in original, not in current form array at all)
+    const deletedRules = originalRules.filter((or: any) =>
       !currentMediaRules.some((cr: any) => cr.issueMediaFormatId === or.issueMediaFormatId)
     );
 
@@ -340,7 +381,7 @@ export class AddEditIssueType implements OnInit {
     if (updateMediaRules.length > 0) {
       changes.updateMediaRules = updateMediaRules;
     }
-    
+
     if (insertMediaRules.length > 0) {
       changes.insertMediaRules = insertMediaRules;
     }
@@ -377,9 +418,11 @@ export class AddEditIssueType implements OnInit {
       min: rule.get('min')?.value,
       max: rule.get('max')?.value,
       maxSizeMB: rule.get('maxSizeMB')?.value,
+      active: rule.get('active')?.value,
       mediaTypes: (rule.get('mediaTypes') as FormArray).controls.map(t => ({
         issueMediaTypeId: t.get('issueMediaTypeId')?.value,
-        isMandatory: t.get('isMandatory')?.value
+        isMandatory: t.get('isMandatory')?.value,
+        active: t.get('active')?.value
       }))
     }));
   }
