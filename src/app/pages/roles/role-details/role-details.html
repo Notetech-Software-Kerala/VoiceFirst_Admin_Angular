@@ -112,14 +112,22 @@
                 @for (planLink of role.planRoleActionLink; track planLink.planRoleLinkId) {
                 <div class="plan-list-item d-block">
                     <!-- Plan Info Header -->
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        <div class="icon-box">
-                            <mat-icon>assignment</mat-icon>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="icon-box">
+                                <mat-icon>assignment</mat-icon>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <h6 class="plan-name mb-0">{{ planLink.planName }}</h6>
+                                <span class="action-count">{{ planLink.planActionLink.length }} Action(s)
+                                    Configured</span>
+                            </div>
                         </div>
-                        <div class="d-flex flex-column">
-                            <h6 class="plan-name mb-0">{{ planLink.planName }}</h6>
-                            <span class="action-count">{{ planLink.planActionLink.length }} Action(s) Configured</span>
-                        </div>
+
+                        <span class="status-mini" [class.active]="planLink.active" [class.inactive]="!planLink.active">
+                            <mat-icon class="status-dot-icon">{{planLink.active ? 'check_circle' : 'cancel'}}</mat-icon>
+                            {{ planLink.active ? 'Active' : 'Inactive' }}
+                        </span>
                     </div>
 
                     <!-- Detailed Action Table -->

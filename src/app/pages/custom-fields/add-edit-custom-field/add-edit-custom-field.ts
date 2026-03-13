@@ -32,7 +32,8 @@ export class AddEditCustomField implements OnInit {
     private customFieldService: CustomFieldService,
     private toastService: ToastService,
     private cdr: ChangeDetectorRef,
-    private encryptionService: EncryptionService
+    private encryptionService: EncryptionService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -49,14 +50,9 @@ export class AddEditCustomField implements OnInit {
       options: this.fb.array([])
     });
 
-    // Listen for data type changes to manage options array
+    // No longer clearing options array on change so options are preserved when toggling types
     this.form.get('fieldDataType')?.valueChanges.subscribe(type => {
-      if (type !== 'dropdown' && type !== 'Dropdown') {
-        const optionsArray = this.form.get('options') as FormArray;
-        while(optionsArray.length !== 0) {
-          optionsArray.removeAt(0);
-        }
-      }
+      // Do nothing: Options persist in UI allowing users to switch back to Dropdown without losing data
     });
   }
 
@@ -216,25 +212,30 @@ export class AddEditCustomField implements OnInit {
     const addValidations = formValue.validations
       .filter((v: any) => v.active !== false)
       .map((v: any) => ({
-      ruleName: v.ruleName,
-      ruleValue: v.ruleValue,
-      message: v.message
-    }));
+        ruleName: v.ruleName,
+        ruleValue: v.ruleValue,
+        message: v.message
+      }));
 
     if (addValidations.length > 0) {
       payload.addValidations = addValidations;
     }
 
-    if (formValue.fieldDataType.toLowerCase() === 'dropdown') {
+    const isOptionType = formValue.fieldDataType.toLowerCase() === 'dropdown' || formValue.fieldDataType.toLowerCase() === 'checkbox' || formValue.fieldDataType.toLowerCase() === 'radio';
+
+    if (isOptionType) {
       const addOptions = formValue.options
         .filter((o: any) => o.active !== false)
         .map((o: any) => ({
-        label: o.label,
-        value: o.value
-      }));
+          label: o.label,
+          value: o.value
+        }));
       if (addOptions.length > 0) {
         payload.addOptions = addOptions;
       }
+    } else {
+      // For text or non-option types, send null/empty array as requested
+      payload.addOptions = [];
     }
 
     console.log('Add Custom Field Payload:', payload);
@@ -244,7 +245,7 @@ export class AddEditCustomField implements OnInit {
         this.submitting = false;
         if (res.statusCode === 200 || res.statusCode === 201) {
           this.toastService.success('Custom Field created successfully', 'Success');
-          this.goBack();
+          this.router.navigate(['/custom-field-details', this.encryptionService.encryptForRoute(res.data.customFieldId)]);
         } else {
           this.toastService.error(res.message || 'Operation failed', 'Error');
         }
@@ -281,8 +282,8 @@ export class AddEditCustomField implements OnInit {
         // Find existing to check for changes
         const originalVal = this.originalData.validations?.find(ov => ov.customFieldValidationId === v.customFieldValidationId);
         if (originalVal) {
-          if (originalVal.ruleName !== v.ruleName || originalVal.ruleValue !== v.ruleValue || 
-              originalVal.message !== v.message || originalVal.active !== v.active) {
+          if (originalVal.ruleName !== v.ruleName || originalVal.ruleValue !== v.ruleValue ||
+            originalVal.message !== v.message || originalVal.active !== v.active) {
             updateValidations.push({
               customFieldValidationId: v.customFieldValidationId,
               ruleName: v.ruleName,
@@ -298,31 +299,46 @@ export class AddEditCustomField implements OnInit {
     if (addValidations.length > 0) payload.addValidations = addValidations;
     if (updateValidations.length > 0) payload.updateValidations = updateValidations;
 
-    // Process Options (Only if it's a dropdown, or was a dropdown and is being changed)
+    // Process Options (Only if it's an option type, else delete existing options)
     const addOptions: any[] = [];
     const updateOptions: any[] = [];
 
-    formValue.options.forEach((o: any) => {
-       if (o.customFieldOptionsId === 0 && o.active !== false) {
-        // New option
-        addOptions.push({
-          label: o.label,
-          value: o.value
+    const isOptionType = formValue.fieldDataType.toLowerCase() === 'dropdown' || formValue.fieldDataType.toLowerCase() === 'checkbox' || formValue.fieldDataType.toLowerCase() === 'radio';
+
+    if (isOptionType) {
+      formValue.options.forEach((o: any) => {
+        if (o.customFieldOptionsId === 0 && o.active !== false) {
+          // New option
+          addOptions.push({
+            label: o.label,
+            value: o.value
+          });
+        } else if (o.customFieldOptionsId !== 0) {
+          const originalOpt = this.originalData.options?.find(oo => oo.customFieldOptionsId === o.customFieldOptionsId);
+          if (originalOpt) {
+            if (originalOpt.label !== o.label || originalOpt.value !== o.value || originalOpt.active !== o.active) {
+              updateOptions.push({
+                customFieldOptionsId: o.customFieldOptionsId,
+                label: o.label,
+                value: o.value,
+                active: o.active
+              });
+            }
+          }
+        }
+      });
+    } else {
+      // It's a non-option type (e.g. Text). Mark all existing original options from the DB as deleted.
+      if (this.originalData.options) {
+        this.originalData.options.forEach(oo => {
+          updateOptions.push({
+            customFieldOptionsId: oo.customFieldOptionsId,
+            active: false
+          });
         });
-       } else if (o.customFieldOptionsId !== 0) {
-         const originalOpt = this.originalData.options?.find(oo => oo.customFieldOptionsId === o.customFieldOptionsId);
-         if (originalOpt) {
-           if (originalOpt.label !== o.label || originalOpt.value !== o.value || originalOpt.active !== o.active) {
-             updateOptions.push({
-               customFieldOptionsId: o.customFieldOptionsId,
-               label: o.label,
-               value: o.value,
-               active: o.active
-             });
-           }
-         }
-       }
-    });
+      }
+      payload.addOptions = []; // Ensure new additions are sent as empty per requirements
+    }
 
     if (addOptions.length > 0) payload.addOptions = addOptions;
     if (updateOptions.length > 0) payload.updateOptions = updateOptions;
@@ -341,7 +357,7 @@ export class AddEditCustomField implements OnInit {
         this.submitting = false;
         if (res.statusCode === 200) {
           this.toastService.success('Custom Field updated successfully', 'Success');
-          this.goBack();
+          this.router.navigate(['/custom-field-details', this.encryptionService.encryptForRoute(this.customFieldId)]);
         } else {
           this.toastService.error(res.message || 'Operation failed', 'Error');
         }

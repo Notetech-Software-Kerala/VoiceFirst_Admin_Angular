@@ -1,1 +1,223 @@
-<p>custom-field-details works!</p>
+<div class="card detail-card p-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+        <div class="d-flex flex-column gap-2">
+            <div class="d-flex align-items-center gap-3">
+                <h2 class="page-title m-0">{{ field?.fieldName }}</h2>
+                @if(field) {
+                <app-status-badge [item]="field"></app-status-badge>
+                }
+            </div>
+            <!-- Meta Info Row -->
+            @if(field) {
+            <div class="row g-3 mt-1">
+                @if(field.createdDate) {
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2">
+                        <mat-icon class="tiny-icon">calendar_today</mat-icon>
+                        <span class="small">Created: <strong>{{ field.createdDate | date:'mediumDate'
+                                }}</strong> by <strong>{{ field.createdUser }}</strong></span>
+                    </div>
+                </div>
+                }
+
+                @if(field.modifiedDate ) {
+                <div class="col-md-auto border-start ps-3 d-none d-md-block"></div>
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2">
+                        <mat-icon class="tiny-icon">edit</mat-icon>
+                        <span class="small">Modified: <strong>{{ field.modifiedDate | date:'mediumDate'
+                                }}</strong> by <strong>{{ field.modifiedUser }}</strong></span>
+                    </div>
+                </div>
+                }
+
+                @if(field.deleted) {
+                <div class="col-md-auto border-start ps-3 d-none d-md-block"></div>
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2 text-danger">
+                        <mat-icon class="tiny-icon">delete</mat-icon>
+                        <span class="small">Deleted: <strong>{{ field.deletedDate | date:'mediumDate' }}</strong> by
+                            <strong>{{ field.deletedUser }}</strong></span>
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2 flex-wrap">
+            @if(field) {
+            @if(!field.deleted) {
+            <button type="button" class="btn-action btn-outline-info" (click)="onEdit()">
+                <mat-icon class="msr">edit</mat-icon>
+                <span class="btn-text">Edit</span>
+            </button>
+            <button type="button" class="btn-action"
+                [ngClass]="field.active ? 'btn-outline-warning' : 'btn-outline-success'" (click)="onSuspend()">
+                <mat-icon class="msr">{{ field.active ? 'block' : 'check_circle' }}</mat-icon>
+                <span class="btn-text">{{ field.active ? 'Suspend' : 'Reinstate' }}</span>
+            </button>
+            }
+
+
+            @if(!field.deleted) {
+            <button type="button" class="btn-action btn-outline-danger" (click)="onDelete()">
+                <mat-icon class="msr">delete</mat-icon>
+                <span class="btn-text">Delete</span>
+            </button>
+            }
+            @else {
+            <button type="button" class="btn-action btn-outline-success" (click)="onRestore()">
+                <mat-icon class="msr">restart_alt</mat-icon>
+                <span class="btn-text">Recover</span>
+            </button>
+            }
+
+            <button type="button" class="btn-action btn-outline" (click)="goBack()">
+                <mat-icon class="msr">arrow_back</mat-icon>
+                <span class="btn-text">Back</span>
+            </button>
+            }
+        </div>
+    </div>
+
+
+
+    @if(loading) {
+    <app-details-loader [rows]="2"></app-details-loader>
+    } @else if (field) {
+
+    <div class="row mb-3">
+        <div class="col-md-6  mb-3">
+            <div class="info-label">Field Key</div>
+            <div class="info-value">{{ field.fieldKey }}</div>
+        </div>
+
+        <div class="col-md-6  mb-3">
+            <div class="info-label">Data Type</div>
+            <div class="info-value text-capitalize">{{ field.fieldDataType || 'N/A'}}</div>
+        </div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="row">
+        <div class="col-12">
+            <h5 class="section-title mb-4">Configuration Details</h5>
+
+            <!-- Validations List -->
+            <div class="d-flex flex-column gap-3 detail-card mb-4">
+                <div class="plan-list-item d-block">
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="icon-box">
+                                <mat-icon>rule</mat-icon>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <h6 class="plan-name mb-0">Validation Rules</h6>
+                                <span class="action-count">{{ field.validations?.length || 0 }} Rule(s)
+                                    Configured</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Validation Table -->
+                    <div class="table-responsive rounded-3 overflow-hidden">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-3">Rule Name</th>
+                                    <th>Value</th>
+                                    <th>Error Message</th>
+                                    <th class="text-end pe-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (val of field.validations; track val.customFieldValidationId) {
+                                <tr>
+                                    <td class="ps-3 fw-medium">{{ val.ruleName }}</td>
+                                    <td>{{ val.ruleValue }}</td>
+                                    <td><span class="text-muted">{{ val.message }}</span></td>
+                                    <td class="text-end pe-3">
+                                        <div class="d-flex justify-content-end">
+                                            <app-status-badge [item]="val"></app-status-badge>
+                                        </div>
+                                    </td>
+                                </tr>
+                                } @empty {
+                                <tr>
+                                    <td colspan="4" class="text-center py-3 text-muted fst-italic">
+                                        No validation rules configured for this field.
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Options List (Conditional based on data type) -->
+            @if(field.fieldDataType === 'dropdown' || field.fieldDataType === 'checkbox' || field.fieldDataType ===
+            'radio'){
+            <div class="d-flex flex-column gap-3 detail-card">
+                <div class="plan-list-item d-block">
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="icon-box">
+                                <mat-icon>list</mat-icon>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <h6 class="plan-name mb-0">Selectable Options</h6>
+                                <span class="action-count">{{ field.options?.length || 0 }} Option(s) Configured</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Options Table -->
+                    <div class="table-responsive rounded-3 overflow-hidden">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-3">Display Label</th>
+                                    <th>Backend Value</th>
+                                    <th class="text-end pe-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (opt of field.options; track opt.customFieldOptionsId) {
+                                <tr>
+                                    <td class="ps-3 fw-medium">{{ opt.label }}</td>
+                                    <td><span class="badge bg-light text-dark border">{{ opt.value }}</span></td>
+                                    <td class="text-end pe-3">
+                                        <div class="d-flex justify-content-end">
+                                            <app-status-badge [item]="opt"></app-status-badge>
+                                        </div>
+                                    </td>
+                                </tr>
+                                } @empty {
+                                <tr>
+                                    <td colspan="3" class="text-center py-3 text-muted fst-italic">
+                                        No options configured for this {{field.fieldDataType}}.
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+
+
+    } @else {
+    <div class="alert alert-warning">
+        Custom Field not found.
+    </div>
+    }
+</div>
