@@ -32,6 +32,12 @@ export class BusinessActivityService {
     )
   }
 
+  getById(id: number): Observable<ApiResponse<BusinessActivityModel>> {
+    return this.http.get<ApiResponse<BusinessActivityModel>>(
+      `${this.base}${apiConfig.businessActivity}/${id}`
+    );
+  }
+
   update(id: number, data: Partial<BusinessActivityModel>): Observable<ApiResponse<BusinessActivityModel>> {
     return this.http.patch<ApiResponse<BusinessActivityModel>>(
       `${this.base}${apiConfig.businessActivity}/${id}`,
