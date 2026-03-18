@@ -1,0 +1,97 @@
+<div class="profile-page">
+
+    <!-- Header Card -->
+    <div class="card profile-header-card mb-4">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <!-- Avatar + Name -->
+            <div class="d-flex align-items-center gap-4">
+                <div class="avatar-circle">
+                    <span class="avatar-initials">{{ initials }}</span>
+                </div>
+                <div>
+                    <h2 class="profile-name mb-0">{{ fullName }}</h2>
+                    <p class="profile-email mb-1">{{ user?.email }}</p>
+                    <span class="profile-badge">{{ profileDetails.designation }}</span>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="d-flex gap-2 flex-wrap align-items-start pt-1">
+                <button type="button" class="btn-action btn-outline-info" (click)="openChangePassword()">
+                    <mat-icon class="msr">lock_reset</mat-icon>
+                    <span class="btn-text">Change Password</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Cards Row -->
+    <div class="row g-4">
+
+        <!-- Personal Info -->
+        <div class="col-md-6">
+            <div class="card info-card h-100">
+                <div class="info-card-header">
+                    <div class="icon-box">
+                        <mat-icon>person</mat-icon>
+                    </div>
+                    <h6 class="info-card-title mb-0">Personal Information</h6>
+                </div>
+                <div class="info-grid">
+                    <div class="info-row">
+                        <div class="info-label">First Name</div>
+                        <div class="info-value">{{ user?.firstName || '—' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Last Name</div>
+                        <div class="info-value">{{ user?.lastName || '—' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Email</div>
+                        <div class="info-value">{{ user?.email || '—' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Mobile</div>
+                        <div class="info-value">{{ user?.mobileNo || '—' }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Work Info -->
+        <div class="col-md-6">
+            <div class="card info-card h-100">
+                <div class="info-card-header">
+                    <div class="icon-box">
+                        <mat-icon>work</mat-icon>
+                    </div>
+                    <h6 class="info-card-title mb-0">Work Information</h6>
+                </div>
+                <div class="info-grid">
+                    <div class="info-row">
+                        <div class="info-label">Employee ID</div>
+                        <div class="info-value">{{ profileDetails.employeeId }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Department</div>
+                        <div class="info-value">{{ profileDetails.department }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Designation</div>
+                        <div class="info-value">{{ profileDetails.designation }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Join Date</div>
+                        <div class="info-value">{{ profileDetails.joinDate | date:'mediumDate' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Location</div>
+                        <div class="info-value">{{ profileDetails.location }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>

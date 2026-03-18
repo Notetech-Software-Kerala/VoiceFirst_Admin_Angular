@@ -1,0 +1,125 @@
+/* ============================================================
+   Profile Page
+   ============================================================ */
+.profile-page {
+    padding: 0;
+}
+
+/* Header Card */
+.profile-header-card {
+    padding: 2rem;
+    border-radius: 16px;
+    position: relative;
+}
+
+/* Avatar */
+.avatar-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--color-hover-primary, #6366f1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+}
+
+.avatar-initials {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+    letter-spacing: 1px;
+}
+
+.profile-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.profile-email {
+    font-size: 0.9rem;
+    color: var(--color-text-placeholder);
+}
+
+.profile-badge {
+    display: inline-block;
+    background: var(--color-bg-secondary);
+    color: var(--color-hover-primary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--color-border-hr);
+    letter-spacing: 0.5px;
+}
+
+/* Info Cards */
+.info-card {
+    padding: 1.5rem;
+    border-radius: 14px;
+}
+
+.info-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--color-border-hr);
+}
+
+.info-card-title {
+    font-weight: 600;
+    color: var(--color-text-primary);
+    font-size: 0.95rem;
+}
+
+.icon-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background-color: var(--color-bg-secondary);
+    color: var(--color-hover-primary);
+    flex-shrink: 0;
+}
+
+.icon-box mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+/* Info Rows */
+.info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+}
+
+.info-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 0.5rem;
+    align-items: start;
+}
+
+.info-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-text-placeholder);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-value {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    word-break: break-all;
+}

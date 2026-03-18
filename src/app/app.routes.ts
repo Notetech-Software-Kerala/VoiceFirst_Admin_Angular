@@ -289,6 +289,10 @@ export const routes: Routes = [
                         loadComponent: () => import('./pages/employees/employee-details/employee-details').then(m => m.EmployeeDetails)
                     }
                 ]
+            },
+            {
+                path: 'profile',
+                loadComponent: () => import('./pages/profile/profile').then(m => m.Profile)
             }
         ]
     },
