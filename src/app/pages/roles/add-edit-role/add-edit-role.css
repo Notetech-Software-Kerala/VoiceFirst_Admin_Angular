@@ -214,3 +214,11 @@ h6 {
     background: var(--color-hover-primary);
     color: #fff;
 }
+
+mat-icon {
+    cursor: pointer;
+}
+
+.btn-outline-success:hover {
+    color: #FFF !important;
+}

@@ -68,25 +68,25 @@
                         @if (val.get('active')?.value) {
                         <div class="plan-card p-3 position-relative" [formGroupName]="i">
                             <button type="button" class="btn-clear position-absolute top-0 end-0 m-2 text-danger"
-                                (click)="removeValidation(i)" matTooltip="Remove Rule">
+                                (click)="removeValidation(i)">
                                 <mat-icon>close</mat-icon>
                             </button>
 
                             <div class="row g-2 align-items-end me-4">
                                 <div class="col-md-4">
                                     <label class="form-label fs-7">Rule Name</label>
-                                    <input type="text" class="form-control form-control-sm"
-                                        formControlName="ruleName" placeholder="e.g. required, minLength">
+                                    <input type="text" class="form-control form-control-sm" formControlName="ruleName"
+                                        placeholder="e.g. required, minLength">
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fs-7">Rule Value</label>
-                                    <input type="text" class="form-control form-control-sm"
-                                        formControlName="ruleValue" placeholder="e.g. true, 10">
+                                    <input type="text" class="form-control form-control-sm" formControlName="ruleValue"
+                                        placeholder="e.g. true, 10">
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fs-7">Error Message</label>
-                                    <input type="text" class="form-control form-control-sm"
-                                        formControlName="message" placeholder="Custom error msg">
+                                    <input type="text" class="form-control form-control-sm" formControlName="message"
+                                        placeholder="Custom error msg">
                                 </div>
                             </div>
                         </div>
@@ -121,20 +121,20 @@
                             @if (opt.get('active')?.value) {
                             <div class="plan-card p-3 position-relative" [formGroupName]="j">
                                 <button type="button" class="btn-clear position-absolute top-0 end-0 m-2 text-danger"
-                                    (click)="removeOption(j)" matTooltip="Remove Option">
+                                    (click)="removeOption(j)">
                                     <mat-icon>close</mat-icon>
                                 </button>
 
                                 <div class="row g-2 align-items-end me-4">
                                     <div class="col-md-6">
                                         <label class="form-label fs-7">Label</label>
-                                        <input type="text" class="form-control form-control-sm"
-                                            formControlName="label" placeholder="Display Text">
+                                        <input type="text" class="form-control form-control-sm" formControlName="label"
+                                            placeholder="Display Text">
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label fs-7">Value</label>
-                                        <input type="text" class="form-control form-control-sm"
-                                            formControlName="value" placeholder="Backend Value">
+                                        <input type="text" class="form-control form-control-sm" formControlName="value"
+                                            placeholder="Backend Value">
                                     </div>
                                 </div>
                             </div>

@@ -1,0 +1,140 @@
+<div class="card detail-card p-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+        <div class="d-flex flex-column gap-2">
+            <div class="d-flex align-items-center gap-3">
+                <h2 class="page-title m-0">{{ item?.activityName }}</h2>
+                @if(item) {
+                <app-status-badge [item]="item"></app-status-badge>
+                }
+            </div>
+            <!-- Meta Info Row -->
+            @if(item) {
+            <div class="row g-3 mt-1">
+                @if(item.createdDate) {
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2">
+                        <mat-icon class="tiny-icon">calendar_today</mat-icon>
+                        <span class="small">Created: <strong>{{ item.createdDate | date:'mediumDate' }}</strong> by
+                            <strong>{{ item.createdUser }}</strong></span>
+                    </div>
+                </div>
+                }
+                @if(item.modifiedDate) {
+                <div class="col-md-auto border-start ps-3 d-none d-md-block"></div>
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2">
+                        <mat-icon class="tiny-icon">edit</mat-icon>
+                        <span class="small">Modified: <strong>{{ item.modifiedDate | date:'mediumDate' }}</strong> by
+                            <strong>{{ item.modifiedUser }}</strong></span>
+                    </div>
+                </div>
+                }
+                @if(item.deleted) {
+                <div class="col-md-auto border-start ps-3 d-none d-md-block"></div>
+                <div class="col-md-auto">
+                    <div class="meta-item d-flex align-items-center gap-2 text-danger">
+                        <mat-icon class="tiny-icon">delete</mat-icon>
+                        <span class="small">Deleted: <strong>{{ item.deletedDate | date:'mediumDate' }}</strong> by
+                            <strong>{{ item.deletedUser }}</strong></span>
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2 flex-wrap">
+            @if(item) {
+            @if(!item.deleted) {
+            <button type="button" class="btn-action btn-outline-info" (click)="onEdit()">
+                <mat-icon class="msr">edit</mat-icon>
+                <span class="btn-text">Edit</span>
+            </button>
+            <button type="button" class="btn-action"
+                [ngClass]="item.active ? 'btn-outline-warning' : 'btn-outline-success'" (click)="onSuspend()">
+                <mat-icon class="msr">{{ item.active ? 'block' : 'check_circle' }}</mat-icon>
+                <span class="btn-text">{{ item.active ? 'Suspend' : 'Reinstate' }}</span>
+            </button>
+            }
+            @if(!item.deleted) {
+            <button type="button" class="btn-action btn-outline-danger" (click)="onDelete()">
+                <mat-icon class="msr">delete</mat-icon>
+                <span class="btn-text">Delete</span>
+            </button>
+            }
+            @else {
+            <button type="button" class="btn-action btn-outline-success" (click)="onRestore()">
+                <mat-icon class="msr">restart_alt</mat-icon>
+                <span class="btn-text">Recover</span>
+            </button>
+            }
+            <button type="button" class="btn-action btn-outline" (click)="goBack()">
+                <mat-icon class="msr">arrow_back</mat-icon>
+                <span class="btn-text">Back</span>
+            </button>
+            }
+        </div>
+    </div>
+
+    @if(loading) {
+    <app-details-loader [rows]="2"></app-details-loader>
+    } @else if (item) {
+
+    <!-- Content Section: Custom Fields -->
+    <div class="row">
+        <div class="col-12">
+            <h5 class="section-title mb-4">Linked Custom Fields</h5>
+
+            <div class="d-flex flex-column gap-3 detail-card mb-4">
+                <div class="plan-list-item d-block">
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="icon-box">
+                                <mat-icon>tune</mat-icon>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <h6 class="plan-name mb-0">Custom Fields</h6>
+                                <span class="action-count">{{ item.activityCustomFields?.length || 0 }} Field(s)
+                                    Linked</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (item.activityCustomFields && item.activityCustomFields.length > 0) {
+                    <div class="config-row">
+                        @for (cf of item.activityCustomFields; track cf.activityCustomFieldLinkId) {
+                        <div class="config-card" [class.inactive-card]="!cf.active">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <mat-icon class="tiny-icon text-primary">label</mat-icon>
+                                <span class="fw-semibold">{{ cf.fieldName }}</span>
+                                @if (!cf.active) {
+                                <span class="badge bg-danger-subtle text-danger ms-auto">Inactive</span>
+                                } @else {
+                                <span class="badge bg-success-subtle text-success ms-auto">Active</span>
+                                }
+                            </div>
+                            <div class="text-muted small text-capitalize">{{ cf.fieldDataType }}</div>
+                        </div>
+                        }
+                    </div>
+                    } @else {
+                    <div class="empty-state-modern">
+                        <mat-icon class="empty-icon">tune</mat-icon>
+                        <p class="mb-0">No custom fields linked to this activity.</p>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    } @else {
+    <div class="alert alert-warning">
+        Business Activity not found.
+    </div>
+    }
+
+</div>

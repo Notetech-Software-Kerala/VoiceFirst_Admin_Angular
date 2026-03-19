@@ -73,7 +73,24 @@ export const routes: Routes = [
             },
             {
                 path: 'business-activity',
-                loadComponent: () => import('./pages/business-activity/business-activity').then(m => m.BusinessActivity)
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () => import('./pages/business-activity/business-activity-list/business-activity-list').then(m => m.BusinessActivityList)
+                    },
+                    {
+                        path: 'add',
+                        loadComponent: () => import('./pages/business-activity/add-edit-business-activity/add-edit-business-activity').then(m => m.AddEditBusinessActivity)
+                    },
+                    {
+                        path: 'edit/:id',
+                        loadComponent: () => import('./pages/business-activity/add-edit-business-activity/add-edit-business-activity').then(m => m.AddEditBusinessActivity)
+                    },
+                    {
+                        path: 'details/:id',
+                        loadComponent: () => import('./pages/business-activity/business-activity-details/business-activity-details').then(m => m.BusinessActivityDetails)
+                    }
+                ]
             },
             {
                 path: 'custom-field',
@@ -272,6 +289,10 @@ export const routes: Routes = [
                         loadComponent: () => import('./pages/employees/employee-details/employee-details').then(m => m.EmployeeDetails)
                     }
                 ]
+            },
+            {
+                path: 'profile',
+                loadComponent: () => import('./pages/profile/profile').then(m => m.Profile)
             }
         ]
     },

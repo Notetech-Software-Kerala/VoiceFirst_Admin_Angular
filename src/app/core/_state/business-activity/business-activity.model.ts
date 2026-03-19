@@ -13,4 +13,19 @@ export interface BusinessActivityModel {
 
   deletedUser: string;
   deletedDate: string | null;
+
+  activityCustomFields?: BusinessActivityCustomField[];
+}
+
+export interface BusinessActivityCustomField {
+  activityCustomFieldLinkId: number;
+  activityId: number;
+  customFieldId: number;
+  fieldDataType: string;
+  fieldName: string;
+  active: boolean;
+  createdDate: string;
+  createdUser: string;
+  modifiedDate: string | null;
+  modifiedUser: string | null;
 }

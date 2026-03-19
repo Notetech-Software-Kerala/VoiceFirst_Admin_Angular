@@ -25,6 +25,14 @@ export class CustomFieldService {
     );
   }
 
+  lookup(): Observable<ApiResponse<CustomFieldModel[]>> {
+    let params = new HttpParams().set('Limit', 1000); // Fetch all custom fields for options
+    return this.http.get<ApiResponse<CustomFieldModel[]>>(
+      `${this.base}${apiConfig.customField}`,
+      { params }
+    );
+  }
+
   getById(id: number): Observable<ApiResponse<CustomFieldModel>> {
     return this.http.get<ApiResponse<CustomFieldModel>>(
       `${this.base}${apiConfig.customField}/${id}`

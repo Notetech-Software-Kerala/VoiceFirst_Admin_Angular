@@ -44,108 +44,135 @@
                                     Rule Configuration
                                 </span>
 
+                                @if (mediaRules.at(i).get('active')?.value !== false) {
                                 <mat-icon class="msr-delete" (click)="removeMediaRule(i)">delete</mat-icon>
+                                } @else {
+                                <button type="button"
+                                    class="btn btn-sm btn-outline-success ms-auto d-flex align-items-center mb-1"
+                                    style="font-size: 11px; padding: 2px 6px;" (click)="recoverMediaRule(i)">
+                                    <mat-icon class="msr">restart_alt</mat-icon>
+                                    Recover
+                                </button>
+                                }
 
                             </div>
 
-                            <div class="row g-3">
-                                <!-- Media Format -->
-                                <div class="col-12 col-md-6 col-xl-3">
-                                    <label class="form-label small">Media Format <span
-                                            class="text-danger">*</span></label>
-                                    <select class="form-select form-select-sm" formControlName="issueMediaFormatId">
-                                        <option [value]="null" disabled>Select format</option>
-                                        @for (fmt of mediaFormats; track fmt.issueMediaFormatId) {
-                                        <option [value]="fmt.issueMediaFormatId">{{ fmt.issueMediaFormat }}</option>
-                                        }
-                                    </select>
+                            <div [class.opacity-50]="mediaRules.at(i).get('active')?.value === false"
+                                [style.pointer-events]="mediaRules.at(i).get('active')?.value === false ? 'none' : 'auto'">
+                                <div class="row g-3">
+                                    <!-- Media Format -->
+                                    <div class="col-12 col-md-6 col-xl-3">
+                                        <label class="form-label small">Media Format <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-select form-select-sm" formControlName="issueMediaFormatId">
+                                            <option [value]="null" disabled>Select format</option>
+                                            @for (fmt of mediaFormats; track fmt.issueMediaFormatId) {
+                                            <option [value]="fmt.issueMediaFormatId">{{ fmt.issueMediaFormat }}</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <!-- Max Size MB -->
+                                    <div class="col-12 col-md-6 col-xl-3">
+                                        <label class="form-label small">Max Size (MB) <span
+                                                class="text-danger">*</span></label>
+                                        <input type="number" class="form-control form-control-sm"
+                                            formControlName="maxSizeMB" min="0.1" step="0.1" placeholder="e.g. 5" />
+                                    </div>
+
+                                    <!-- Min -->
+                                    <div class="col-6 col-md-6 col-xl-3">
+                                        <label class="form-label small">Min Count <span
+                                                class="text-danger">*</span></label>
+                                        <input type="number" class="form-control form-control-sm" formControlName="min"
+                                            min="0" placeholder="0" />
+                                    </div>
+
+                                    <!-- Max -->
+                                    <div class="col-6 col-md-6 col-xl-3">
+                                        <label class="form-label small">Max Count <span
+                                                class="text-danger">*</span></label>
+                                        <input type="number" class="form-control form-control-sm" formControlName="max"
+                                            min="1" placeholder="1" />
+                                    </div>
                                 </div>
 
-                                <!-- Max Size MB -->
-                                <div class="col-12 col-md-6 col-xl-3">
-                                    <label class="form-label small">Max Size (MB) <span
-                                            class="text-danger">*</span></label>
-                                    <input type="number" class="form-control form-control-sm"
-                                        formControlName="maxSizeMB" min="0.1" step="0.1" placeholder="e.g. 5" />
-                                </div>
+                                <!-- Media Types Sub-section -->
+                                <div class="mt-4 media-type-well">
+                                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2"
+                                        style="border-bottom: 1px solid var(--color-border-hr);">
+                                        <h6 class="mb-0 fs-14 fw-semibold d-flex align-items-center gap-2"
+                                            style="color: var(--color-text-primary);">
+                                            <mat-icon class="msr"
+                                                style="font-size:18px;width:18px;height:18px;">attachment</mat-icon>
+                                            Allowed Media Types
+                                        </h6>
+                                        <button type="button"
+                                            class="btn-action btn-outline btn-xs d-flex align-items-center justify-content-center gap-1"
+                                            (click)="addMediaType(i)">
+                                            <mat-icon class="msr"
+                                                style="font-size:14px;width:14px;height:14px;line-height:14px;">add</mat-icon>
+                                            <span>Add Type</span>
+                                        </button>
+                                    </div>
 
-                                <!-- Min -->
-                                <div class="col-6 col-md-6 col-xl-3">
-                                    <label class="form-label small">Min Count <span class="text-danger">*</span></label>
-                                    <input type="number" class="form-control form-control-sm" formControlName="min"
-                                        min="0" placeholder="0" />
-                                </div>
+                                    <div formArrayName="mediaTypes">
+                                        @for (mt of getMediaTypes(i).controls; track $index; let j = $index) {
+                                        <div [formGroupName]="j"
+                                            class="row g-2 align-items-center mb-2 media-type-row-ui rounded p-2"
+                                            [class.bg-light]="getMediaTypes(i).at(j).get('active')?.value === false">
+                                            <div class="col-12 col-sm-6 col-md-6"
+                                                [class.opacity-50]="getMediaTypes(i).at(j).get('active')?.value === false"
+                                                [style.pointer-events]="getMediaTypes(i).at(j).get('active')?.value === false ? 'none' : 'auto'">
+                                                <select class="form-select form-select-sm shadow-none w-100"
+                                                    formControlName="issueMediaTypeId">
+                                                    <option [value]="null" disabled>Select type</option>
+                                                    @for (type of mediaTypes; track type.issueMediaTypeId) {
+                                                    <option [value]="type.issueMediaTypeId"
+                                                        [disabled]="getSelectedMediaTypeIds(i, j).has(type.issueMediaTypeId)">
+                                                        {{ type.issueMediaType }}
+                                                    </option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="col-8 col-sm-4 col-md-4"
+                                                [class.opacity-50]="getMediaTypes(i).at(j).get('active')?.value === false"
+                                                [style.pointer-events]="getMediaTypes(i).at(j).get('active')?.value === false ? 'none' : 'auto'">
+                                                <div class="form-check d-flex align-items-center gap-2 mt-1">
+                                                    <input class="form-check-input mt-0" style="cursor: pointer;"
+                                                        type="checkbox" formControlName="isMandatory"
+                                                        [id]="'mandatory-' + i + '-' + j" />
+                                                    <label class="form-check-label small mb-0 mt-1 user-select-none"
+                                                        style="cursor: pointer;"
+                                                        [for]="'mandatory-' + i + '-' + j">Mandatory</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-4 col-sm-2 col-md-2 text-end">
+                                                @if (getMediaTypes(i).at(j).get('active')?.value !== false) {
+                                                <mat-icon class="delete-btn-card"
+                                                    style="font-size: 1.2rem; width: 1.2rem; height: 1.2rem;"
+                                                    (click)="removeMediaType(i, j)">close</mat-icon>
+                                                } @else {
+                                                <mat-icon class="msr"
+                                                    style="font-size: 1.2rem; width: 1.2rem; height: 1.2rem;"
+                                                    (click)="recoverMediaType(i, j)">restart_alt</mat-icon>
 
-                                <!-- Max -->
-                                <div class="col-6 col-md-6 col-xl-3">
-                                    <label class="form-label small">Max Count <span class="text-danger">*</span></label>
-                                    <input type="number" class="form-control form-control-sm" formControlName="max"
-                                        min="1" placeholder="1" />
-                                </div>
-                            </div>
-
-                            <!-- Media Types Sub-section -->
-                            <div class="mt-4 media-type-well">
-                                <div class="d-flex align-items-center justify-content-between mb-3 pb-2"
-                                    style="border-bottom: 1px solid var(--color-border-hr);">
-                                    <h6 class="mb-0 fs-14 fw-semibold d-flex align-items-center gap-2"
-                                        style="color: var(--color-text-primary);">
-                                        <mat-icon class="msr"
-                                            style="font-size:18px;width:18px;height:18px;">attachment</mat-icon>
-                                        Allowed Media Types
-                                    </h6>
-                                    <button type="button"
-                                        class="btn-action btn-outline btn-xs d-flex align-items-center justify-content-center gap-1"
-                                        (click)="addMediaType(i)">
-                                        <mat-icon class="msr"
-                                            style="font-size:14px;width:14px;height:14px;line-height:14px;">add</mat-icon>
-                                        <span>Add Type</span>
-                                    </button>
-                                </div>
-
-                                <div formArrayName="mediaTypes">
-                                    @for (mt of getMediaTypes(i).controls; track $index; let j = $index) {
-                                    <div [formGroupName]="j"
-                                        class="row g-2 align-items-center mb-2 media-type-row-ui rounded p-2">
-                                        <div class="col-12 col-sm-6 col-md-6">
-                                            <select class="form-select form-select-sm shadow-none w-100"
-                                                formControlName="issueMediaTypeId">
-                                                <option [value]="null" disabled>Select type</option>
-                                                @for (type of mediaTypes; track type.issueMediaTypeId) {
-                                                <option [value]="type.issueMediaTypeId"
-                                                    [disabled]="getSelectedMediaTypeIds(i, j).has(type.issueMediaTypeId)">
-                                                    {{ type.issueMediaType }}
-                                                </option>
                                                 }
-                                            </select>
-                                        </div>
-                                        <div class="col-8 col-sm-4 col-md-4">
-                                            <div class="form-check d-flex align-items-center gap-2 mt-1">
-                                                <input class="form-check-input mt-0" style="cursor: pointer;"
-                                                    type="checkbox" formControlName="isMandatory"
-                                                    [id]="'mandatory-' + i + '-' + j" />
-                                                <label class="form-check-label small mb-0 mt-1 user-select-none"
-                                                    style="cursor: pointer;"
-                                                    [for]="'mandatory-' + i + '-' + j">Mandatory</label>
                                             </div>
                                         </div>
-                                        <div class="col-4 col-sm-2 col-md-2 text-end">
-                                            <mat-icon class="delete-btn-card"
-                                                style="font-size: 1.2rem; width: 1.2rem; height: 1.2rem;"
-                                                (click)="removeMediaType(i, j)">close</mat-icon>
+                                        }
+                                        @if (getMediaTypes(i).length === 0) {
+                                        <div class="text-center p-3 rounded border border-dashed"
+                                            style="border-color: var(--color-border-hr) !important;">
+                                            <mat-icon class="msr"
+                                                style="color: var(--color-text-placeholder);">attach_file</mat-icon>
+                                            <small class="d-block mt-1" style="color: var(--color-text-primary);">No
+                                                media
+                                                types added. Click "Add Type" to
+                                                include one.</small>
                                         </div>
+                                        }
                                     </div>
-                                    }
-                                    @if (getMediaTypes(i).length === 0) {
-                                    <div class="text-center p-3 rounded border border-dashed"
-                                        style="border-color: var(--color-border-hr) !important;">
-                                        <mat-icon class="msr"
-                                            style="color: var(--color-text-placeholder);">attach_file</mat-icon>
-                                        <small class="d-block mt-1" style="color: var(--color-text-primary);">No media
-                                            types added. Click "Add Type" to
-                                            include one.</small>
-                                    </div>
-                                    }
                                 </div>
                             </div>
                         </div>

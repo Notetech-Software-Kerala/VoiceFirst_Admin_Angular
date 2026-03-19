@@ -86,20 +86,22 @@
                                     <h6 class="m-0 fw-bold">{{ plan.planName }}</h6>
                                 </div>
                                 @if (plan.isRemoved) {
-                                <button type="button" class="btn btn-sm btn-outline-primary" (click)="restorePlan(i)">
-                                    Add Again
+
+                                <button type="button"
+                                    class="btn btn-sm btn-outline-success ms-auto d-flex align-items-center mb-1"
+                                    style="font-size: 11px; padding: 2px 6px;" (click)="restorePlan(i)">
+                                    <mat-icon class="msr">restart_alt</mat-icon>
+                                    Recover
                                 </button>
                                 } @else {
-                                <button type="button" class="btn btn-sm btn-outline-danger" (click)="removePlan(i)"
-                                    matTooltip="Remove Plan">
-                                    <mat-icon class="icon-sm">delete</mat-icon>
-                                </button>
+                                <mat-icon class="msr text-danger mt-1 fs-5" style="cursor: pointer;"
+                                    (click)="removePlan(i)">delete</mat-icon>
                                 }
                             </div>
                             <div class="card-body">
                                 @if (plan.isRemoved) {
                                 <div class="removed-overlay">
-                                    <span>Plan marked for removal</span>
+                                    <span>Recover to reuse</span>
                                 </div>
                                 }
                                 <!-- Programs within the Plan -->

@@ -104,7 +104,14 @@ export class Login {
       };
 
       this.authService.login(payload).subscribe({
-        next: () => {
+        next: (res: any) => {
+          console.log("Login Response", res);
+
+          if (res.statusCode == 401) {
+            this.toast.error(res.message, 'Login Failed');
+            this.submitting = false;
+            return;
+          }
           this.submitting = false;
           this.router.navigate(['/dashboard']);
           this.toast.success('Welcome to Voice First', 'Login Success');

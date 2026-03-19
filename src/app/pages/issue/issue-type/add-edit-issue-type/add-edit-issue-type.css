@@ -97,3 +97,11 @@
     color: #fa574b !important;
     margin-top: 6px !important;
 }
+
+mat-icon {
+    cursor: pointer;
+}
+
+.btn-outline-success:hover {
+    color: #FFF !important;
+}

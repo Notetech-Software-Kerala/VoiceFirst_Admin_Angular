@@ -4,34 +4,32 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { Store } from '@ngrx/store';
 
-import { CustomFieldService } from '../../../core/_state/custom-field/custom-field.service';
+import { BusinessActivityService } from '../../../core/_state/business-activity/business-activity.service';
 import { ConfirmationService } from '../../../partials/shared_directives/confirmation';
 import { ToastService } from '../../../partials/shared_services/toast.service';
 import { MaterialModule } from '../../../material.module';
 import { StatusBadge } from '../../../partials/shared_modules/status-badge/status-badge';
 import { EncryptionService } from '../../../partials/shared_services/encryption.service';
 import { DetailsLoaderComponent } from '../../../partials/shared_modules/details-loader/details-loader.component';
-
-// Assuming actions might be available, otherwise we just manage local state.
-// import { CustomFieldActions } from '../../../core/_state/custom-field/custom-field.action';
+import { BusinessActivityModel } from '../../../core/_state/business-activity/business-activity.model';
 
 @Component({
-  selector: 'app-custom-field-details',
+  selector: 'app-business-activity-details',
   standalone: true,
   imports: [CommonModule, MaterialModule, StatusBadge, DetailsLoaderComponent],
-  templateUrl: './custom-field-details.html',
-  styleUrl: './custom-field-details.css',
+  templateUrl: './business-activity-details.html',
+  styleUrl: './business-activity-details.css',
 })
-export class CustomFieldDetails implements OnInit, OnDestroy {
-  field: any | null = null;
+export class BusinessActivityDetails implements OnInit, OnDestroy {
+  item: BusinessActivityModel | null = null;
   loading = true;
   private destroy$ = new Subject<void>();
-  customFieldId: number = 0;
+  activityId: number = 0;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private customFieldService: CustomFieldService,
+    private businessActivityService: BusinessActivityService,
     private confirmationService: ConfirmationService,
     private toastService: ToastService,
     private store: Store,
@@ -45,10 +43,10 @@ export class CustomFieldDetails implements OnInit, OnDestroy {
       if (encryptedId) {
         const decryptedId = this.encryptionService.decryptFromRoute(encryptedId);
         if (decryptedId) {
-          this.customFieldId = +decryptedId;
-          this.loadCustomFieldDetails(this.customFieldId);
+          this.activityId = +decryptedId;
+          this.loadDetails(this.activityId);
         } else {
-          this.toastService.error('Invalid Custom Field ID', 'Error');
+          this.toastService.error('Invalid Business Activity ID', 'Error');
           this.goBack();
         }
       }
@@ -60,21 +58,21 @@ export class CustomFieldDetails implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  loadCustomFieldDetails(id: number) {
+  loadDetails(id: number) {
     this.loading = true;
-    this.customFieldService.getById(id)
+    this.businessActivityService.getById(id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
           if (res.statusCode === 200 && res.data) {
-            this.field = res.data;
+            this.item = res.data;
           } else {
-            this.toastService.error(res.message || 'Failed to load custom field details', 'Error');
+            this.toastService.error(res.message || 'Failed to load details', 'Error');
           }
           this.loading = false;
         },
         error: (error) => {
-          console.error('Error loading custom field details', error);
+          console.error('Error loading details', error);
           this.loading = false;
         }
       });
@@ -85,26 +83,24 @@ export class CustomFieldDetails implements OnInit, OnDestroy {
   }
 
   onEdit() {
-    if (this.field) {
-      const encryptedId = this.encryptionService.encryptForRoute(this.field.customFieldId);
-      this.router.navigate(['/custom-field/edit', encryptedId]);
+    if (this.item) {
+      const encryptedId = this.encryptionService.encryptForRoute(this.item.activityId);
+      this.router.navigate(['/business-activity/edit', encryptedId]);
     }
   }
 
   onDelete() {
-    if (!this.field) return;
+    if (!this.item) return;
 
-    this.confirmationService.confirmDelete(this.field.fieldName)
+    this.confirmationService.confirmDelete(this.item.activityName)
       .pipe(takeUntil(this.destroy$))
       .subscribe(confirmed => {
         if (confirmed) {
-          this.customFieldService.delete(this.field!.customFieldId).subscribe({
+          this.businessActivityService.delete(this.item!.activityId).subscribe({
             next: (res: any) => {
               if (res.statusCode === 200) {
-                this.toastService.success('Custom Field deleted successfully', 'Success');
-                this.field = res.data;
-                // this.store.dispatch(CustomFieldActions.delete({ id: this.customFieldId }));
-                this.goBack(); // Navigate back after delete
+                this.toastService.success('Business Activity deleted successfully', 'Success');
+                this.goBack();
               }
             },
             error: (error) => { }
@@ -114,27 +110,25 @@ export class CustomFieldDetails implements OnInit, OnDestroy {
   }
 
   onSuspend() {
-    if (!this.field) return;
+    if (!this.item) return;
 
-    const status = !this.field.active;
-    const action = this.field.active ? 'Suspend' : 'Reinstate';
+    const status = !this.item.active;
+    const action = this.item.active ? 'Suspend' : 'Reinstate';
 
-    this.confirmationService.confirmSuspend(this.field.fieldName, status)
+    this.confirmationService.confirmSuspend(this.item.activityName, status)
       .pipe(takeUntil(this.destroy$))
       .subscribe(confirmed => {
         if (confirmed) {
           const changes = { active: status };
-          this.customFieldService.update(this.field!.customFieldId, changes).subscribe({
+          this.businessActivityService.update(this.item!.activityId, changes).subscribe({
             next: (res: any) => {
-              if (res.statusCode === 200) {
-                this.toastService.success(`Custom Field ${action}ed successfully`, 'Success');
+              if (!res || res.statusCode === 200 || res.statusCode === 204) {
+                this.toastService.success(`Business Activity ${action}ed successfully`, 'Success');
 
                 // Update local state
-                if (this.field) {
-                  this.field = { ...this.field, active: status };
+                if (this.item) {
+                  this.item = { ...this.item, active: status };
                 }
-
-                // this.store.dispatch(CustomFieldActions.update({ ... }));
               }
             },
             error: (error) => { }
@@ -144,18 +138,17 @@ export class CustomFieldDetails implements OnInit, OnDestroy {
   }
 
   onRestore() {
-    if (!this.field) return;
+    if (!this.item) return;
 
-    this.confirmationService.confirmRestore(this.field.fieldName)
+    this.confirmationService.confirmRestore(this.item.activityName)
       .pipe(takeUntil(this.destroy$))
       .subscribe(confirmed => {
         if (confirmed) {
-          // Assuming method name is restore in service
-          this.customFieldService.restore(this.customFieldId).subscribe({
+          this.businessActivityService.restore(this.activityId).subscribe({
             next: (res: any) => {
               if (res.statusCode === 200) {
-                this.toastService.success('Custom Field recovered successfully', 'Success');
-                this.loadCustomFieldDetails(this.customFieldId);
+                this.toastService.success('Business Activity recovered successfully', 'Success');
+                this.loadDetails(this.activityId);
               }
             },
             error: (error) => { }
