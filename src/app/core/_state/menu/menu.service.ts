@@ -46,7 +46,7 @@ export class MenuService {
         );
     }
 
-    saveMenuOrder(payload: any): Observable<ApiResponse<void>> {
+    updateWebMenu(payload: any): Observable<ApiResponse<void>> {
         return this.http.patch<ApiResponse<void>>(
             `${this.base}${apiConfig.webMenuBulkUpdate}`,
             payload
@@ -62,7 +62,7 @@ export class MenuService {
         );
     }
 
-    saveAppMenuOrder(payload: any): Observable<ApiResponse<void>> {
+    updateAppMenu(payload: any): Observable<ApiResponse<void>> {
         return this.http.patch<ApiResponse<void>>(
             `${this.base}${apiConfig.appMenuBulkUpdate}`,
             payload

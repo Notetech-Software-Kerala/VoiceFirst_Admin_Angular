@@ -207,7 +207,7 @@ export class AppMenu implements OnInit {
     }
 
     console.log('Save Payload:', payload);
-    this.menuService.saveAppMenuOrder(payload).subscribe({
+    this.menuService.updateAppMenu(payload).subscribe({
       next: (res) => {
         console.log('Saved successfully', res);
         this.originalMenuItems = JSON.parse(JSON.stringify(currentFlatList));

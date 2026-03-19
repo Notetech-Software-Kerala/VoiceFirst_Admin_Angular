@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { WebMenuModel } from '../../../../core/_state/menu/menu.model';
 import { MaterialModule } from '../../../../material.module';
 import { MenuService } from '../../../../core/_state/menu/menu.service';
+import { ConfirmationService } from '../../../../partials/shared_directives/confirmation';
+import { ToastService } from '../../../../partials/shared_services/toast.service';
 
 export interface MenuNode extends WebMenuModel {
   children: MenuNode[];
@@ -21,7 +23,10 @@ export class WebMenu implements OnInit {
   // Keep track of connected drop lists
   connectedDropLists: string[] = ['root-list'];
 
-  constructor(private menuService: MenuService) { }
+  constructor(private menuService: MenuService,
+    private confirmationService: ConfirmationService,
+    private toastService: ToastService,
+  ) { }
 
   originalMenuItems: WebMenuModel[] = [];
 
@@ -196,13 +201,57 @@ export class WebMenu implements OnInit {
     }
 
     console.log('Save Payload:', payload);
-    this.menuService.saveMenuOrder(payload).subscribe({
+    this.menuService.updateWebMenu(payload).subscribe({
       next: (res) => {
         console.log('Saved successfully', res);
         this.originalMenuItems = JSON.parse(JSON.stringify(currentFlatList));
       },
       error: (err) => { console.error(err) }
     });
+  }
+
+
+
+  onDelete(node: MenuNode) {
+    this.confirmationService.confirmDelete(node.menuName)
+      .subscribe(confirmed => {
+        if (!confirmed) return;
+
+        const payload = {
+          statusUpdate: [{ webMenuId: node.webMenuId, active: false }]
+        };
+
+        this.menuService.updateWebMenu(payload).subscribe({
+          next: (res) => {
+            if (res.statusCode === 200) {
+              node.active = false;
+              this.toastService.success(`"${node.menuName}" deleted`, 'Success');
+            }
+          },
+          error: () => this.toastService.error('Failed to delete menu', 'Error')
+        });
+      });
+  }
+
+  onRestore(node: MenuNode) {
+    this.confirmationService.confirmRestore(node.menuName)
+      .subscribe(confirmed => {
+        if (!confirmed) return;
+
+        const payload = {
+          statusUpdate: [{ webMenuId: node.webMenuId, active: true }]
+        };
+
+        this.menuService.updateWebMenu(payload).subscribe({
+          next: (res) => {
+            if (res.statusCode === 200) {
+              node.active = true;
+              this.toastService.success(`"${node.menuName}" restored`, 'Success');
+            }
+          },
+          error: () => this.toastService.error('Failed to restore menu', 'Error')
+        });
+      });
   }
 
   flattenTree(nodes: MenuNode[]): MenuNode[] {

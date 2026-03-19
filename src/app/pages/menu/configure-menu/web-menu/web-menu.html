@@ -43,18 +43,24 @@
             </div>
         </div>
 
-        <div class="node-actions d-flex gap-2">
+        <div class="node-actions d-flex gap-1 align-items-center">
             @if (node.children.length > 0 || !node.route) {
             <button mat-icon-button (click)="toggleExpand(node)">
                 <mat-icon>{{ node.isExpanded ? 'expand_less' : 'expand_more' }}</mat-icon>
             </button>
             }
-            <!-- <button mat-icon-button color="primary">
-                <mat-icon>edit</mat-icon>
-            </button> -->
-            <button mat-icon-button color="warn">
+
+            @if (node.active) {
+            <!-- Suspend / Reinstate -->
+            <button mat-icon-button color="warn" (click)="onDelete(node)">
                 <mat-icon class="msr-delete">delete</mat-icon>
             </button>
+            } @else {
+            <!-- Recover -->
+            <button mat-icon-button (click)="onRestore(node)">
+                <mat-icon class="msr-restore">restart_alt</mat-icon>
+            </button>
+            }
         </div>
     </div>
 
