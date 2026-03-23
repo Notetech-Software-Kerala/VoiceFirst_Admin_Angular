@@ -4,6 +4,8 @@ import { MenuService } from '../../../../core/_state/menu/menu.service';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../../../../material.module';
+import { ConfirmationService } from '../../../../partials/shared_directives/confirmation';
+import { ToastService } from '../../../../partials/shared_services/toast.service';
 
 export interface MenuNode extends AppMenuModel {
   children: MenuNode[];
@@ -21,7 +23,11 @@ export class AppMenu implements OnInit {
   // Keep track of connected drop lists
   connectedDropLists: string[] = ['root-list'];
 
-  constructor(private menuService: MenuService) { }
+  constructor(
+    private menuService: MenuService,
+    private confirmationService: ConfirmationService,
+    private toastService: ToastService
+  ) { }
 
   originalMenuItems: AppMenuModel[] = [];
 
@@ -214,6 +220,48 @@ export class AppMenu implements OnInit {
       },
       error: (err) => { console.error(err) }
     });
+  }
+
+  onDelete(node: MenuNode) {
+    this.confirmationService.confirmDelete(node.menuName)
+      .subscribe(confirmed => {
+        if (!confirmed) return;
+
+        const payload = {
+          statusUpdate: [{ appMenuId: node.appMenuId, active: false }]
+        };
+
+        this.menuService.updateAppMenu(payload).subscribe({
+          next: (res) => {
+            if (res.statusCode === 200) {
+              node.active = false;
+              this.toastService.success(`"${node.menuName}" deleted`, 'Success');
+            }
+          },
+          error: () => this.toastService.error('Failed to delete menu', 'Error')
+        });
+      });
+  }
+
+  onRestore(node: MenuNode) {
+    this.confirmationService.confirmRestore(node.menuName)
+      .subscribe(confirmed => {
+        if (!confirmed) return;
+
+        const payload = {
+          statusUpdate: [{ appMenuId: node.appMenuId, active: true }]
+        };
+
+        this.menuService.updateAppMenu(payload).subscribe({
+          next: (res) => {
+            if (res.statusCode === 200) {
+              node.active = true;
+              this.toastService.success(`"${node.menuName}" restored`, 'Success');
+            }
+          },
+          error: () => this.toastService.error('Failed to restore menu', 'Error')
+        });
+      });
   }
 
   flattenTree(nodes: MenuNode[]): MenuNode[] {
