@@ -8,8 +8,8 @@
     </div>
 
     <div class="tree-wrapper">
-        <div cdkDropList [cdkDropListData]="menuNodes" [id]="'root-list'" [cdkDropListConnectedTo]="connectedDropLists"
-            (cdkDropListDropped)="drop($event)" class="menu-list root-list" [cdkDropListSortingDisabled]="false">
+        <div cdkDropList [cdkDropListData]="menuNodes" [id]="'root-list'"
+            (cdkDropListDropped)="drop($event)" class="menu-list root-list">
             @for (node of menuNodes; track node.appMenuId) {
             <div cdkDrag [cdkDragData]="node" class="menu-node-wrapper">
 
@@ -25,14 +25,14 @@
 </div>
 
 <ng-template #nodeTemplate let-node>
-    <div class="menu-node-content" [class.has-children]="node.children.length > 0">
+    <div class="menu-node-content" [class.has-children]="node.children.length > 0"
+        [class.node-inactive]="!node.active">
         <div class="node-handle" cdkDragHandle>
             <mat-icon class="drag-icon">drag_indicator</mat-icon>
         </div>
 
         <div class="node-info d-flex align-items-center flex-grow-1 gap-3">
             <div class="node-icon-wrapper">
-                <!-- Check if icon is font awesome / feather or mat-icon -->
                 <i *ngIf="false" [class]="'feather icon-' + node.icon"></i>
                 <mat-icon>{{ node.icon }}</mat-icon>
             </div>
@@ -64,11 +64,10 @@
         </div>
     </div>
 
-    <!-- Nested Drop List -->
+    <!-- Nested Drop List — only rendered when expanded, CDK picks it up automatically via cdkDropListGroup -->
     @if (node.isExpanded && !node.route) {
     <div class="node-children" cdkDropList [cdkDropListData]="node.children" [id]="'list-' + node.appMenuId"
-        [cdkDropListConnectedTo]="connectedDropLists" (cdkDropListDropped)="drop($event)"
-        [cdkDropListSortingDisabled]="false">
+        (cdkDropListDropped)="drop($event)">
 
         @for (child of node.children; track child.appMenuId) {
         <div cdkDrag [cdkDragData]="child" class="menu-node-wrapper">
@@ -76,6 +75,11 @@
             <div *cdkDragPlaceholder class="menu-placeholder"></div>
         </div>
         }
+
+        @if (node.children.length === 0) {
+        <div class="empty-drop-hint">Drop valid menu item here</div>
+        }
     </div>
     }
+
 </ng-template>

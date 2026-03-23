@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, CdkDropListGroup, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { WebMenuModel } from '../../../../core/_state/menu/menu.model';
 import { MaterialModule } from '../../../../material.module';
@@ -15,13 +15,12 @@ export interface MenuNode extends WebMenuModel {
 @Component({
   selector: 'app-web-menu',
   imports: [DragDropModule, CommonModule, MaterialModule],
+  hostDirectives: [CdkDropListGroup],
   templateUrl: './web-menu.html',
   styleUrl: './web-menu.css',
 })
 export class WebMenu implements OnInit {
   menuNodes: MenuNode[] = [];
-  // Keep track of connected drop lists
-  connectedDropLists: string[] = ['root-list'];
 
   constructor(private menuService: MenuService,
     private confirmationService: ConfirmationService,
@@ -39,7 +38,6 @@ export class WebMenu implements OnInit {
       console.log(res);
       this.originalMenuItems = JSON.parse(JSON.stringify(res)); // Deep copy
       this.menuNodes = this.buildTree(res);
-      this.updateConnectedDropLists();
     });
   }
 
@@ -78,24 +76,6 @@ export class WebMenu implements OnInit {
     return roots;
   }
 
-  updateConnectedDropLists() {
-    const ids: string[] = ['root-list'];
-
-    const traverse = (nodes: MenuNode[]) => {
-      nodes.forEach(node => {
-        // Only allow dropping into nodes with no route (containers)
-        if (!node.route && node.isExpanded) {
-          ids.push(`list-${node.webMenuId}`);
-        }
-        if (node.children.length > 0 && node.isExpanded) {
-          traverse(node.children);
-        }
-      });
-    };
-
-    traverse(this.menuNodes);
-    this.connectedDropLists = [...ids];
-  }
 
   drop(event: CdkDragDrop<MenuNode[]>) {
     if (event.previousContainer === event.container) {
@@ -197,14 +177,20 @@ export class WebMenu implements OnInit {
 
     if (Object.keys(payload).length === 0) {
       console.log('No changes to save');
+      this.toastService.info('No changes to save', 'Info');
       return;
     }
 
     console.log('Save Payload:', payload);
     this.menuService.updateWebMenu(payload).subscribe({
       next: (res) => {
-        console.log('Saved successfully', res);
-        this.originalMenuItems = JSON.parse(JSON.stringify(currentFlatList));
+        if (res.statusCode === 200) {
+          this.toastService.success('Menu configuration updated successfully', 'Success');
+          this.originalMenuItems = JSON.parse(JSON.stringify(currentFlatList));
+        }
+        else {
+          this.toastService.error(res.message, 'Error');
+        }
       },
       error: (err) => { console.error(err) }
     });

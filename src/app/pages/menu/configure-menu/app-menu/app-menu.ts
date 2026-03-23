@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AppMenuModel } from '../../../../core/_state/menu/menu.model';
 import { MenuService } from '../../../../core/_state/menu/menu.service';
-import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, CdkDropListGroup, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../../../../material.module';
 import { ConfirmationService } from '../../../../partials/shared_directives/confirmation';
@@ -15,13 +15,12 @@ export interface MenuNode extends AppMenuModel {
 @Component({
   selector: 'app-app-menu',
   imports: [DragDropModule, CommonModule, MaterialModule],
+  hostDirectives: [CdkDropListGroup],
   templateUrl: './app-menu.html',
   styleUrl: './app-menu.css',
 })
 export class AppMenu implements OnInit {
   menuNodes: MenuNode[] = [];
-  // Keep track of connected drop lists
-  connectedDropLists: string[] = ['root-list'];
 
   constructor(
     private menuService: MenuService,
@@ -40,7 +39,6 @@ export class AppMenu implements OnInit {
       console.log(res);
       this.originalMenuItems = JSON.parse(JSON.stringify(res)); // Deep copy
       this.menuNodes = this.buildTree(res);
-      this.updateConnectedDropLists();
     });
   }
 
@@ -79,35 +77,6 @@ export class AppMenu implements OnInit {
     return roots;
   }
 
-  updateConnectedDropLists() {
-    const ids: string[] = ['root-list'];
-
-    const traverse = (nodes: MenuNode[]) => {
-      nodes.forEach(node => {
-        // Only allow dropping into nodes with no route (containers)
-        // AND only if they are expanded (visible in DOM)
-        if (!node.route && node.isExpanded) {
-          ids.push(`list-${node.appMenuId}`);
-        }
-
-        // Continue traversal regardless of expansion, because if a parent is collapsed, 
-        // its children are not in DOM either (by virtue of parent being hidden? No, by virtue of *ngIf on parent's children container).
-        // Wait, if parent is collapsed, the child list is NOT in DOM. 
-        // So we only traverse if expanded? 
-        // Actually, if node is NOT expanded, its `node.children` are inside the `*if (node.isExpanded)` block?
-        // Let's check HTML. Yes: @if (node.isExpanded && !node.route)
-        // So if node is NOT expanded, its children drop list does not exist.
-
-        if (node.children.length > 0 && node.isExpanded) {
-          traverse(node.children);
-        }
-      });
-    };
-
-    traverse(this.menuNodes);
-    this.connectedDropLists = [...ids]; // New reference to trigger change detection
-    console.log('Connected Drop Lists:', this.connectedDropLists);
-  }
 
   drop(event: CdkDragDrop<MenuNode[]>) {
     if (event.previousContainer === event.container) {
@@ -209,14 +178,20 @@ export class AppMenu implements OnInit {
 
     if (Object.keys(payload).length === 0) {
       console.log('No changes to save');
+      this.toastService.info('No changes to save', 'Info');
       return;
     }
 
     console.log('Save Payload:', payload);
     this.menuService.updateAppMenu(payload).subscribe({
       next: (res) => {
-        console.log('Saved successfully', res);
-        this.originalMenuItems = JSON.parse(JSON.stringify(currentFlatList));
+        if (res.statusCode === 200) {
+          this.toastService.success('Menu configuration updated successfully', 'Success');
+          this.originalMenuItems = JSON.parse(JSON.stringify(currentFlatList));
+        }
+        else {
+          this.toastService.error(res.message, 'Error');
+        }
       },
       error: (err) => { console.error(err) }
     });
