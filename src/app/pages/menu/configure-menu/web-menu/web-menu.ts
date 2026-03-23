@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, CdkDropListGroup, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { WebMenuModel } from '../../../../core/_state/menu/menu.model';
 import { MaterialModule } from '../../../../material.module';
 import { MenuService } from '../../../../core/_state/menu/menu.service';
+import { ConfirmationService } from '../../../../partials/shared_directives/confirmation';
+import { ToastService } from '../../../../partials/shared_services/toast.service';
 
 export interface MenuNode extends WebMenuModel {
   children: MenuNode[];
@@ -13,15 +15,17 @@ export interface MenuNode extends WebMenuModel {
 @Component({
   selector: 'app-web-menu',
   imports: [DragDropModule, CommonModule, MaterialModule],
+  hostDirectives: [CdkDropListGroup],
   templateUrl: './web-menu.html',
   styleUrl: './web-menu.css',
 })
 export class WebMenu implements OnInit {
   menuNodes: MenuNode[] = [];
-  // Keep track of connected drop lists
-  connectedDropLists: string[] = ['root-list'];
 
-  constructor(private menuService: MenuService) { }
+  constructor(private menuService: MenuService,
+    private confirmationService: ConfirmationService,
+    private toastService: ToastService,
+  ) { }
 
   originalMenuItems: WebMenuModel[] = [];
 
@@ -34,7 +38,6 @@ export class WebMenu implements OnInit {
       console.log(res);
       this.originalMenuItems = JSON.parse(JSON.stringify(res)); // Deep copy
       this.menuNodes = this.buildTree(res);
-      this.updateConnectedDropLists();
     });
   }
 
@@ -73,24 +76,6 @@ export class WebMenu implements OnInit {
     return roots;
   }
 
-  updateConnectedDropLists() {
-    const ids: string[] = ['root-list'];
-
-    const traverse = (nodes: MenuNode[]) => {
-      nodes.forEach(node => {
-        // Only allow dropping into nodes with no route (containers)
-        if (!node.route && node.isExpanded) {
-          ids.push(`list-${node.webMenuId}`);
-        }
-        if (node.children.length > 0 && node.isExpanded) {
-          traverse(node.children);
-        }
-      });
-    };
-
-    traverse(this.menuNodes);
-    this.connectedDropLists = [...ids];
-  }
 
   drop(event: CdkDragDrop<MenuNode[]>) {
     if (event.previousContainer === event.container) {
@@ -192,17 +177,67 @@ export class WebMenu implements OnInit {
 
     if (Object.keys(payload).length === 0) {
       console.log('No changes to save');
+      this.toastService.info('No changes to save', 'Info');
       return;
     }
 
     console.log('Save Payload:', payload);
-    this.menuService.saveMenuOrder(payload).subscribe({
+    this.menuService.updateWebMenu(payload).subscribe({
       next: (res) => {
-        console.log('Saved successfully', res);
-        this.originalMenuItems = JSON.parse(JSON.stringify(currentFlatList));
+        if (res.statusCode === 200) {
+          this.toastService.success('Menu configuration updated successfully', 'Success');
+          this.originalMenuItems = JSON.parse(JSON.stringify(currentFlatList));
+        }
+        else {
+          this.toastService.error(res.message, 'Error');
+        }
       },
       error: (err) => { console.error(err) }
     });
+  }
+
+
+
+  onDelete(node: MenuNode) {
+    this.confirmationService.confirmDelete(node.menuName)
+      .subscribe(confirmed => {
+        if (!confirmed) return;
+
+        const payload = {
+          statusUpdate: [{ webMenuId: node.webMenuId, active: false }]
+        };
+
+        this.menuService.updateWebMenu(payload).subscribe({
+          next: (res) => {
+            if (res.statusCode === 200) {
+              node.active = false;
+              this.toastService.success(`"${node.menuName}" deleted`, 'Success');
+            }
+          },
+          error: () => this.toastService.error('Failed to delete menu', 'Error')
+        });
+      });
+  }
+
+  onRestore(node: MenuNode) {
+    this.confirmationService.confirmRestore(node.menuName)
+      .subscribe(confirmed => {
+        if (!confirmed) return;
+
+        const payload = {
+          statusUpdate: [{ webMenuId: node.webMenuId, active: true }]
+        };
+
+        this.menuService.updateWebMenu(payload).subscribe({
+          next: (res) => {
+            if (res.statusCode === 200) {
+              node.active = true;
+              this.toastService.success(`"${node.menuName}" restored`, 'Success');
+            }
+          },
+          error: () => this.toastService.error('Failed to restore menu', 'Error')
+        });
+      });
   }
 
   flattenTree(nodes: MenuNode[]): MenuNode[] {
