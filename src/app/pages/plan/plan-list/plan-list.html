@@ -85,10 +85,12 @@
 
                         <mat-menu #rowMenu="matMenu" class="row-menu" xPosition="before" yPosition="below">
 
-                            <button mat-menu-item (click)="navigateToDetails(item)">
-                                <mat-icon class="msr-edit">visibility</mat-icon>
-                                <span>View</span>
+                            @if (!item.deleted) {
+                            <button mat-menu-item (click)="navigateToEdit(item)">
+                                <mat-icon class="msr-edit">edit</mat-icon>
+                                <span>Edit</span>
                             </button>
+                            }
 
                             @if (!item.deleted) {
                             <button mat-menu-item (click)="onSuspend(item)">
@@ -97,6 +99,7 @@
                                 <span>{{ item.active ? 'Suspend' : 'Reinstate' }}</span>
                             </button>
                             }
+
                             @if (!item.deleted) {
                             <button mat-menu-item (click)="onDelete(item)">
                                 <mat-icon class="msr-delete">delete</mat-icon>
