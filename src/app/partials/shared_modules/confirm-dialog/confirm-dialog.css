@@ -40,7 +40,7 @@
 
 /* Material symbol */
 .icon-wrap .material-symbols-rounded {
-  font-size: 24px;
+  font-size: 1.25rem;
   line-height: 1;
   font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 24;
 }

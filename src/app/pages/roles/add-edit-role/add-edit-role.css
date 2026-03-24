@@ -137,7 +137,7 @@ h6 {
 
 .empty-state mat-icon {
     opacity: 0.5;
-    font-size: 24px;
+    font-size: 1.25rem;
     width: 24px;
     height: 24px;
     margin-bottom: 8px;

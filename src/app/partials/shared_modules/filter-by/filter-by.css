@@ -34,9 +34,10 @@
 .dropdown-menu {
     position: absolute;
     top: 100%;
-    left: 0;
+    right: 0;
+    left: auto;
     z-index: 1050;
-    min-width: 240px;
+    min-width: 230px;
     max-height: 400px;
     overflow-y: auto;
     margin-top: 0.5rem;

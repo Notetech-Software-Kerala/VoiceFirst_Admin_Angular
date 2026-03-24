@@ -7,6 +7,7 @@ import { ConfirmDialog } from '../../partials/shared_modules/confirm-dialog/conf
 import { MENU_CONFIG, MenuItem } from '../../core/_config/menuConfig';
 import { AuthService } from '../../core/_auth/auth.service';
 import { APP_VERSION, BUILD_TIME } from '../../../environments/version';
+import { UserInfo } from '../../core/_auth/auth.model';
 
 @Component({
   selector: 'app-base-layout',
@@ -37,8 +38,11 @@ export class BaseLayout {
 
   menu: MenuItem[] = MENU_CONFIG;
 
+  user: UserInfo | null = null;
+
   ngOnInit(): void {
     // Load saved theme or system preference
+    this.user = this.authService.currentUser;
     const saved = localStorage.getItem('theme');
     const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
     this.isDarkTheme = saved ? saved === 'dark' : prefersDark;
@@ -102,6 +106,12 @@ export class BaseLayout {
     return `Logo ${size} ${theme}`;
   }
 
+  get initials(): string {
+    if (!this.user) return 'U';
+    const first = this.user.firstName?.[0] ?? '';
+    const last = this.user.lastName?.[0] ?? '';
+    return (first + last).toUpperCase() || 'U';
+  }
 
   isGroupActive(item: MenuItem): boolean {
     if (!item.children?.length) return false;

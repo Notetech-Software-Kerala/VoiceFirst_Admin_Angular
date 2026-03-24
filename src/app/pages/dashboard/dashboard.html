@@ -8,7 +8,7 @@
         </div>
         <div class="date-display">
             <span class="material-symbols-rounded">calendar_today</span>
-            <span>Jan 12, 2026</span>
+            <span>{{ currentDate | date:'mediumDate' }}</span>
         </div>
     </header>
 
@@ -37,43 +37,49 @@
         <!-- Chart Section (Placeholder) -->
         <article class="card chart-card">
             <div class="card-header">
-                <h3 class="card-title">Organization Growth</h3>
+                <h3 class="card-title">Issues Resolution Trend</h3>
                 <button class="icon-btn-small">
                     <span class="material-symbols-rounded">more_horiz</span>
                 </button>
             </div>
-            <div class="chart-placeholder">
-                <!-- In a real app, a chart library like Chart.js or ApexCharts would go here -->
-                <div class="bars">
-                    <div class="bar" style="height: 40%"></div>
-                    <div class="bar" style="height: 70%"></div>
-                    <div class="bar" style="height: 50%"></div>
-                    <div class="bar" style="height: 85%"></div>
-                    <div class="bar" style="height: 60%"></div>
-                    <div class="bar" style="height: 90%"></div>
-                    <div class="bar" style="height: 45%"></div>
-                </div>
-                <p class="chart-label">New Organizations (Weekly)</p>
+            <div class="chart-placeholder" style="display: block; width: 100%;">
+                @if (chartOptions) {
+                <apx-chart 
+                    [series]="chartOptions.series" 
+                    [chart]="chartOptions.chart" 
+                    [xaxis]="chartOptions.xaxis" 
+                    [yaxis]="chartOptions.yaxis"
+                    [colors]="chartOptions.colors"
+                    [dataLabels]="chartOptions.dataLabels"
+                    [stroke]="chartOptions.stroke"
+                    [grid]="chartOptions.grid"
+                    [legend]="chartOptions.legend"
+                    [fill]="chartOptions.fill">
+                </apx-chart>
+                }
+                <p class="chart-label text-center mt-3 mb-0">Issues Raised vs Resolved (Weekly)</p>
             </div>
         </article>
 
         <!-- Recent Activity -->
         <article class="card activity-card">
             <div class="card-header">
-                <h3 class="card-title">System Activity Log</h3>
+                <h3 class="card-title">Recent Critical Issues</h3>
                 <a href="#" class="link-sm">View All</a>
             </div>
             <ul class="activity-list">
-                @for(activity of recentActivities; track activity.id) {
+                @for(issue of criticalIssues; track issue.id) {
                 <li class="activity-item">
-                    <div class="activity-avatar">{{ activity.user.charAt(0) }}</div>
+                    <div class="issue-icon" [class]="issue.statusColor">
+                        <span class="material-symbols-rounded">{{ issue.icon }}</span>
+                    </div>
                     <div class="activity-details">
                         <p class="activity-desc">
-                            <span class="fw-medium">{{ activity.user }}</span> - {{ activity.action }}
+                            <span class="fw-medium">{{ issue.title }}</span>
                         </p>
-                        <span class="activity-time">{{ activity.time }}</span>
+                        <span class="activity-time">{{ issue.module }} • {{ issue.time }}</span>
                     </div>
-                    <span class="status-badge" [class]="activity.statusColor">{{ activity.status }}</span>
+                    <span class="status-badge" [class]="issue.statusColor">{{ issue.status }}</span>
                 </li>
                 }
             </ul>
