@@ -1,48 +1,74 @@
 <div class="main-container">
-    <div class="login-card">
+    <div class="forgot-card">
 
-        <div class="login-form">
-            <div class="logo-container">
-                <img [src]="src" alt="Voice First Logo" class="logo-image">
+        <!-- Left branding panel -->
+        <div class="forgot-left">
+            <div class="left-content">
+
+
+                <h1 class="welcome-title">Reset your Voice First access</h1>
+
+                <p class="welcome-subtitle">
+                    Recover your account securely and get back to managing services, issues,
+                    subscriptions, and workflows without interruption.
+                </p>
+
+                <div class="feature-list">
+                    <span class="feature-pill">Secure recovery</span>
+                    <span class="feature-pill">Issue Tracking</span>
+                    <span class="feature-pill">Service Management</span>
+                    <span class="feature-pill">Role-Based Access</span>
+                </div>
             </div>
+        </div>
 
-            <!-- Step 1: Email/Phone -->
-
-            <h6 class="title mb-2 fw-bold text-center">Forgot Password</h6>
-            <!-- <p class="mb-4 small">Enter your email address to receive a password reset link.</p> -->
-
-            <form [formGroup]="emailForm" (ngSubmit)="onSubmitEmail()">
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input id="email" type="email" class="form-control" formControlName="email"
-                        placeholder="Enter your email"
-                        [attr.aria-invalid]="fEmail['email'].invalid && fEmail['email'].touched">
-                    @if (fEmail['email'].touched && fEmail['email'].errors?.['required']) {
-                    <div class="text-danger small mt-1">
-                        Email is required.
-                    </div>
-                    }
-                    @if (fEmail['email'].touched && fEmail['email'].errors?.['email']) {
-                    <div class="text-danger small mt-1">
-                        Please enter a valid email address.
-                    </div>
-                    }
+        <!-- Right form panel -->
+        <div class="forgot-right">
+            <div class="forgot-form-wrapper">
+                <div class="top-brand">
+                    <img [src]="src" alt="Voice First Logo" class="top-brand-logo">
                 </div>
 
-                <button class="button-primary w-100 mb-3 mt-3" type="submit"
-                    [disabled]="emailForm.invalid || submitting">
-                    {{ submitting ? 'Sending...' : 'Send Reset Link' }}
-                </button>
-            </form>
+                <div class="form-header">
+                    <h2 class="page-title">Forgot Password</h2>
+                    <p class="page-subtitle">
+                        Enter your email address and we’ll send you a reset link.
+                    </p>
+                </div>
 
+                <form class="forgot-form" [formGroup]="emailForm" (ngSubmit)="onSubmitEmail()">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email address</label>
+                        <input id="email" type="email" class="form-control" formControlName="email"
+                            placeholder="Enter your email" autocomplete="email"
+                            [attr.aria-invalid]="fEmail['email'].invalid && fEmail['email'].touched">
 
+                        @if (fEmail['email'].touched && fEmail['email'].errors?.['required']) {
+                        <div class="text-danger small mt-1">
+                            Email is required.
+                        </div>
+                        }
 
-            <div class="text-center mt-3 pt-3" style="border-top: 1px solid var(--color-border-hr);">
-                <a class="link small text-decoration-none" routerLink="/login">
-                    <i class="fa-solid fa-arrow-left me-1"></i> Back to Login
-                </a>
+                        @if (fEmail['email'].touched && fEmail['email'].errors?.['email']) {
+                        <div class="text-danger small mt-1">
+                            Please enter a valid email address.
+                        </div>
+                        }
+                    </div>
+
+                    <button class="button-primary w-100 mt-2" type="submit"
+                        [disabled]="emailForm.invalid || submitting">
+                        {{ submitting ? 'Sending...' : 'Send Reset Link' }}
+                    </button>
+                </form>
+
+                <div class="bottom-link">
+                    <a class="link small text-decoration-none" routerLink="/login">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Back to Login
+                    </a>
+                </div>
             </div>
-
         </div>
+
     </div>
 </div>
