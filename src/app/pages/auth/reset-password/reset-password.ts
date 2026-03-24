@@ -28,6 +28,8 @@ export class ResetPassword {
   emailMode = false;
   tokenMode = false;
 
+  isResending: boolean = false;
+
 
   constructor(
     private fb: FormBuilder,
@@ -101,16 +103,21 @@ export class ResetPassword {
       return;
     }
 
+    this.isResending = true;
     this.authService.forgotPassword({ email: this.emailForResend }).subscribe({
       next: (res: any) => {
+        this.isResending = false;
         if (res.statusCode === 200) {
           this.toast.success('Email resent successfully', 'Success');
         } else {
           this.toast.error(res.message || 'Failed to resend email', 'Error');
         }
       },
-      error: () => {
-        this.toast.error('Failed to resend email', 'Error');
+      error: (err) => {
+        this.isResending = false;
+        if (err?.error?.statusCode === 410) {
+          this.router.navigate(['/forgot-password']);
+        }
       }
     });
   }
@@ -180,7 +187,9 @@ export class ResetPassword {
       },
       error: (err) => {
         this.submitting = false;
-        this.toast.error(err?.error?.message || 'Failed to reset password', 'Error');
+        if (err?.error?.statusCode === 410) {
+          this.router.navigate(['/forgot-password']);
+        }
       }
     });
   }
