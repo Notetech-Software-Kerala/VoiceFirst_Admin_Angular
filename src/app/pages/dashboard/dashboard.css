@@ -210,45 +210,13 @@
 
 /* Chart Placeholder Styles */
 .chart-card {
-    min-height: 400px;
+    min-height: 380px;
 }
 
 .chart-placeholder {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    background: linear-gradient(to bottom, transparent 0%, rgba(105, 92, 254, 0.02) 100%);
-}
-
-.bars {
-    display: flex;
-    align-items: flex-end;
-    gap: 12px;
-    height: 200px;
-    margin-bottom: 16px;
-}
-
-.bar {
-    width: 24px;
-    border-radius: 4px;
-    background: var(--color-primary, #695cfe);
-    opacity: 0.8;
-    transition: height 1s ease-out;
-    animation: grow 1s ease-out backwards;
-}
-
-.bar:hover {
-    opacity: 1;
-    transform: scaleY(1.05);
-}
-
-@keyframes grow {
-    from {
-        height: 0;
-    }
+    padding: 20px 24px 24px;
+    background: transparent;
 }
 
 .chart-label {
@@ -281,17 +249,32 @@
     background: var(--color-bg-secondary, #f8fafc);
 }
 
-.activity-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: var(--color-primary, #695cfe);
-    color: #fff;
+.issue-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
-    font-size: 1rem;
+}
+
+.issue-icon .material-symbols-rounded {
+    font-size: 1.25rem;
+}
+
+.issue-icon.danger {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.issue-icon.warning {
+    background: #ffedd5;
+    color: #ea580c;
+}
+
+.issue-icon.blue {
+    background: #dbeafe;
+    color: #2563eb;
 }
 
 .activity-details {

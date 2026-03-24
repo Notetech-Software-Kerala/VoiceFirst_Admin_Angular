@@ -16,6 +16,10 @@ export class AuthService {
     private userSubject = new BehaviorSubject<UserInfo | null>(null);
     user$ = this.userSubject.asObservable();
 
+    get currentUser(): UserInfo | null {
+        return this.userSubject.value;
+    }
+
     private refreshTokenTimeout: any;
 
     // ✅ prevents multiple simultaneous refresh calls (timer + interceptor + guards)

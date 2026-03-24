@@ -121,8 +121,12 @@
         <div class="dropdown">
           <button class="profile-btn dropdown-toggle" id="profileMenuButton" type="button" data-bs-toggle="dropdown"
             aria-expanded="false" aria-haspopup="true">
-            <img src="/images/users/user1.jpg" alt="" class="avatar" />
-            <span class="profile-name">You</span>
+            <div class="avatar-circle">
+              <span class="avatar-initials">{{ initials }}</span>
+            </div>
+            <span class="profile-name">
+              {{ user?.firstName }} {{ user?.lastName }}
+            </span>
             <span class="material-symbols-rounded caret">expand_more</span>
           </button>
 

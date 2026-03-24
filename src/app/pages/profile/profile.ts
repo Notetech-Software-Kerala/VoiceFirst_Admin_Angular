@@ -31,9 +31,8 @@ export class Profile implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.authService.user$.subscribe(user => {
-      this.user = user;
-    });
+    this.user = this.authService.currentUser;
+    console.log(this.user);
   }
 
   get fullName(): string {
