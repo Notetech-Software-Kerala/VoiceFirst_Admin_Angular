@@ -1,84 +1,106 @@
 <div class="main-container">
   <div class="login-card">
 
-    <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+    <!-- Left reference-style panel -->
+    <div class="login-left">
+      <div class="left-content">
 
-      <div class="logo-container">
-        <img [src]="src" alt="Voice First Logo" class="logo-image">
+
+        <h1 class="welcome-title">Welcome to<br>Voice First</h1>
+
+        <p class="welcome-subtitle">
+          Your comprehensive admin portal to seamlessly manage services, issues, subscriptions, and workflows.
+        </p>
+
+        <div class="feature-list">
+          <span class="feature-pill">Service Management</span>
+          <span class="feature-pill">Issue Tracking</span>
+          <span class="feature-pill">Subscription Plans</span>
+          <span class="feature-pill">Role-based Access</span>
+        </div>
       </div>
-      <h6 class="title mb-4 fw-bold text-center">Login</h6>
+    </div>
 
-      <div class="row g-3">
-        <!-- Email -->
-        <div class="col-md-12">
-          <label for="email" class="form-label">Email</label>
-          <input id="email" type="email" class="form-control" formControlName="email" placeholder="you@example.com"
-            autocomplete="email" [attr.aria-invalid]="f['email'].invalid && f['email'].touched" />
-          @if (f['email'].touched && f['email'].errors?.['required']) {
-          <div class="text-danger small mt-1">
-            Email is required.
-          </div>
-          }
-          @if (f['email'].touched && f['email'].errors?.['email']) {
-          <div class="text-danger small mt-1">
-            Please enter a valid email address.
-          </div>
-          }
+    <!-- Right login panel -->
+    <div class="login-right">
+      <div class="login-form-wrapper">
+
+        <div class="top-badge">
+          <img [src]="src" alt="Voice First Logo" class="top-badge-logo">
         </div>
 
-        <!-- Password -->
-        <div class="col-md-12">
-          <label for="password" class="form-label">Password</label>
-          <div class="position-relative">
-            <input id="password" [type]="hidePassword ? 'password' : 'text'" class="form-control"
-              formControlName="password" placeholder="••••••••" autocomplete="current-password"
-              [attr.aria-invalid]="f['password'].invalid && f['password'].touched" />
-            <button type="button"
-              class="btn btn-link p-0 position-absolute top-50 end-0 translate-middle-y me-3 text-decoration-none d-flex align-items-center"
-              (click)="togglePassword()" [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'">
-              <span class="material-symbols-rounded" style="color: var(--color-text-placeholder); font-size: 22px;">
-                {{ hidePassword ? 'visibility' : 'visibility_off' }}
-              </span>
-            </button>
+        <h2 class="login-heading">Sign in to your account</h2>
+        <p class="login-subheading">
+          Enter your credentials to access the dashboard.
+        </p>
+
+        <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+          <div class="row g-3">
+            <!-- Email -->
+            <div class="col-md-12">
+              <label for="email" class="form-label">Email</label>
+              <input id="email" type="email" class="form-control" formControlName="email" placeholder="you@example.com"
+                autocomplete="email" [attr.aria-invalid]="f['email'].invalid && f['email'].touched" />
+              @if (f['email'].touched && f['email'].errors?.['required']) {
+              <div class="text-danger small mt-1">
+                Email is required.
+              </div>
+              }
+              @if (f['email'].touched && f['email'].errors?.['email']) {
+              <div class="text-danger small mt-1">
+                Please enter a valid email address.
+              </div>
+              }
+            </div>
+
+            <!-- Password -->
+            <div class="col-md-12">
+              <label for="password" class="form-label">Password</label>
+              <div class="position-relative">
+                <input id="password" [type]="hidePassword ? 'password' : 'text'" class="form-control"
+                  formControlName="password" placeholder="••••••••" autocomplete="current-password"
+                  [attr.aria-invalid]="f['password'].invalid && f['password'].touched" />
+                <button type="button"
+                  class="btn btn-link p-0 position-absolute top-50 end-0 translate-middle-y me-3 text-decoration-none d-flex align-items-center"
+                  (click)="togglePassword()" [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'">
+                  <span class="material-symbols-rounded" style="color: var(--color-text-placeholder); font-size: 22px;">
+                    {{ hidePassword ? 'visibility' : 'visibility_off' }}
+                  </span>
+                </button>
+              </div>
+
+              @if (f['password'].touched && f['password'].errors?.['required']) {
+              <div class="text-danger small mt-1">
+                Password is required.
+              </div>
+              }
+              @if (f['password'].touched && f['password'].errors?.['minlength']) {
+              <div class="text-danger small mt-1">
+                Must be at least 6 characters.
+              </div>
+              }
+            </div>
+
+            <!-- Remember me + Forgot password -->
+            <div class="col-12 d-flex justify-content-end align-items-center">
+              <!-- <div class="form-check">
+                <input id="remember" type="checkbox" class="form-check-input" formControlName="remember" />
+                <label for="remember" class="form-check-label">Remember me</label>
+              </div> -->
+
+              <a class="link" routerLink="/forgot-password">Forgot password?</a>
+            </div>
+
+            <!-- Submit -->
+            <div class="col-12">
+              <button class="button-primary w-100" type="submit" [disabled]="loginForm.invalid || submitting">
+                {{ submitting ? 'Signing in…' : 'Sign in' }}
+              </button>
+            </div>
           </div>
-          @if (f['password'].touched && f['password'].errors?.['required']) {
-          <div class="text-danger small mt-1">
-            Password is required.
-          </div>
-          }
-          @if (f['password'].touched && f['password'].errors?.['minlength']) {
-          <div class="text-danger small mt-1">
-            Must be at least 6 characters.
-          </div>
-          }
-        </div>
-
-        <!-- Remember me + Forgot password -->
-        <div class="col-12 d-flex justify-content-between align-items-center">
-          <div class="form-check">
-            <input id="remember" type="checkbox" class="form-check-input" formControlName="remember" />
-            <label for="remember" class="form-check-label">Remember me</label>
-          </div>
-
-          <a class="link" routerLink="/forgot-password">Forgot password?</a>
-        </div>
-
-
-        <!-- Submit -->
-        <div class="col-12">
-          <button class="button-primary w-100" type="submit" [disabled]="loginForm.invalid || submitting">
-            {{ submitting ? 'Signing in…' : 'Sign in' }}
-          </button>
-        </div>
-
-        <!-- Sign up link -->
-        <!-- <div class="col-12 text-center">
-          <p class="muted mb-0">
-            Don’t have an account?
-            <a class="link" routerLink="/register">Create one</a>
-          </p>
-        </div> -->
+        </form>
       </div>
-    </form>
+    </div>
+
   </div>
 </div>
