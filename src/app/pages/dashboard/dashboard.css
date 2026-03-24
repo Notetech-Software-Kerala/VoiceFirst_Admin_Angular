@@ -96,7 +96,7 @@
 }
 
 .stat-value {
-    font-size: 1.75rem;
+    font-size: 1.25rem;
     font-weight: 700;
     color: var(--color-text-primary, #1e293b);
     margin: 0 0 8px 0;
@@ -129,7 +129,7 @@
 }
 
 .stat-icon .material-symbols-rounded {
-    font-size: 24px;
+    font-size: 1.25rem;
 }
 
 /* Icon Colors */
