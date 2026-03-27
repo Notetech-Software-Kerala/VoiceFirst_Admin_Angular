@@ -181,8 +181,6 @@ export class ResetPassword {
         if (res.statusCode === 200) {
           this.toast.success('Password reset successfully', 'Success');
           this.router.navigate(['/login']);
-        } else {
-          this.toast.error(res.message || 'Failed to reset password', 'Error');
         }
       },
       error: (err) => {

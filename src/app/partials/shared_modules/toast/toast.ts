@@ -12,6 +12,7 @@ export interface ToastOptions {
   type?: ToastType;
   duration?: number;     // ms (default 5000)
   dismissible?: boolean; // default true
+  position?: 'top-right' | 'center';
 }
 
 @Component({
