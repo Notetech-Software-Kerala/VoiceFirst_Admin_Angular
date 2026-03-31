@@ -97,7 +97,7 @@
 
         <div class="col-md-6  mb-3">
             <div class="info-label">Data Type</div>
-            <div class="info-value text-capitalize">{{ field.fieldDataType || 'N/A'}}</div>
+            <div class="info-value text-capitalize">{{ activeDataType?.fieldDataType || 'N/A'}}</div>
         </div>
     </div>
 
@@ -117,8 +117,7 @@
                             </div>
                             <div class="d-flex flex-column">
                                 <h6 class="plan-name mb-0">Validation Rules</h6>
-                                <span class="action-count">{{ field.validations?.length || 0 }} Rule(s)
-                                    Configured</span>
+                                <span class="action-count">{{ activeDataType?.validations?.length || 0 }} Rule(s) Configured</span>
                             </div>
                         </div>
                     </div>
@@ -135,7 +134,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @for (val of field.validations; track val.customFieldValidationId) {
+                                @for (val of activeDataType?.validations || []; track val.customFieldValidationId) {
                                 <tr>
                                     <td class="ps-3 fw-medium">{{ val.ruleName }}</td>
                                     <td>{{ val.ruleValue }}</td>
@@ -160,8 +159,7 @@
             </div>
 
             <!-- Options List (Conditional based on data type) -->
-            @if(field.fieldDataType === 'dropdown' || field.fieldDataType === 'checkbox' || field.fieldDataType ===
-            'radio'){
+            @if(activeDataType?.fieldDataType === 'dropdown' || activeDataType?.fieldDataType === 'checkbox' || activeDataType?.fieldDataType === 'radio'){
             <div class="d-flex flex-column gap-3 detail-card">
                 <div class="plan-list-item d-block">
                     <!-- Header -->
@@ -172,7 +170,7 @@
                             </div>
                             <div class="d-flex flex-column">
                                 <h6 class="plan-name mb-0">Selectable Options</h6>
-                                <span class="action-count">{{ field.options?.length || 0 }} Option(s) Configured</span>
+                                <span class="action-count">{{ activeDataType?.options?.length || 0 }} Option(s) Configured</span>
                             </div>
                         </div>
                     </div>
@@ -188,7 +186,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @for (opt of field.options; track opt.customFieldOptionsId) {
+                                @for (opt of activeDataType?.options || []; track opt.customFieldOptionsId) {
                                 <tr>
                                     <td class="ps-3 fw-medium">{{ opt.label }}</td>
                                     <td><span class="badge bg-light text-dark border">{{ opt.value }}</span></td>
@@ -201,7 +199,7 @@
                                 } @empty {
                                 <tr>
                                     <td colspan="3" class="text-center py-3 text-muted fst-italic">
-                                        No options configured for this {{field.fieldDataType}}.
+                                        No options configured for this {{activeDataType?.fieldDataType}}.
                                     </td>
                                 </tr>
                                 }

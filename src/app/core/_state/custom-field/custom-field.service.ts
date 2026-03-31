@@ -65,4 +65,20 @@ export class CustomFieldService {
       {}
     );
   }
+
+  dataTypeLookup(): Observable<ApiResponse<CustomFieldModel[]>> {
+    return this.http.get<ApiResponse<CustomFieldModel[]>>(
+      `${this.base}${apiConfig.customFieldDataType}`,
+    );
+  }
+
+  validationRuleLookup(queryParams: any): Observable<ApiResponse<CustomFieldModel[]>> {
+    let params = new HttpParams({
+      fromObject: queryParams
+    });
+    return this.http.get<ApiResponse<CustomFieldModel[]>>(
+      `${this.base}${apiConfig.customFieldValidationRule}`,
+      { params }
+    );
+  }
 }

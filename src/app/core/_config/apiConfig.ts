@@ -115,5 +115,7 @@ export const apiConfig = {
     customField: '/user-custom-field',
     getCustomFieldLookup: '/user-custom-field/lookup',
     customFieldRestore: '/user-custom-field/recover',
+    customFieldDataType: '/user-custom-field/lookup/datatype',
+    customFieldValidationRule: '/user-custom-field/lookup/validation-rule',
 
 };

@@ -1,6 +1,7 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { CustomFieldService } from '../../../core/_state/custom-field/custom-field.service';
 import { ToastService } from '../../../partials/shared_services/toast.service';
 import { EncryptionService } from '../../../partials/shared_services/encryption.service';
@@ -16,14 +17,23 @@ import { CustomFieldModel, CustomFieldValidation, CustomFieldOption } from '../.
   templateUrl: './add-edit-custom-field.html',
   styleUrl: './add-edit-custom-field.css',
 })
-export class AddEditCustomField implements OnInit {
+export class AddEditCustomField implements OnInit, OnDestroy {
   form!: FormGroup;
   isEditMode = false;
   customFieldId!: number;
   submitting = false;
   originalData!: CustomFieldModel;
 
-  dataTypes = ['Text', 'Number', 'Date', 'Time', 'Dropdown'];
+  dataTypes: any[] = [];
+  validationRules: any[] = [];
+  selectedDataTypeName = '';
+
+  // Validation Rule Lookup State
+  searchRuleText: string = '';
+  searchRuleSubject = new Subject<string>();
+  rulePage = 1;
+  ruleTotalPages = 1;
+  readonly ruleLookupLimit = 10;
 
   constructor(
     private location: Location,
@@ -37,22 +47,47 @@ export class AddEditCustomField implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.searchRuleSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(text => {
+      this.searchRuleText = text;
+      this.rulePage = 1;
+      this.validationRules = [];
+      this.loadValidationRules();
+    });
+
     this.formInItialize();
-    this.checkEditMode();
+    this.loadLookups();
+  }
+
+  ngOnDestroy(): void {
+    this.searchRuleSubject.complete();
+  }
+
+  loadLookups() {
+    this.customFieldService.dataTypeLookup().subscribe((res: any) => {
+      this.dataTypes = res.data || [];
+      this.checkEditMode();
+    });
   }
 
   formInItialize() {
     this.form = this.fb.group({
       fieldName: ['', Validators.required],
       fieldKey: ['', Validators.required],
-      fieldDataType: ['', Validators.required],
+      fieldDataTypeId: ['', Validators.required],
       validations: this.fb.array([]),
       options: this.fb.array([])
     });
 
-    // No longer clearing options array on change so options are preserved when toggling types
-    this.form.get('fieldDataType')?.valueChanges.subscribe(type => {
-      // Do nothing: Options persist in UI allowing users to switch back to Dropdown without losing data
+    this.form.get('fieldDataTypeId')?.valueChanges.subscribe(id => {
+      const type = this.dataTypes.find(t => t.fieldDataTypeId == id);
+      this.selectedDataTypeName = type ? (type.fieldDataType || '').toLowerCase() : '';
+
+      // Clear existing validation rules form inputs when datatype changes
+      this.validations.clear();
+      this.validationRules = [];
     });
   }
 
@@ -71,7 +106,8 @@ export class AddEditCustomField implements OnInit {
   createValidationRule(): FormGroup {
     return this.fb.group({
       customFieldValidationId: [0], // 0 indicates a new rule
-      ruleName: ['', Validators.required],
+      ruleId: ['', Validators.required],
+      ruleName: [''], // Holds selected label
       ruleValue: ['', Validators.required],
       message: ['', Validators.required],
       active: [true]
@@ -89,6 +125,58 @@ export class AddEditCustomField implements OnInit {
 
   addValidation() {
     this.validations.push(this.createValidationRule());
+    if (this.validationRules.length === 0 && this.ruleTotalPages === 1) {
+      this.loadValidationRules();
+    }
+  }
+
+  // --- Validation Rule Search & Pagination --- //
+  loadValidationRules() {
+    const params: any = { PageNumber: this.rulePage, Limit: this.ruleLookupLimit };
+    if (this.searchRuleText) {
+      params.SearchText = this.searchRuleText;
+    }
+
+    this.customFieldService.validationRuleLookup(params).subscribe({
+      next: (res: any) => {
+        if (res && res.data) {
+          const items = res.data.items || res.data;
+          this.validationRules = [...items];
+          this.ruleTotalPages = res.data.totalPages || 1;
+        }
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  onRuleSearch(event: any) {
+    this.searchRuleSubject.next(event.target.value);
+  }
+
+  onPrevRulePage(event: Event) {
+    event.stopPropagation();
+    if (this.rulePage > 1) {
+      this.rulePage--;
+      this.validationRules = [];
+      this.loadValidationRules();
+    }
+  }
+
+  onNextRulePage(event: Event) {
+    event.stopPropagation();
+    if (this.rulePage < this.ruleTotalPages) {
+      this.rulePage++;
+      this.validationRules = [];
+      this.loadValidationRules();
+    }
+  }
+
+  selectRule(index: number, rule: any) {
+    const valGroup = this.validations.at(index) as FormGroup;
+    valGroup.patchValue({
+      ruleId: rule.ruleId,
+      ruleName: rule.ruleName
+    });
   }
 
   removeValidation(index: number) {
@@ -148,34 +236,55 @@ export class AddEditCustomField implements OnInit {
   }
 
   patchForm(data: CustomFieldModel) {
+    const activeDataType = data.fieldDataTypes && data.fieldDataTypes.length > 0 ? data.fieldDataTypes[0] : null;
+    let typeId = activeDataType?.fieldDataTypeId;
+    if (!typeId && activeDataType?.fieldDataType && this.dataTypes.length) {
+      const match = this.dataTypes.find(t => (t.fieldDataType || '').toLowerCase() === (activeDataType.fieldDataType || '').toLowerCase());
+      if (match) typeId = match.fieldDataTypeId;
+    }
+
     this.form.patchValue({
       fieldName: data.fieldName,
-      fieldKey: data.fieldKey,
-      fieldDataType: data.fieldDataType
+      fieldKey: data.fieldKey
     });
 
-    if (data.validations && data.validations.length > 0) {
-      data.validations.forEach(val => {
-        this.validations.push(this.fb.group({
-          customFieldValidationId: [val.customFieldValidationId],
-          ruleName: [val.ruleName, Validators.required],
-          ruleValue: [val.ruleValue, Validators.required],
-          message: [val.message, Validators.required],
-          active: [val.active]
-        }));
-      });
-    }
+    const finishPatching = () => {
+      this.form.patchValue({ fieldDataTypeId: typeId || '' }, { emitEvent: false });
+      const type = this.dataTypes.find(t => t.fieldDataTypeId == typeId);
+      this.selectedDataTypeName = type ? (type.fieldDataType || '').toLowerCase() : '';
 
-    if (data.options && data.options.length > 0) {
-      data.options.forEach(opt => {
-        this.options.push(this.fb.group({
-          customFieldOptionsId: [opt.customFieldOptionsId],
-          label: [opt.label, Validators.required],
-          value: [opt.value, Validators.required],
-          active: [opt.active]
-        }));
-      });
-    }
+      if (activeDataType?.validations && activeDataType.validations.length > 0) {
+        activeDataType.validations.forEach((val: any) => {
+          let resolvedRuleId = val.ruleId;
+          if (!resolvedRuleId && val.ruleName && this.validationRules.length) {
+            const ruleMatch = this.validationRules.find(r => (r.ruleName || '').toLowerCase() === (val.ruleName || '').toLowerCase());
+            if (ruleMatch) resolvedRuleId = ruleMatch.ruleId;
+          }
+
+          this.validations.push(this.fb.group({
+            customFieldValidationId: [val.customFieldValidationId],
+            ruleId: [resolvedRuleId || '', Validators.required],
+            ruleName: [val.ruleName || ''],
+            ruleValue: [val.ruleValue, Validators.required],
+            message: [val.message, Validators.required],
+            active: [val.active]
+          }));
+        });
+      }
+
+      if (activeDataType?.options && activeDataType.options.length > 0) {
+        activeDataType.options.forEach((opt: any) => {
+          this.options.push(this.fb.group({
+            customFieldOptionsId: [opt.customFieldOptionsId],
+            label: [opt.label, Validators.required],
+            value: [opt.value, Validators.required],
+            active: [opt.active]
+          }));
+        });
+      }
+    };
+
+    finishPatching();
   }
 
   goBack() {
@@ -205,38 +314,37 @@ export class AddEditCustomField implements OnInit {
 
     const payload: any = {
       fieldName: formValue.fieldName,
-      fieldKey: formValue.fieldKey,
-      fieldDataType: formValue.fieldDataType,
+      fieldKey: formValue.fieldKey
     };
 
     const addValidations = formValue.validations
       .filter((v: any) => v.active !== false)
       .map((v: any) => ({
-        ruleName: v.ruleName,
+        ruleId: +v.ruleId,
         ruleValue: v.ruleValue,
         message: v.message
       }));
 
-    if (addValidations.length > 0) {
-      payload.addValidations = addValidations;
-    }
-
-    const isOptionType = formValue.fieldDataType.toLowerCase() === 'dropdown' || formValue.fieldDataType.toLowerCase() === 'checkbox' || formValue.fieldDataType.toLowerCase() === 'radio';
+    const addOptions: any[] = [];
+    const isOptionType = ['dropdown', 'select', 'checkbox', 'radio'].includes(this.selectedDataTypeName);
 
     if (isOptionType) {
-      const addOptions = formValue.options
+      formValue.options
         .filter((o: any) => o.active !== false)
-        .map((o: any) => ({
+        .forEach((o: any) => addOptions.push({
           label: o.label,
           value: o.value
         }));
-      if (addOptions.length > 0) {
-        payload.addOptions = addOptions;
-      }
-    } else {
-      // For text or non-option types, send null/empty array as requested
-      payload.addOptions = [];
     }
+
+    payload.addCustomFieldDataType = [
+      {
+        fieldDataTypeId: +formValue.fieldDataTypeId,
+        valueDataType: "Varchar", // default fallback
+        addValidations: addValidations.length > 0 ? addValidations : [],
+        addOptions: addOptions.length > 0 ? addOptions : []
+      }
+    ];
 
     console.log('Add Custom Field Payload:', payload);
 
@@ -245,7 +353,7 @@ export class AddEditCustomField implements OnInit {
         this.submitting = false;
         if (res.statusCode === 200 || res.statusCode === 201) {
           this.toastService.success('Custom Field created successfully', 'Success');
-          this.router.navigate(['/custom-field-details', this.encryptionService.encryptForRoute(res.data.customFieldId)]);
+          this.router.navigate(['/custom-field/details', this.encryptionService.encryptForRoute(res.data.customFieldId)]);
         } else {
           this.toastService.error(res.message || 'Operation failed', 'Error');
         }
@@ -259,35 +367,31 @@ export class AddEditCustomField implements OnInit {
 
   editCustomField() {
     const formValue = this.form.value;
-    const payload: any = {};
+    const payload: any = {
+      fieldName: formValue.fieldName,
+      fieldKey: formValue.fieldKey,
+      active: true
+    };
 
-    // Basic fields diff
-    if (formValue.fieldName !== this.originalData.fieldName) payload.fieldName = formValue.fieldName;
-    if (formValue.fieldKey !== this.originalData.fieldKey) payload.fieldKey = formValue.fieldKey;
-    if (formValue.fieldDataType !== this.originalData.fieldDataType) payload.fieldDataType = formValue.fieldDataType;
-
-    // Process Validations
     const addValidations: any[] = [];
     const updateValidations: any[] = [];
+    const originalDataType = this.originalData.fieldDataTypes && this.originalData.fieldDataTypes.length > 0 ? this.originalData.fieldDataTypes[0] : null;
 
     formValue.validations.forEach((v: any) => {
       if (v.customFieldValidationId === 0 && v.active !== false) {
-        // New validation
         addValidations.push({
-          ruleName: v.ruleName,
+          ruleId: +v.ruleId,
           ruleValue: v.ruleValue,
           message: v.message
         });
       } else if (v.customFieldValidationId !== 0) {
-        // Find existing to check for changes
-        const originalVal = this.originalData.validations?.find(ov => ov.customFieldValidationId === v.customFieldValidationId);
+        const originalVal = originalDataType?.validations?.find((ov: any) => ov.customFieldValidationId === v.customFieldValidationId);
         if (originalVal) {
-          if (originalVal.ruleName !== v.ruleName || originalVal.ruleValue !== v.ruleValue ||
+          if (originalVal.ruleId !== +v.ruleId || originalVal.ruleValue !== v.ruleValue ||
             originalVal.message !== v.message || originalVal.active !== v.active) {
             updateValidations.push({
               customFieldValidationId: v.customFieldValidationId,
-              ruleName: v.ruleName,
-              ruleValue: v.ruleValue,
+              ruleValue: v.ruleValue, // Assuming the API accepts ruleValue changes without ruleId for updates
               message: v.message,
               active: v.active
             });
@@ -296,25 +400,16 @@ export class AddEditCustomField implements OnInit {
       }
     });
 
-    if (addValidations.length > 0) payload.addValidations = addValidations;
-    if (updateValidations.length > 0) payload.updateValidations = updateValidations;
-
-    // Process Options (Only if it's an option type, else delete existing options)
     const addOptions: any[] = [];
     const updateOptions: any[] = [];
-
-    const isOptionType = formValue.fieldDataType.toLowerCase() === 'dropdown' || formValue.fieldDataType.toLowerCase() === 'checkbox' || formValue.fieldDataType.toLowerCase() === 'radio';
+    const isOptionType = ['dropdown', 'select', 'checkbox', 'radio'].includes(this.selectedDataTypeName);
 
     if (isOptionType) {
       formValue.options.forEach((o: any) => {
         if (o.customFieldOptionsId === 0 && o.active !== false) {
-          // New option
-          addOptions.push({
-            label: o.label,
-            value: o.value
-          });
+          addOptions.push({ label: o.label, value: o.value });
         } else if (o.customFieldOptionsId !== 0) {
-          const originalOpt = this.originalData.options?.find(oo => oo.customFieldOptionsId === o.customFieldOptionsId);
+          const originalOpt = originalDataType?.options?.find((oo: any) => oo.customFieldOptionsId === o.customFieldOptionsId);
           if (originalOpt) {
             if (originalOpt.label !== o.label || originalOpt.value !== o.value || originalOpt.active !== o.active) {
               updateOptions.push({
@@ -328,27 +423,39 @@ export class AddEditCustomField implements OnInit {
         }
       });
     } else {
-      // It's a non-option type (e.g. Text). Mark all existing original options from the DB as deleted.
-      if (this.originalData.options) {
-        this.originalData.options.forEach(oo => {
+      if (originalDataType?.options) {
+        originalDataType.options.forEach((oo: any) => {
           updateOptions.push({
             customFieldOptionsId: oo.customFieldOptionsId,
             active: false
           });
         });
       }
-      payload.addOptions = []; // Ensure new additions are sent as empty per requirements
     }
 
-    if (addOptions.length > 0) payload.addOptions = addOptions;
-    if (updateOptions.length > 0) payload.updateOptions = updateOptions;
+    const typeUpdateBlock: any = {
+      customFieldLinkId: originalDataType?.customFieldLinkId || 0,
+      valueDataType: originalDataType?.valueDataType || "Varchar",
+      active: true
+    };
 
+    if (addValidations.length) typeUpdateBlock.addValidations = addValidations;
+    if (updateValidations.length) typeUpdateBlock.updateValidations = updateValidations;
+    if (addOptions.length) typeUpdateBlock.addOptions = addOptions;
+    if (updateOptions.length) typeUpdateBlock.updateOptions = updateOptions;
 
-    if (Object.keys(payload).length === 0) {
-      this.toastService.info('No changes detected', 'Info');
-      this.submitting = false;
-      return;
+    // Check if Data Type changed (Add it as new or updated)
+    let typeId = originalDataType?.fieldDataTypeId;
+    if (!typeId && originalDataType?.fieldDataType && this.dataTypes.length) {
+      const match = this.dataTypes.find(t => (t.fieldDataType || '').toLowerCase() === (originalDataType.fieldDataType || '').toLowerCase());
+      if (match) typeId = match.fieldDataTypeId;
     }
+
+    if (typeId && +formValue.fieldDataTypeId !== typeId) {
+      typeUpdateBlock.fieldDataTypeId = +formValue.fieldDataTypeId; // Will include for backend consistency even if not strictly in sample
+    }
+
+    payload.updateCustomFieldDataTypes = [typeUpdateBlock];
 
     console.log('Update Custom Field Payload:', payload);
 
@@ -357,7 +464,7 @@ export class AddEditCustomField implements OnInit {
         this.submitting = false;
         if (res.statusCode === 200) {
           this.toastService.success('Custom Field updated successfully', 'Success');
-          this.router.navigate(['/custom-field-details', this.encryptionService.encryptForRoute(this.customFieldId)]);
+          this.router.navigate(['/custom-field/details', this.encryptionService.encryptForRoute(this.customFieldId)]);
         } else {
           this.toastService.error(res.message || 'Operation failed', 'Error');
         }

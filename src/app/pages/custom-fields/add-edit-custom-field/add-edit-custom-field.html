@@ -36,16 +36,16 @@
                 </div>
 
                 <div class="col-md-4">
-                    <label for="fieldDataType" class="form-label">Data Type <span class="text-danger">*</span></label>
-                    <select class="form-select" id="fieldDataType" formControlName="fieldDataType">
+                    <label for="fieldDataTypeId" class="form-label">Data Type <span class="text-danger">*</span></label>
+                    <select class="form-select" id="fieldDataTypeId" formControlName="fieldDataTypeId">
                         <option value="" disabled>Select Data Type</option>
-                        @for (type of dataTypes; track type) {
-                        <option [value]="type | lowercase">{{ type }}</option>
+                        @for (type of dataTypes; track type.fieldDataTypeId) {
+                        <option [value]="type.fieldDataTypeId">{{ type.fieldDataType }}</option>
                         }
                     </select>
-                    @if (form.get('fieldDataType')?.touched && form.get('fieldDataType')?.invalid) {
+                    @if (form.get('fieldDataTypeId')?.touched && form.get('fieldDataTypeId')?.invalid) {
                     <div class="text-danger small">
-                        @if (form.get('fieldDataType')?.hasError('required')) { Data Type is required. }
+                        @if (form.get('fieldDataTypeId')?.hasError('required')) { Data Type is required. }
                     </div>
                     }
                 </div>
@@ -74,9 +74,59 @@
 
                             <div class="row g-2 align-items-end me-4">
                                 <div class="col-md-4">
-                                    <label class="form-label fs-7">Rule Name</label>
-                                    <input type="text" class="form-control form-control-sm" formControlName="ruleName"
-                                        placeholder="e.g. required, minLength">
+                                    <label class="form-label fs-7">Rule</label>
+                                    <div class="dropdown w-100">
+                                        <button class="form-select form-select-sm text-start w-100" type="button"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                            {{ val.get('ruleName')?.value || 'Select Rule' }}
+                                        </button>
+                                        <ul class="dropdown-menu p-0 shadow-sm custom-dropdown-menu w-100">
+                                            <!-- Search -->
+                                            <li class="p-2 border-bottom sticky-top custom-dropdown-header-footer"
+                                                style="z-index: 3;" (click)="$event.stopPropagation()">
+                                                <input type="text" class="form-control form-control-sm"
+                                                    placeholder="Search rule..." (input)="onRuleSearch($event)"
+                                                    autofocus>
+                                            </li>
+                                            <!-- Prev Page -->
+                                            @if (rulePage > 1) {
+                                            <li class="border-bottom sticky-top custom-dropdown-header-footer"
+                                                style="z-index: 2;">
+                                                <button type="button"
+                                                    class="dropdown-item custom-pagination-btn fw-bold py-2"
+                                                    (click)="onPrevRulePage($event)">
+                                                    &laquo; Previous Page
+                                                </button>
+                                            </li>
+                                            }
+                                            <!-- Items -->
+                                            @for (rule of validationRules; track rule.ruleId) {
+                                            <li>
+                                                <button type="button" class="dropdown-item py-2"
+                                                    [class.active]="val.get('ruleId')?.value == rule.ruleId"
+                                                    (click)="selectRule(i, rule)">
+                                                    {{ rule.ruleName }}
+                                                </button>
+                                            </li>
+                                            }
+                                            @if (validationRules.length === 0) {
+                                            <li class="text-center text-muted p-2 small custom-dropdown-header-footer">
+                                                <span>No rules found.</span>
+                                            </li>
+                                            }
+                                            <!-- Next Page -->
+                                            @if (rulePage < ruleTotalPages) { <li
+                                                class="border-top sticky-bottom custom-dropdown-header-footer"
+                                                style="z-index: 2;">
+                                                <button type="button"
+                                                    class="dropdown-item custom-pagination-btn fw-bold py-2"
+                                                    (click)="onNextRulePage($event)">
+                                                    Next Page &raquo;
+                                                </button>
+                                                </li>
+                                                }
+                                        </ul>
+                                    </div>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fs-7">Rule Value</label>
@@ -102,8 +152,8 @@
                 </div>
 
 
-                <!-- Options Section (Only for Dropdown) -->
-                <ng-container *ngIf="form.get('fieldDataType')?.value === 'dropdown'">
+                <!-- Options Section (Only for Dropdown/Select/Checkbox/Radio) -->
+                <ng-container *ngIf="['dropdown', 'select', 'checkbox', 'radio'].includes(selectedDataTypeName)">
                     <!-- Spacer -->
                     <hr class="mt-4 mb-2">
 
