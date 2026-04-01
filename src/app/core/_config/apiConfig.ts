@@ -5,6 +5,9 @@ export const apiConfig = {
     refresh: '/auth/refresh-token',
     logout: '/auth/logout',
 
+    //User
+    user: '/users/me',
+
     // Program Action Endpoints
     programAction: '/program-action',
     getProgramActionLookup: '/program-action/lookup',
