@@ -1,8 +1,12 @@
 
 export interface CustomFieldModel {
   customFieldId: number;
+  // Lookup API returns customFieldLinkId as the unique identifier per type
+  customFieldLinkId?: number;
   fieldName: string;
   fieldKey: string;
+  // Flat fieldDataType returned by the lookup API
+  fieldDataType?: string;
   fieldDataTypes?: CustomFieldDataTypeModel[];
   deleted: boolean;
   active: boolean;

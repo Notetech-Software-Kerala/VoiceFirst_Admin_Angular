@@ -145,10 +145,38 @@ export class EditProfile implements OnInit {
       return;
     }
 
+    const formValue = this.form.value;
+    const payload: any = {};
+
+    if (formValue.firstName !== this.data.firstName) payload.firstName = formValue.firstName;
+    if (formValue.lastName !== this.data.lastName) payload.lastName = formValue.lastName;
+    if (formValue.email !== this.data.email) payload.email = formValue.email;
+    
+    const formattedGender = formValue.gender ? formValue.gender.toLowerCase() : '';
+    const originalGender = this.data.gender ? this.data.gender.toLowerCase() : '';
+    if (formattedGender !== originalGender) payload.gender = formattedGender;
+    
+    if (formValue.mobileNo !== this.data.mobileNo) {
+      payload.mobileNo = formValue.mobileNo;
+      // Always include dialCodeId when mobile number changes
+      payload.dialCodeId = formValue.dialCodeId;
+    }
+    
+    if (Number(formValue.birthYear) !== Number(this.data.birthYear)) {
+      payload.birthYear = Number(formValue.birthYear);
+    }
+    
+    if (formValue.dialCodeId !== this.data.dialCodeId && !payload.dialCodeId) {
+      payload.dialCodeId = formValue.dialCodeId;
+    }
+
+    if (Object.keys(payload).length === 0) {
+      this.toastService.info('No changes were detected', 'Info');
+      this.dialogRef.close(false);
+      return;
+    }
+
     this.isSubmitting = true;
-    // We stringify birthYear if necessary, but the payload structure indicates it's a string
-    const payload = { ...this.form.value };
-    payload.birthYear = String(payload.birthYear);
 
     this.userService.updateCurrentUser(payload).subscribe({
       next: (res) => {
