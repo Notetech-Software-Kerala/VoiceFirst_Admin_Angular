@@ -8,7 +8,7 @@ import { EncryptionService } from '../../../partials/shared_services/encryption.
 import { CommonModule, Location } from '@angular/common';
 import { MaterialModule } from '../../../material.module';
 import { ReactiveFormsModule } from '@angular/forms';
-import { CustomFieldModel, CustomFieldValidation, CustomFieldOption } from '../../../core/_state/custom-field/custom-field.model';
+import { CustomFieldModel } from '../../../core/_state/custom-field/custom-field.model';
 
 @Component({
   selector: 'app-add-edit-custom-field',
@@ -25,15 +25,15 @@ export class AddEditCustomField implements OnInit, OnDestroy {
   originalData!: CustomFieldModel;
 
   dataTypes: any[] = [];
-  validationRules: any[] = [];
-  selectedDataTypeName = '';
 
-  // Validation Rule Lookup State
-  searchRuleText: string = '';
-  searchRuleSubject = new Subject<string>();
-  rulePage = 1;
-  ruleTotalPages = 1;
+  // Per-block validation rules state
+  blockValidationRules: any[][] = [];
+  ruleSearchTexts: string[] = [];
+  rulePages: number[] = [];
+  ruleTotalPages: number[] = [];
   readonly ruleLookupLimit = 10;
+
+  private ruleSearchSubject = new Subject<{ index: number; text: string }>();
 
   constructor(
     private location: Location,
@@ -47,23 +47,25 @@ export class AddEditCustomField implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.searchRuleSubject.pipe(
+    this.ruleSearchSubject.pipe(
       debounceTime(400),
-      distinctUntilChanged()
-    ).subscribe(text => {
-      this.searchRuleText = text;
-      this.rulePage = 1;
-      this.validationRules = [];
-      this.loadValidationRules();
+      distinctUntilChanged((a, b) => a.index === b.index && a.text === b.text)
+    ).subscribe(({ index, text }) => {
+      this.ruleSearchTexts[index] = text;
+      this.rulePages[index] = 1;
+      this.blockValidationRules[index] = [];
+      this.loadValidationRules(index);
     });
 
-    this.formInItialize();
+    this.formInitialize();
     this.loadLookups();
   }
 
   ngOnDestroy(): void {
-    this.searchRuleSubject.complete();
+    this.ruleSearchSubject.complete();
   }
+
+  // --- Lookups ---
 
   loadLookups() {
     this.customFieldService.dataTypeLookup().subscribe((res: any) => {
@@ -72,137 +74,233 @@ export class AddEditCustomField implements OnInit, OnDestroy {
     });
   }
 
-  formInItialize() {
-    this.form = this.fb.group({
-      fieldName: ['', Validators.required],
-      fieldKey: ['', Validators.required],
-      fieldDataTypeId: ['', Validators.required],
-      validations: this.fb.array([]),
-      options: this.fb.array([])
-    });
-
-    this.form.get('fieldDataTypeId')?.valueChanges.subscribe(id => {
-      const type = this.dataTypes.find(t => t.fieldDataTypeId == id);
-      this.selectedDataTypeName = type ? (type.fieldDataType || '').toLowerCase() : '';
-
-      // Clear existing validation rules form inputs when datatype changes
-      this.validations.clear();
-      this.validationRules = [];
-    });
-  }
-
-  get validations(): FormArray {
-    return this.form.get('validations') as FormArray;
-  }
-
-  get options(): FormArray {
-    return this.form.get('options') as FormArray;
-  }
-
-  hasActiveItems(formArray: FormArray): boolean {
-    return formArray.controls.some(c => c.get('active')?.value === true);
-  }
-
-  createValidationRule(): FormGroup {
-    return this.fb.group({
-      customFieldValidationId: [0], // 0 indicates a new rule
-      ruleId: ['', Validators.required],
-      ruleName: [''], // Holds selected label
-      ruleValue: ['', Validators.required],
-      message: ['', Validators.required],
-      active: [true]
-    });
-  }
-
-  createOption(): FormGroup {
-    return this.fb.group({
-      customFieldOptionsId: [0], // 0 indicates a new option
-      label: ['', Validators.required],
-      value: ['', Validators.required],
-      active: [true]
-    });
-  }
-
-  addValidation() {
-    this.validations.push(this.createValidationRule());
-    if (this.validationRules.length === 0 && this.ruleTotalPages === 1) {
-      this.loadValidationRules();
+  loadValidationRules(blockIndex: number) {
+    const typeId = (this.dataTypeBlocks.at(blockIndex) as FormGroup).get('fieldDataTypeId')?.value;
+    if (!typeId) {
+      this.blockValidationRules[blockIndex] = [];
+      this.cdr.markForCheck();
+      return;
     }
-  }
 
-  // --- Validation Rule Search & Pagination --- //
-  loadValidationRules() {
-    const params: any = { PageNumber: this.rulePage, Limit: this.ruleLookupLimit };
-    if (this.searchRuleText) {
-      params.SearchText = this.searchRuleText;
+    const page = this.rulePages[blockIndex] || 1;
+    const text = this.ruleSearchTexts[blockIndex] || '';
+    const params: any = { 
+      FieldDataTypeId: typeId,
+      PageNumber: page, 
+      Limit: this.ruleLookupLimit 
+    };
+    if (text) {
+      params.SearchText = text;
     }
 
     this.customFieldService.validationRuleLookup(params).subscribe({
       next: (res: any) => {
         if (res && res.data) {
           const items = res.data.items || res.data;
-          this.validationRules = [...items];
-          this.ruleTotalPages = res.data.totalPages || 1;
+          this.blockValidationRules[blockIndex] = [...items];
+          this.ruleTotalPages[blockIndex] = res.data.totalPages || 1;
         }
         this.cdr.markForCheck();
       }
     });
   }
 
-  onRuleSearch(event: any) {
-    this.searchRuleSubject.next(event.target.value);
-  }
+  // --- Form Initialization ---
 
-  onPrevRulePage(event: Event) {
-    event.stopPropagation();
-    if (this.rulePage > 1) {
-      this.rulePage--;
-      this.validationRules = [];
-      this.loadValidationRules();
-    }
-  }
-
-  onNextRulePage(event: Event) {
-    event.stopPropagation();
-    if (this.rulePage < this.ruleTotalPages) {
-      this.rulePage++;
-      this.validationRules = [];
-      this.loadValidationRules();
-    }
-  }
-
-  selectRule(index: number, rule: any) {
-    const valGroup = this.validations.at(index) as FormGroup;
-    valGroup.patchValue({
-      ruleId: rule.ruleId,
-      ruleName: rule.ruleName
+  formInitialize() {
+    this.form = this.fb.group({
+      fieldName: ['', Validators.required],
+      fieldKey: ['', Validators.required],
+      dataTypeBlocks: this.fb.array([])
     });
   }
 
-  removeValidation(index: number) {
-    const valGroup = this.validations.at(index) as FormGroup;
-    const id = valGroup.get('customFieldValidationId')?.value;
-    if (id !== 0) {
-      valGroup.get('active')?.setValue(false);
-      // We don't remove it from the array if it exists in DB, we just mark active=false so we can track deletion
+  get dataTypeBlocks(): FormArray {
+    return this.form.get('dataTypeBlocks') as FormArray;
+  }
+
+  // --- Block Management ---
+
+  createDataTypeBlock(overrides: any = {}): FormGroup {
+    return this.fb.group({
+      customFieldLinkId: [overrides.customFieldLinkId ?? 0],
+      isExisting: [overrides.isExisting ?? false],
+      active: [overrides.active ?? true],
+      fieldDataTypeId: [overrides.fieldDataTypeId ?? '', Validators.required],
+      valueDataType: [overrides.valueDataType ?? 'Varchar'],
+      validations: this.fb.array(overrides.validations ?? []),
+      options: this.fb.array(overrides.options ?? [])
+    });
+  }
+
+  addDataTypeBlock() {
+    const index = this.dataTypeBlocks.length;
+    this.dataTypeBlocks.push(this.createDataTypeBlock());
+    this.blockValidationRules[index] = [];
+    this.ruleSearchTexts[index] = '';
+    this.rulePages[index] = 1;
+    this.ruleTotalPages[index] = 1;
+  }
+
+  removeDataTypeBlock(index: number) {
+    const block = this.dataTypeBlocks.at(index) as FormGroup;
+    if (block.get('isExisting')?.value) {
+      block.get('active')?.setValue(false);
     } else {
-      this.validations.removeAt(index);
+      this.dataTypeBlocks.removeAt(index);
+      this.blockValidationRules.splice(index, 1);
+      this.ruleSearchTexts.splice(index, 1);
+      this.rulePages.splice(index, 1);
+      this.ruleTotalPages.splice(index, 1);
     }
   }
 
-  addOption() {
-    this.options.push(this.createOption());
+  onDataTypeChange(blockIndex: number) {
+    // Clear previously loaded rules and active validations for this block
+    this.blockValidationRules[blockIndex] = [];
+    this.rulePages[blockIndex] = 1;
+    this.ruleSearchTexts[blockIndex] = '';
+    
+    // Clear validation forms inside this block so old rules don't get sent incorrectly
+    this.getValidations(blockIndex).clear();
+    
+    // Load rules for new data type
+    this.loadValidationRules(blockIndex);
   }
 
-  removeOption(index: number) {
-    const optGroup = this.options.at(index) as FormGroup;
+  // --- Block Helpers ---
+
+  isOptionTypeById(id: any): boolean {
+    if (!id) return false;
+    const type = this.dataTypes.find(t => t.fieldDataTypeId == id);
+    return type ? !!type.includesOptions : false;
+  }
+
+  isOptionType(blockIndex: number): boolean {
+    const id = (this.dataTypeBlocks.at(blockIndex) as FormGroup).get('fieldDataTypeId')?.value;
+    return this.isOptionTypeById(id);
+  }
+
+  getBlockLabel(blockIndex: number): string {
+    const id = (this.dataTypeBlocks.at(blockIndex) as FormGroup).get('fieldDataTypeId')?.value;
+    if (!id) return `Data Type #${blockIndex + 1}`;
+    const type = this.dataTypes.find(t => t.fieldDataTypeId == id);
+    return type ? (type.fieldDataType || '') : `Data Type #${blockIndex + 1}`;
+  }
+
+  getBlockRules(blockIndex: number): any[] {
+    return this.blockValidationRules[blockIndex] || [];
+  }
+
+  hasActiveBlocks(): boolean {
+    return this.dataTypeBlocks.controls.some(b => b.get('active')?.value !== false);
+  }
+
+  hasActiveItems(formArray: FormArray): boolean {
+    return formArray.controls.some(c => c.get('active')?.value === true);
+  }
+
+  // --- Validations Management ---
+
+  getValidations(blockIndex: number): FormArray {
+    return (this.dataTypeBlocks.at(blockIndex) as FormGroup).get('validations') as FormArray;
+  }
+
+  createValidationRule(): FormGroup {
+    return this.fb.group({
+      customFieldValidationId: [0],
+      ruleId: ['', Validators.required],
+      ruleName: [''],
+      ruleValue: ['', Validators.required],
+      message: ['', Validators.required],
+      active: [true]
+    });
+  }
+
+  addValidation(blockIndex: number) {
+    this.getValidations(blockIndex).push(this.createValidationRule());
+    if (!this.blockValidationRules[blockIndex]?.length) {
+      this.loadValidationRules(blockIndex);
+    }
+  }
+
+  removeValidation(blockIndex: number, valIndex: number) {
+    const validations = this.getValidations(blockIndex);
+    const valGroup = validations.at(valIndex) as FormGroup;
+    const id = valGroup.get('customFieldValidationId')?.value;
+    if (id !== 0) {
+      valGroup.get('active')?.setValue(false);
+    } else {
+      validations.removeAt(valIndex);
+    }
+  }
+
+  selectRule(blockIndex: number, valIndex: number, rule: any) {
+    const valGroup = this.getValidations(blockIndex).at(valIndex) as FormGroup;
+    valGroup.patchValue({ ruleId: rule.ruleId, ruleName: rule.ruleName });
+  }
+
+  onRuleSearch(blockIndex: number, event: any) {
+    this.ruleSearchSubject.next({ index: blockIndex, text: event.target.value });
+  }
+
+  onPrevRulePage(blockIndex: number, event: Event) {
+    event.stopPropagation();
+    if ((this.rulePages[blockIndex] || 1) > 1) {
+      this.rulePages[blockIndex]--;
+      this.blockValidationRules[blockIndex] = [];
+      this.loadValidationRules(blockIndex);
+    }
+  }
+
+  onNextRulePage(blockIndex: number, event: Event) {
+    event.stopPropagation();
+    const page = this.rulePages[blockIndex] || 1;
+    const total = this.ruleTotalPages[blockIndex] || 1;
+    if (page < total) {
+      this.rulePages[blockIndex]++;
+      this.blockValidationRules[blockIndex] = [];
+      this.loadValidationRules(blockIndex);
+    }
+  }
+
+  openRuleDropdown(blockIndex: number) {
+    if (!this.blockValidationRules[blockIndex]?.length) {
+      this.loadValidationRules(blockIndex);
+    }
+  }
+
+  // --- Options Management ---
+
+  getOptions(blockIndex: number): FormArray {
+    return (this.dataTypeBlocks.at(blockIndex) as FormGroup).get('options') as FormArray;
+  }
+
+  createOption(): FormGroup {
+    return this.fb.group({
+      customFieldOptionsId: [0],
+      label: ['', Validators.required],
+      value: ['', Validators.required],
+      active: [true]
+    });
+  }
+
+  addOption(blockIndex: number) {
+    this.getOptions(blockIndex).push(this.createOption());
+  }
+
+  removeOption(blockIndex: number, optIndex: number) {
+    const options = this.getOptions(blockIndex);
+    const optGroup = options.at(optIndex) as FormGroup;
     const id = optGroup.get('customFieldOptionsId')?.value;
     if (id !== 0) {
       optGroup.get('active')?.setValue(false);
     } else {
-      this.options.removeAt(index);
+      options.removeAt(optIndex);
     }
   }
+
+  // --- Edit Mode & Patching ---
 
   checkEditMode() {
     this.route.params.subscribe(params => {
@@ -236,55 +334,57 @@ export class AddEditCustomField implements OnInit, OnDestroy {
   }
 
   patchForm(data: CustomFieldModel) {
-    const activeDataType = data.fieldDataTypes && data.fieldDataTypes.length > 0 ? data.fieldDataTypes[0] : null;
-    let typeId = activeDataType?.fieldDataTypeId;
-    if (!typeId && activeDataType?.fieldDataType && this.dataTypes.length) {
-      const match = this.dataTypes.find(t => (t.fieldDataType || '').toLowerCase() === (activeDataType.fieldDataType || '').toLowerCase());
-      if (match) typeId = match.fieldDataTypeId;
-    }
-
     this.form.patchValue({
       fieldName: data.fieldName,
       fieldKey: data.fieldKey
     });
 
-    const finishPatching = () => {
-      this.form.patchValue({ fieldDataTypeId: typeId || '' }, { emitEvent: false });
-      const type = this.dataTypes.find(t => t.fieldDataTypeId == typeId);
-      this.selectedDataTypeName = type ? (type.fieldDataType || '').toLowerCase() : '';
-
-      if (activeDataType?.validations && activeDataType.validations.length > 0) {
-        activeDataType.validations.forEach((val: any) => {
-          let resolvedRuleId = val.ruleId;
-          if (!resolvedRuleId && val.ruleName && this.validationRules.length) {
-            const ruleMatch = this.validationRules.find(r => (r.ruleName || '').toLowerCase() === (val.ruleName || '').toLowerCase());
-            if (ruleMatch) resolvedRuleId = ruleMatch.ruleId;
-          }
-
-          this.validations.push(this.fb.group({
-            customFieldValidationId: [val.customFieldValidationId],
-            ruleId: [resolvedRuleId || '', Validators.required],
-            ruleName: [val.ruleName || ''],
-            ruleValue: [val.ruleValue, Validators.required],
-            message: [val.message, Validators.required],
-            active: [val.active]
-          }));
-        });
+    const existingDataTypes = data.fieldDataTypes || [];
+    existingDataTypes.forEach((dt: any, i: number) => {
+      
+      let typeId = dt.fieldDataTypeId;
+      if (!typeId && dt.fieldDataType && this.dataTypes.length) {
+        const match = this.dataTypes.find(t =>
+          (t.fieldDataType || '').toLowerCase() === (dt.fieldDataType || '').toLowerCase()
+        );
+        if (match) typeId = match.fieldDataTypeId;
       }
 
-      if (activeDataType?.options && activeDataType.options.length > 0) {
-        activeDataType.options.forEach((opt: any) => {
-          this.options.push(this.fb.group({
-            customFieldOptionsId: [opt.customFieldOptionsId],
-            label: [opt.label, Validators.required],
-            value: [opt.value, Validators.required],
-            active: [opt.active]
-          }));
-        });
-      }
-    };
+      const validationGroups = (dt.validations || []).map((val: any) =>
+        this.fb.group({
+          customFieldValidationId: [val.customFieldValidationId],
+          ruleId: [val.ruleId || '', Validators.required],
+          ruleName: [val.ruleName || ''],
+          ruleValue: [val.ruleValue, Validators.required],
+          message: [val.message, Validators.required],
+          active: [val.active]
+        })
+      );
 
-    finishPatching();
+      const optionGroups = (dt.options || []).map((opt: any) =>
+        this.fb.group({
+          customFieldOptionsId: [opt.customFieldOptionsId],
+          label: [opt.label, Validators.required],
+          value: [opt.value, Validators.required],
+          active: [opt.active]
+        })
+      );
+
+      this.dataTypeBlocks.push(this.createDataTypeBlock({
+        customFieldLinkId: dt.customFieldLinkId || 0,
+        isExisting: true,
+        active: dt.active ?? true,
+        fieldDataTypeId: typeId || '',
+        valueDataType: dt.valueDataType || 'Varchar',
+        validations: validationGroups,
+        options: optionGroups
+      }));
+
+      this.blockValidationRules[i] = [];
+      this.ruleSearchTexts[i] = '';
+      this.rulePages[i] = 1;
+      this.ruleTotalPages[i] = 1;
+    });
   }
 
   goBack() {
@@ -294,6 +394,8 @@ export class AddEditCustomField implements OnInit, OnDestroy {
   get title(): string {
     return this.isEditMode ? 'Edit Custom Field' : 'Add Custom Field';
   }
+
+  // --- Submisson ---
 
   onSubmit() {
     if (this.form.invalid) {
@@ -309,6 +411,7 @@ export class AddEditCustomField implements OnInit, OnDestroy {
     }
   }
 
+  // Matches `{ fieldName, fieldKey, addCustomFieldDataType: [{ fieldDataTypeId, valueDataType, addValidations, addOptions }] }`
   addCustomField() {
     const formValue = this.form.value;
 
@@ -317,36 +420,32 @@ export class AddEditCustomField implements OnInit, OnDestroy {
       fieldKey: formValue.fieldKey
     };
 
-    const addValidations = formValue.validations
-      .filter((v: any) => v.active !== false)
-      .map((v: any) => ({
-        ruleId: +v.ruleId,
-        ruleValue: v.ruleValue,
-        message: v.message
-      }));
+    payload.addCustomFieldDataType = (formValue.dataTypeBlocks || [])
+      .filter((b: any) => b.active !== false)
+      .map((b: any) => {
+        const showOptions = this.isOptionTypeById(b.fieldDataTypeId);
 
-    const addOptions: any[] = [];
-    const isOptionType = ['dropdown', 'select', 'checkbox', 'radio'].includes(this.selectedDataTypeName);
+        const addValidations = (b.validations || [])
+          .filter((v: any) => v.active !== false)
+          .map((v: any) => ({
+            ruleId: +v.ruleId,
+            ruleValue: v.ruleValue,
+            message: v.message
+          }));
 
-    if (isOptionType) {
-      formValue.options
-        .filter((o: any) => o.active !== false)
-        .forEach((o: any) => addOptions.push({
-          label: o.label,
-          value: o.value
-        }));
-    }
+        const addOptions = showOptions
+          ? (b.options || []).filter((o: any) => o.active !== false).map((o: any) => ({ label: o.label, value: o.value }))
+          : [];
 
-    payload.addCustomFieldDataType = [
-      {
-        fieldDataTypeId: +formValue.fieldDataTypeId,
-        valueDataType: "Varchar", // default fallback
-        addValidations: addValidations.length > 0 ? addValidations : [],
-        addOptions: addOptions.length > 0 ? addOptions : []
-      }
-    ];
+        return {
+          fieldDataTypeId: +b.fieldDataTypeId,
+          valueDataType: b.valueDataType || 'Varchar',
+          addValidations,
+          addOptions
+        };
+      });
 
-    console.log('Add Custom Field Payload:', payload);
+    console.log('Add Custom Field Payload:', JSON.stringify(payload, null, 2));
 
     this.customFieldService.create(payload).subscribe({
       next: (res) => {
@@ -365,99 +464,104 @@ export class AddEditCustomField implements OnInit, OnDestroy {
     });
   }
 
+  // Matches `{ fieldName, fieldKey, active, updateCustomFieldDataTypes: [...], addCustomFieldDataTypes: [...] }`
   editCustomField() {
     const formValue = this.form.value;
+
     const payload: any = {
       fieldName: formValue.fieldName,
       fieldKey: formValue.fieldKey,
       active: true
     };
 
-    const addValidations: any[] = [];
-    const updateValidations: any[] = [];
-    const originalDataType = this.originalData.fieldDataTypes && this.originalData.fieldDataTypes.length > 0 ? this.originalData.fieldDataTypes[0] : null;
+    const updateCustomFieldDataTypes: any[] = [];
+    const addCustomFieldDataTypes: any[] = [];
 
-    formValue.validations.forEach((v: any) => {
-      if (v.customFieldValidationId === 0 && v.active !== false) {
-        addValidations.push({
-          ruleId: +v.ruleId,
-          ruleValue: v.ruleValue,
-          message: v.message
-        });
-      } else if (v.customFieldValidationId !== 0) {
-        const originalVal = originalDataType?.validations?.find((ov: any) => ov.customFieldValidationId === v.customFieldValidationId);
-        if (originalVal) {
-          if (originalVal.ruleId !== +v.ruleId || originalVal.ruleValue !== v.ruleValue ||
-            originalVal.message !== v.message || originalVal.active !== v.active) {
-            updateValidations.push({
-              customFieldValidationId: v.customFieldValidationId,
-              ruleValue: v.ruleValue, // Assuming the API accepts ruleValue changes without ruleId for updates
-              message: v.message,
-              active: v.active
-            });
-          }
-        }
-      }
-    });
+    (formValue.dataTypeBlocks || []).forEach((b: any) => {
+      const showOptions = this.isOptionTypeById(b.fieldDataTypeId);
 
-    const addOptions: any[] = [];
-    const updateOptions: any[] = [];
-    const isOptionType = ['dropdown', 'select', 'checkbox', 'radio'].includes(this.selectedDataTypeName);
+      if (b.isExisting) {
+        const originalDT = (this.originalData.fieldDataTypes || []).find((dt: any) => dt.customFieldLinkId === b.customFieldLinkId);
 
-    if (isOptionType) {
-      formValue.options.forEach((o: any) => {
-        if (o.customFieldOptionsId === 0 && o.active !== false) {
-          addOptions.push({ label: o.label, value: o.value });
-        } else if (o.customFieldOptionsId !== 0) {
-          const originalOpt = originalDataType?.options?.find((oo: any) => oo.customFieldOptionsId === o.customFieldOptionsId);
-          if (originalOpt) {
-            if (originalOpt.label !== o.label || originalOpt.value !== o.value || originalOpt.active !== o.active) {
-              updateOptions.push({
-                customFieldOptionsId: o.customFieldOptionsId,
-                label: o.label,
-                value: o.value,
-                active: o.active
+        const addValidations: any[] = [];
+        const updateValidations: any[] = [];
+        (b.validations || []).forEach((v: any) => {
+          if (v.customFieldValidationId === 0 && v.active !== false) {
+            addValidations.push({ ruleId: +v.ruleId, ruleValue: v.ruleValue, message: v.message });
+          } else if (v.customFieldValidationId !== 0) {
+            const orig = originalDT?.validations?.find((ov: any) => ov.customFieldValidationId === v.customFieldValidationId);
+            if (orig && (orig.ruleValue !== v.ruleValue || orig.message !== v.message || orig.active !== v.active)) {
+              updateValidations.push({
+                customFieldValidationId: v.customFieldValidationId,
+                ruleValue: v.ruleValue,
+                message: v.message,
+                active: v.active
               });
             }
           }
-        }
-      });
-    } else {
-      if (originalDataType?.options) {
-        originalDataType.options.forEach((oo: any) => {
-          updateOptions.push({
-            customFieldOptionsId: oo.customFieldOptionsId,
-            active: false
+        });
+
+        const addOptions: any[] = [];
+        const updateOptions: any[] = [];
+        if (showOptions) {
+          (b.options || []).forEach((o: any) => {
+            if (o.customFieldOptionsId === 0 && o.active !== false) {
+              addOptions.push({ label: o.label, value: o.value });
+            } else if (o.customFieldOptionsId !== 0) {
+              const orig = originalDT?.options?.find((oo: any) => oo.customFieldOptionsId === o.customFieldOptionsId);
+              if (orig && (orig.label !== o.label || orig.value !== o.value || orig.active !== o.active)) {
+                updateOptions.push({
+                  customFieldOptionsId: o.customFieldOptionsId,
+                  label: o.label,
+                  value: o.value,
+                  active: o.active
+                });
+              }
+            }
           });
+        } else {
+          // Deactivate options if datatype changed to non-option type
+          (originalDT?.options || []).forEach((oo: any) => {
+            updateOptions.push({ customFieldOptionsId: oo.customFieldOptionsId, active: false });
+          });
+        }
+
+        const block: any = {
+          customFieldLinkId: b.customFieldLinkId,
+          valueDataType: b.valueDataType || 'Varchar',
+          active: b.active
+        };
+        if (addValidations.length) block.addValidations = addValidations;
+        if (updateValidations.length) block.updateValidations = updateValidations;
+        if (addOptions.length) block.addOptions = addOptions;
+        if (updateOptions.length) block.updateOptions = updateOptions;
+
+        updateCustomFieldDataTypes.push(block);
+
+      } else if (b.active !== false) {
+        
+        // Brand-new block mapping for PATCH requirement: `addCustomFieldDataTypes`
+        const addValidations = (b.validations || [])
+          .filter((v: any) => v.active !== false)
+          .map((v: any) => ({ ruleId: +v.ruleId, ruleValue: v.ruleValue, message: v.message }));
+
+        const addOptions = showOptions
+          ? (b.options || []).filter((o: any) => o.active !== false).map((o: any) => ({ label: o.label, value: o.value }))
+          : [];
+
+        addCustomFieldDataTypes.push({
+          fieldDataTypeId: +b.fieldDataTypeId,
+          valueDataType: b.valueDataType || 'Varchar',
+          addValidations,
+          addOptions
         });
       }
-    }
+    });
 
-    const typeUpdateBlock: any = {
-      customFieldLinkId: originalDataType?.customFieldLinkId || 0,
-      valueDataType: originalDataType?.valueDataType || "Varchar",
-      active: true
-    };
+    if (updateCustomFieldDataTypes.length) payload.updateCustomFieldDataTypes = updateCustomFieldDataTypes;
+    if (addCustomFieldDataTypes.length) payload.addCustomFieldDataTypes = addCustomFieldDataTypes;
 
-    if (addValidations.length) typeUpdateBlock.addValidations = addValidations;
-    if (updateValidations.length) typeUpdateBlock.updateValidations = updateValidations;
-    if (addOptions.length) typeUpdateBlock.addOptions = addOptions;
-    if (updateOptions.length) typeUpdateBlock.updateOptions = updateOptions;
-
-    // Check if Data Type changed (Add it as new or updated)
-    let typeId = originalDataType?.fieldDataTypeId;
-    if (!typeId && originalDataType?.fieldDataType && this.dataTypes.length) {
-      const match = this.dataTypes.find(t => (t.fieldDataType || '').toLowerCase() === (originalDataType.fieldDataType || '').toLowerCase());
-      if (match) typeId = match.fieldDataTypeId;
-    }
-
-    if (typeId && +formValue.fieldDataTypeId !== typeId) {
-      typeUpdateBlock.fieldDataTypeId = +formValue.fieldDataTypeId; // Will include for backend consistency even if not strictly in sample
-    }
-
-    payload.updateCustomFieldDataTypes = [typeUpdateBlock];
-
-    console.log('Update Custom Field Payload:', payload);
+    console.log('Update Custom Field Payload:', JSON.stringify(payload, null, 2));
 
     this.customFieldService.update(this.customFieldId, payload).subscribe({
       next: (res) => {
