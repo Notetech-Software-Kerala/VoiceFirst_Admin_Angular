@@ -1,0 +1,138 @@
+<mat-dialog-content>
+    <h5 class="mb-4">Edit Profile</h5>
+    <form [formGroup]="form" class="row g-3">
+        <!-- First Name -->
+        <div class="col-md-6">
+            <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
+            <input type="text" id="firstName" class="form-control" formControlName="firstName"
+                placeholder="Enter first name">
+            @if (form.get('firstName')?.touched && form.get('firstName')?.invalid) {
+            <div class="text-danger small mt-1">First Name is required.</div>
+            }
+        </div>
+
+        <!-- Last Name -->
+        <div class="col-md-6">
+            <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
+            <input type="text" id="lastName" class="form-control" formControlName="lastName"
+                placeholder="Enter last name">
+            @if (form.get('lastName')?.touched && form.get('lastName')?.invalid) {
+            <div class="text-danger small mt-1">Last Name is required.</div>
+            }
+        </div>
+
+        <!-- Email -->
+        <!-- <div class="col-12">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" id="email" class="form-control" formControlName="email" placeholder="example@email.com"
+                readonly>
+            @if (form.get('email')?.touched && form.get('email')?.invalid) {
+            <div class="text-danger small mt-1">
+                @if (form.get('email')?.hasError('required')) { Email is required. }
+                @if (form.get('email')?.hasError('email')) { Valid email is required. }
+            </div>
+            }
+        </div> -->
+
+        <!-- Mobile Number with Dial Code -->
+        <div class="col-12">
+            <label for="mobileNo" class="form-label">Mobile Number <span class="text-danger">*</span></label>
+            <div class="input-group">
+                <!-- Dial Code Dropdown -->
+                <div class="dropdown" style="max-width: 140px; flex-shrink: 0;">
+                    <button class="form-select text-start w-100" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false" style="min-height: 38px; border-radius: 0.375rem 0 0 0.375rem;">
+                        {{ form.get('dialCodeId')?.value ? selectedDialCodeLabel : 'Code' }}
+                    </button>
+                    <ul class="dropdown-menu p-0 shadow-sm custom-dropdown-menu" style="min-width: 220px;">
+                        <!-- Search -->
+                        <li class="p-2 border-bottom sticky-top custom-dropdown-header-footer bg-white"
+                            style="z-index: 3;" (click)="$event.stopPropagation()">
+                            <input type="text" class="form-control form-control-sm" placeholder="Search dial code..."
+                                (input)="onDialCodeSearch($event)" autofocus>
+                        </li>
+                        <!-- Prev Page -->
+                        @if (dialCodePage > 1) {
+                        <li class="border-bottom sticky-top custom-dropdown-header-footer bg-light" style="z-index: 2;">
+                            <button type="button" class="dropdown-item custom-pagination-btn fw-bold py-2 text-center"
+                                (click)="onPrevDialCodePage($event)">
+                                &laquo; Previous Page
+                            </button>
+                        </li>
+                        }
+                        <!-- Items -->
+                        @for (item of dialCodeList; track item.dialCodeId) {
+                        <li>
+                            <button type="button" class="dropdown-item py-2"
+                                [class.active]="form.get('dialCodeId')?.value == item.dialCodeId"
+                                (click)="selectDialCode(item)">
+                                {{ item.dialCode }}
+                            </button>
+                        </li>
+                        }
+                        <!-- Next Page -->
+                        @if (dialCodePage < dialCodeTotalPages) { <li
+                            class="border-top sticky-bottom custom-dropdown-header-footer bg-light" style="z-index: 2;">
+                            <button type="button" class="dropdown-item custom-pagination-btn fw-bold py-2 text-center"
+                                (click)="onNextDialCodePage($event)">
+                                Next Page &raquo;
+                            </button>
+                            </li>
+                            }
+
+                            @if (dialCodeList.length === 0) {
+                            <li class="p-3 text-center text-muted small fst-italic">
+                                No codes found.
+                            </li>
+                            }
+                    </ul>
+                </div>
+
+                <!-- Number Input -->
+                <input type="text" id="mobileNo" class="form-control ps-3" formControlName="mobileNo"
+                    placeholder="Enter mobile number">
+            </div>
+
+            @if ((form.get('mobileNo')?.touched && form.get('mobileNo')?.invalid) || (form.get('dialCodeId')?.touched &&
+            form.get('dialCodeId')?.invalid)) {
+            <div class="text-danger small mt-1">Complete Mobile Number (Code & Number) is required.</div>
+            }
+        </div>
+
+        <!-- Gender -->
+        <div class="col-md-6">
+            <label for="gender" class="form-label">Gender <span class="text-danger">*</span></label>
+            <select id="gender" class="form-select text-capitalize" formControlName="gender">
+                <option value="" disabled>Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+            </select>
+            @if (form.get('gender')?.touched && form.get('gender')?.invalid) {
+            <div class="text-danger small mt-1">Gender is required.</div>
+            }
+        </div>
+
+        <!-- Birth Year -->
+        <div class="col-md-6">
+            <label for="birthYear" class="form-label">Birth Year <span class="text-danger">*</span></label>
+            <input type="number" id="birthYear" class="form-control" formControlName="birthYear" placeholder="YYYY"
+                min="1900" max="2100">
+            @if (form.get('birthYear')?.touched && form.get('birthYear')?.invalid) {
+            <div class="text-danger small mt-1">Valid Birth Year (YYYY) is required.</div>
+            }
+        </div>
+
+
+
+        <mat-dialog-actions class="mt-4">
+            <button type="button" class="close-btn" (click)="close()">Cancel</button>
+            <button class="submit-btn" type="button" [disabled]="isSubmitting || form.invalid" (click)="save()">
+                @if (isSubmitting) {
+                <span class="btn-loader"></span>
+                }
+                Save Changes
+            </button>
+        </mat-dialog-actions>
+    </form>
+</mat-dialog-content>

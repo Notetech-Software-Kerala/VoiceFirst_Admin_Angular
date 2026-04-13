@@ -1,12 +1,14 @@
 
 export interface CustomFieldModel {
   customFieldId: number;
+  // Lookup API returns customFieldLinkId as the unique identifier per type
+  customFieldLinkId?: number;
   fieldName: string;
   fieldKey: string;
-  fieldDataType: string;
+  // Flat fieldDataType returned by the lookup API
+  fieldDataType?: string;
+  fieldDataTypes?: CustomFieldDataTypeModel[];
   deleted: boolean;
-  validations?: CustomFieldValidation[];
-  options?: CustomFieldOption[];
   active: boolean;
 
   createdUser: string;
@@ -18,9 +20,25 @@ export interface CustomFieldModel {
   deletedUser: string;
   deletedDate: string | null;
 }
+export interface CustomFieldDataTypeModel {
+  customFieldLinkId: number;
+  fieldDataTypeId: number;
+  customFieldId: number;
+  fieldDataType: string;
+  valueDataType: string;
+  validations?: CustomFieldValidation[];
+  options?: CustomFieldOption[];
+  active: boolean;
+
+  createdDate: string;
+  createdUser: string;
+  modifiedDate: string | null;
+  modifiedUser: string;
+}
 
 export interface CustomFieldValidation {
   customFieldValidationId: number;
+  ruleId?: number;
   ruleName: string;
   ruleValue: string;
   message: string;

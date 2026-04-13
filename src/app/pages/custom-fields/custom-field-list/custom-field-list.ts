@@ -82,6 +82,7 @@ export class CustomFieldList extends BaseListComponent {
       .pipe(takeUntil(this.destroy$))
       .subscribe(data => {
         this.customFields = data;
+        console.log(this.customFields);
         this.cdr.markForCheck();
       });
 

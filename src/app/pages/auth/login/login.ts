@@ -114,7 +114,7 @@ export class Login {
           }
           this.submitting = false;
           this.router.navigate(['/dashboard']);
-          this.toast.success('Welcome to Voice First', 'Login Success');
+          this.toast.success('Welcome to Voice First', 'Login Success', { position: 'center' });
         },
         error: (err) => {
           this.submitting = false;

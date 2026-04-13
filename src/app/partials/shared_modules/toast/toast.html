@@ -1,6 +1,7 @@
 <div class="toast-wrap" role="region" aria-label="Notifications">
     <article *ngFor="let t of toasts" class="toast" [class.success]="t.type === 'success'"
         [class.info]="t.type === 'info'" [class.warning]="t.type === 'warning'" [class.error]="t.type === 'error'"
+        [class.center]="t.position === 'center'"
         [style.--duration.ms]="t.duration || 0" role="status" aria-live="polite" (mouseenter)="pause(t.id!)"
         (mouseleave)="resume(t.id!)">
 

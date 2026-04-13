@@ -153,10 +153,10 @@ export class AddEditBusinessActivity implements OnInit {
 
     this.originalCustomFieldsData = data.activityCustomFields || [];
 
-    // Pre-select active linked custom fields
+    // Pre-select active linked custom fields using customFieldLinkId
     const activeIds: number[] = (data.activityCustomFields || [])
       .filter((cf: any) => cf.active)
-      .map((cf: any) => cf.customFieldId);
+      .map((cf: any) => cf.customFieldLinkId);
 
     const fa = this.form.get('customFieldIds') as FormArray;
     fa.clear();
@@ -183,24 +183,24 @@ export class AddEditBusinessActivity implements OnInit {
     }
   }
 
-  isCustomFieldChecked(customFieldId: number): boolean {
+  isCustomFieldChecked(customFieldLinkId: number): boolean {
     const fa = this.form.get('customFieldIds') as FormArray;
-    return fa.controls.some(c => c.value === customFieldId);
+    return fa.controls.some(c => c.value === customFieldLinkId);
   }
 
-  onCustomFieldChange(event: Event, customFieldId: number) {
+  onCustomFieldChange(event: Event, customFieldLinkId: number) {
     const checked = (event.target as HTMLInputElement).checked;
-    this.toggleCustomField(customFieldId, checked);
+    this.toggleCustomField(customFieldLinkId, checked);
   }
 
-  toggleCustomField(customFieldId: number, isChecked: boolean) {
+  toggleCustomField(customFieldLinkId: number, isChecked: boolean) {
     const fa = this.form.get('customFieldIds') as FormArray;
     if (isChecked) {
-      if (!fa.controls.some(c => c.value === customFieldId)) {
-        fa.push(this.fb.control(customFieldId));
+      if (!fa.controls.some(c => c.value === customFieldLinkId)) {
+        fa.push(this.fb.control(customFieldLinkId));
       }
     } else {
-      const index = fa.controls.findIndex(c => c.value === customFieldId);
+      const index = fa.controls.findIndex(c => c.value === customFieldLinkId);
       if (index !== -1) fa.removeAt(index);
     }
   }
@@ -257,9 +257,10 @@ export class AddEditBusinessActivity implements OnInit {
       changes.activityName = formValue.activityName;
     }
 
+    // Key on customFieldLinkId - the new identifier from the lookup API
     const originalMap = new Map<number, any>();
     this.originalCustomFieldsData.forEach((link: any) => {
-      originalMap.set(link.customFieldId, link);
+      originalMap.set(link.customFieldLinkId, link);
     });
 
     const currentIds = new Set<number>(selectedIds);
@@ -272,8 +273,8 @@ export class AddEditBusinessActivity implements OnInit {
       }
     });
 
-    originalMap.forEach((linkData, customFieldId) => {
-      const isSelected = currentIds.has(customFieldId);
+    originalMap.forEach((linkData, customFieldLinkId) => {
+      const isSelected = currentIds.has(customFieldLinkId);
 
       if (linkData.active && !isSelected) {
         updateCustomField.push({ activityCustomFieldLinkId: linkData.activityCustomFieldLinkId, active: false });

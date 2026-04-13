@@ -12,15 +12,13 @@
             <h5 class="mb-4">{{title}}</h5>
             <form [formGroup]="form" class="row g-3">
 
-                <!-- Basic Settings -->
+                <!-- ── Basic Info ── -->
                 <div class="col-md-4">
                     <label for="fieldName" class="form-label">Field Name <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="fieldName" formControlName="fieldName"
                         placeholder="Enter field name" />
                     @if (form.get('fieldName')?.touched && form.get('fieldName')?.invalid) {
-                    <div class="text-danger small">
-                        @if (form.get('fieldName')?.hasError('required')) { Field Name is required. }
-                    </div>
+                    <div class="text-danger small">Field Name is required.</div>
                     }
                 </div>
 
@@ -29,135 +27,242 @@
                     <input type="text" class="form-control" id="fieldKey" formControlName="fieldKey"
                         placeholder="Enter unique field key" />
                     @if (form.get('fieldKey')?.touched && form.get('fieldKey')?.invalid) {
-                    <div class="text-danger small">
-                        @if (form.get('fieldKey')?.hasError('required')) { Field Key is required. }
-                    </div>
+                    <div class="text-danger small">Field Key is required.</div>
                     }
                 </div>
 
-                <div class="col-md-4">
-                    <label for="fieldDataType" class="form-label">Data Type <span class="text-danger">*</span></label>
-                    <select class="form-select" id="fieldDataType" formControlName="fieldDataType">
-                        <option value="" disabled>Select Data Type</option>
-                        @for (type of dataTypes; track type) {
-                        <option [value]="type | lowercase">{{ type }}</option>
-                        }
-                    </select>
-                    @if (form.get('fieldDataType')?.touched && form.get('fieldDataType')?.invalid) {
-                    <div class="text-danger small">
-                        @if (form.get('fieldDataType')?.hasError('required')) { Data Type is required. }
-                    </div>
-                    }
-                </div>
-
-                <!-- Spacer -->
                 <hr class="mt-4 mb-2">
 
-                <!-- Validations Section -->
+                <!-- ── Data Type Configurations ── -->
                 <div class="col-12">
                     <div class="d-flex justify-content-between align-items-center mb-3 mt-2">
-                        <h6 class="fw-bold m-0 ls-1">Validation Rules</h6>
+                        <h6 class="fw-bold m-0 ls-1">Data Type Configurations</h6>
                         <button type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
-                            (click)="addValidation()">
-                            <mat-icon class="icon-sm">add</mat-icon> Add Rule
+                            (click)="addDataTypeBlock()">
+                            <mat-icon class="icon-sm">add</mat-icon> Add Data Type
                         </button>
                     </div>
 
-                    <div formArrayName="validations" class="d-flex flex-column gap-3">
-                        @for (val of validations.controls; track val; let i = $index) {
-                        @if (val.get('active')?.value) {
-                        <div class="plan-card p-3 position-relative" [formGroupName]="i">
+                    <div formArrayName="dataTypeBlocks" class="d-flex flex-column gap-3">
+
+                        <!-- Iterate over data type blocks -->
+                        @for (block of dataTypeBlocks.controls; track block; let bi = $index) {
+                        @if (block.get('active')?.value !== false) {
+
+                        <div class="plan-card p-3 position-relative" [formGroupName]="bi">
+
+                            <!-- Block Remove Button -->
                             <button type="button" class="btn-clear position-absolute top-0 end-0 m-2 text-danger"
-                                (click)="removeValidation(i)">
+                                (click)="removeDataTypeBlock(bi)">
                                 <mat-icon>close</mat-icon>
                             </button>
 
-                            <div class="row g-2 align-items-end me-4">
+                            <!-- Row 1: Data Type selection -->
+                            <div class="row g-2 align-items-end me-4 mb-1">
                                 <div class="col-md-4">
-                                    <label class="form-label fs-7">Rule Name</label>
-                                    <input type="text" class="form-control form-control-sm" formControlName="ruleName"
-                                        placeholder="e.g. required, minLength">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fs-7">Rule Value</label>
-                                    <input type="text" class="form-control form-control-sm" formControlName="ruleValue"
-                                        placeholder="e.g. true, 10">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fs-7">Error Message</label>
-                                    <input type="text" class="form-control form-control-sm" formControlName="message"
-                                        placeholder="Custom error msg">
+                                    <label class="form-label fs-7">
+                                        Data Type <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select form-select-sm" formControlName="fieldDataTypeId" (change)="onDataTypeChange(bi)">
+                                        <option value="" disabled>Select Data Type</option>
+                                        @for (type of dataTypes; track type.fieldDataTypeId) {
+                                        <option [value]="type.fieldDataTypeId">{{ type.fieldDataType }}</option>
+                                        }
+                                    </select>
+                                    @if (block.get('fieldDataTypeId')?.touched && block.get('fieldDataTypeId')?.invalid) {
+                                    <div class="text-danger small">Data Type is required.</div>
+                                    }
                                 </div>
                             </div>
+
+                            <!-- ── Validation Rules block scoped ── -->
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="section-label">
+                                        <mat-icon class="icon-sm">rule</mat-icon> Validation Rules
+                                    </span>
+                                    <button type="button"
+                                        class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
+                                        (click)="addValidation(bi)">
+                                        <mat-icon class="icon-sm">add</mat-icon> Add Rule
+                                    </button>
+                                </div>
+
+                                <div formArrayName="validations" class="d-flex flex-column gap-2">
+                                    <!-- Iterate over validations inside this block -->
+                                    @for (val of getValidations(bi).controls; track val; let vi = $index) {
+                                    @if (val.get('active')?.value !== false) {
+                                    <div class="inner-card p-3 position-relative" [formGroupName]="vi">
+                                        
+                                        <!-- Remove Validation Button -->
+                                        <button type="button" class="btn-clear position-absolute top-0 end-0 m-2 text-danger"
+                                            (click)="removeValidation(bi, vi)">
+                                            <mat-icon>close</mat-icon>
+                                        </button>
+
+                                        <div class="row g-2 align-items-end me-4">
+                                            <!-- Rule dropdown -->
+                                            <div class="col-md-4">
+                                                <label class="form-label fs-7">Rule</label>
+                                                <div class="dropdown w-100">
+                                                    <button class="form-select form-select-sm text-start w-100"
+                                                        type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                                                        (click)="openRuleDropdown(bi)">
+                                                        {{ val.get('ruleName')?.value || 'Select Rule' }}
+                                                    </button>
+                                                    
+                                                    <ul class="dropdown-menu p-0 shadow-sm custom-dropdown-menu w-100">
+                                                        <!-- Search Input -->
+                                                        <li class="p-2 border-bottom sticky-top custom-dropdown-header-footer"
+                                                            style="z-index: 3;" (click)="$event.stopPropagation()">
+                                                            <input type="text" class="form-control form-control-sm"
+                                                                placeholder="Search rule..."
+                                                                (input)="onRuleSearch(bi, $event)" autofocus>
+                                                        </li>
+                                                        
+                                                        <!-- Pagination Prev -->
+                                                        @if ((rulePages[bi] || 1) > 1) {
+                                                        <li class="border-bottom sticky-top custom-dropdown-header-footer"
+                                                            style="z-index: 2;">
+                                                            <button type="button"
+                                                                class="dropdown-item custom-pagination-btn fw-bold py-2"
+                                                                (click)="onPrevRulePage(bi, $event)">
+                                                                &laquo; Previous Page
+                                                            </button>
+                                                        </li>
+                                                        }
+                                                        
+                                                        <!-- Dynamic Lookups for this Block -->
+                                                        @for (rule of getBlockRules(bi); track rule.ruleId) {
+                                                        <li>
+                                                            <button type="button" class="dropdown-item py-2"
+                                                                [class.active]="val.get('ruleId')?.value == rule.ruleId"
+                                                                (click)="selectRule(bi, vi, rule)">
+                                                                {{ rule.ruleName }}
+                                                            </button>
+                                                        </li>
+                                                        }
+
+                                                        @if (!getBlockRules(bi).length) {
+                                                        <li class="text-center text-muted p-2 small">No rules found.</li>
+                                                        }
+                                                        
+                                                        <!-- Pagination Next -->
+                                                        @if ((rulePages[bi] || 1) < (ruleTotalPages[bi] || 1)) {
+                                                        <li class="border-top sticky-bottom custom-dropdown-header-footer"
+                                                            style="z-index: 2;">
+                                                            <button type="button"
+                                                                class="dropdown-item custom-pagination-btn fw-bold py-2"
+                                                                (click)="onNextRulePage(bi, $event)">
+                                                                Next Page &raquo;
+                                                            </button>
+                                                        </li>
+                                                        }
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <label class="form-label fs-7">Rule Value</label>
+                                                <input type="text" class="form-control form-control-sm"
+                                                    formControlName="ruleValue" placeholder="e.g. true, 10">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fs-7">Error Message</label>
+                                                <input type="text" class="form-control form-control-sm"
+                                                    formControlName="message" placeholder="Validation error message">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    }
+                                    }
+
+                                    <!-- Empty validatons state -->
+                                    @if (getValidations(bi).controls.length === 0 || !hasActiveItems(getValidations(bi))) {
+                                    <div class="empty-state-sm">
+                                        <mat-icon>rule</mat-icon>
+                                        <p>No validation rules added.</p>
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- ── Options part (visible only for valid data types) ── -->
+                            @if (isOptionType(bi)) {
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="section-label">
+                                        <mat-icon class="icon-sm">list</mat-icon> Options
+                                    </span>
+                                    <button type="button"
+                                        class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
+                                        (click)="addOption(bi)">
+                                        <mat-icon class="icon-sm">add</mat-icon> Add Option
+                                    </button>
+                                </div>
+
+                                <div formArrayName="options" class="d-flex flex-column gap-2">
+                                    <!-- Iterate over options inside this block -->
+                                    @for (opt of getOptions(bi).controls; track opt; let oi = $index) {
+                                    @if (opt.get('active')?.value !== false) {
+                                    <div class="inner-card p-3 position-relative" [formGroupName]="oi">
+                                        
+                                        <!-- Remove Option Button -->
+                                        <button type="button"
+                                            class="btn-clear position-absolute top-0 end-0 m-2 text-danger"
+                                            (click)="removeOption(bi, oi)">
+                                            <mat-icon>close</mat-icon>
+                                        </button>
+
+                                        <div class="row g-2 align-items-end me-4">
+                                            <div class="col-md-6">
+                                                <label class="form-label fs-7">Label</label>
+                                                <input type="text" class="form-control form-control-sm"
+                                                    formControlName="label" placeholder="Display text">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fs-7">Value</label>
+                                                <input type="text" class="form-control form-control-sm"
+                                                    formControlName="value" placeholder="Backend value">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    }
+                                    }
+
+                                    <!-- Empty options state -->
+                                    @if (getOptions(bi).controls.length === 0 || !hasActiveItems(getOptions(bi))) {
+                                    <div class="empty-state-sm">
+                                        <mat-icon>list</mat-icon>
+                                        <p>No options added for this type.</p>
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+                            }
+
                         </div>
+
                         }
                         }
-                        @if (validations.controls.length === 0 || !hasActiveItems(validations)) {
+
+                        <!-- Base empty state when 0 blocks exist -->
+                        @if (dataTypeBlocks.controls.length === 0 || !hasActiveBlocks()) {
                         <div class="empty-state">
-                            <mat-icon>rule</mat-icon>
-                            <p>No validation rules added.</p>
+                            <mat-icon>category</mat-icon>
+                            <p>No data types configured. Click "Add Data Type" to begin.</p>
                         </div>
                         }
+
                     </div>
                 </div>
 
-
-                <!-- Options Section (Only for Dropdown) -->
-                <ng-container *ngIf="form.get('fieldDataType')?.value === 'dropdown'">
-                    <!-- Spacer -->
-                    <hr class="mt-4 mb-2">
-
-                    <div class="col-12">
-                        <div class="d-flex justify-content-between align-items-center mb-3 mt-2">
-                            <h6 class="fw-bold m-0 ls-1">Dropdown Options</h6>
-                            <button type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
-                                (click)="addOption()">
-                                <mat-icon class="icon-sm">add</mat-icon> Add Option
-                            </button>
-                        </div>
-
-                        <div formArrayName="options" class="d-flex flex-column gap-3">
-                            @for (opt of options.controls; track opt; let j = $index) {
-                            @if (opt.get('active')?.value) {
-                            <div class="plan-card p-3 position-relative" [formGroupName]="j">
-                                <button type="button" class="btn-clear position-absolute top-0 end-0 m-2 text-danger"
-                                    (click)="removeOption(j)">
-                                    <mat-icon>close</mat-icon>
-                                </button>
-
-                                <div class="row g-2 align-items-end me-4">
-                                    <div class="col-md-6">
-                                        <label class="form-label fs-7">Label</label>
-                                        <input type="text" class="form-control form-control-sm" formControlName="label"
-                                            placeholder="Display Text">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fs-7">Value</label>
-                                        <input type="text" class="form-control form-control-sm" formControlName="value"
-                                            placeholder="Backend Value">
-                                    </div>
-                                </div>
-                            </div>
-                            }
-                            }
-                            @if (options.controls.length === 0 || !hasActiveItems(options)) {
-                            <div class="empty-state">
-                                <mat-icon>list</mat-icon>
-                                <p>No options added for this dropdown.</p>
-                            </div>
-                            }
-                        </div>
-                    </div>
-                </ng-container>
-
-                <!-- Submit Buttons -->
+                <!-- ── Submit Actions ── -->
                 <div class="col-12 mt-4 d-flex justify-content-end gap-2">
                     <mat-dialog-actions class="mt-4">
                         <button type="button" class="close-btn" (click)="goBack()">Cancel</button>
                         <button class="submit-btn" type="submit" [disabled]="submitting" (click)="onSubmit()">
-                            @if (submitting) {
-                            <span class="btn-loader"></span>
-                            }
+                            @if (submitting) { <span class="btn-loader"></span> }
                             Save Field
                         </button>
                     </mat-dialog-actions>

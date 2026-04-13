@@ -24,6 +24,8 @@ import { DetailsLoaderComponent } from '../../../partials/shared_modules/details
 })
 export class CustomFieldDetails implements OnInit, OnDestroy {
   field: any | null = null;
+
+
   loading = true;
   private destroy$ = new Subject<void>();
   customFieldId: number = 0;
