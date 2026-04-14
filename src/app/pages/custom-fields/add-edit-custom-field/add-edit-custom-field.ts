@@ -9,6 +9,7 @@ import { CommonModule, Location } from '@angular/common';
 import { MaterialModule } from '../../../material.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CustomFieldModel } from '../../../core/_state/custom-field/custom-field.model';
+import { ConfirmationService } from '../../../partials/shared_directives/confirmation';
 
 @Component({
   selector: 'app-add-edit-custom-field',
@@ -43,6 +44,7 @@ export class AddEditCustomField implements OnInit, OnDestroy {
     private toastService: ToastService,
     private cdr: ChangeDetectorRef,
     private encryptionService: EncryptionService,
+    private confirmationService: ConfirmationService,
     private router: Router
   ) { }
 
@@ -143,16 +145,33 @@ export class AddEditCustomField implements OnInit, OnDestroy {
   }
 
   removeDataTypeBlock(index: number) {
-    const block = this.dataTypeBlocks.at(index) as FormGroup;
-    if (block.get('isExisting')?.value) {
-      block.get('active')?.setValue(false);
-    } else {
-      this.dataTypeBlocks.removeAt(index);
-      this.blockValidationRules.splice(index, 1);
-      this.ruleSearchTexts.splice(index, 1);
-      this.rulePages.splice(index, 1);
-      this.ruleTotalPages.splice(index, 1);
-    }
+    const label = this.getBlockLabel(index);
+    this.confirmationService.confirmDelete(label).subscribe(confirmed => {
+      if (confirmed) {
+        const block = this.dataTypeBlocks.at(index) as FormGroup;
+        if (block.get('isExisting')?.value) {
+          block.get('active')?.setValue(false);
+        } else {
+          this.dataTypeBlocks.removeAt(index);
+          this.blockValidationRules.splice(index, 1);
+          this.ruleSearchTexts.splice(index, 1);
+          this.rulePages.splice(index, 1);
+          this.ruleTotalPages.splice(index, 1);
+        }
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  recoverDataTypeBlock(index: number) {
+    const label = this.getBlockLabel(index);
+    this.confirmationService.confirmRestore(label, `Are you sure you want to recover "${label}"?`).subscribe(confirmed => {
+      if (confirmed) {
+        const block = this.dataTypeBlocks.at(index) as FormGroup;
+        block.get('active')?.setValue(true);
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   onDataTypeChange(blockIndex: number) {
@@ -174,6 +193,14 @@ export class AddEditCustomField implements OnInit, OnDestroy {
     if (!id) return false;
     const type = this.dataTypes.find(t => t.fieldDataTypeId == id);
     return type ? !!type.includesOptions : false;
+  }
+
+  isDataTypeSelected(typeId: number, currentBlockIndex: number): boolean {
+    return this.dataTypeBlocks.controls.some((block: any, index: number) => 
+      index !== currentBlockIndex && 
+      block.get('active')?.value !== false && 
+      block.get('fieldDataTypeId')?.value == typeId
+    );
   }
 
   isOptionType(blockIndex: number): boolean {
@@ -464,15 +491,14 @@ export class AddEditCustomField implements OnInit, OnDestroy {
     });
   }
 
-  // Matches `{ fieldName, fieldKey, active, updateCustomFieldDataTypes: [...], addCustomFieldDataTypes: [...] }`
+  // Matches `{ fieldName, fieldKey, updateCustomFieldDataTypes: [...], addCustomFieldDataTypes: [...] }`
   editCustomField() {
     const formValue = this.form.value;
 
-    const payload: any = {
-      fieldName: formValue.fieldName,
-      fieldKey: formValue.fieldKey,
-      active: true
-    };
+    const payload: any = {};
+
+    if (formValue.fieldName !== this.originalData.fieldName) payload.fieldName = formValue.fieldName;
+    if (formValue.fieldKey !== this.originalData.fieldKey) payload.fieldKey = formValue.fieldKey;
 
     const updateCustomFieldDataTypes: any[] = [];
     const addCustomFieldDataTypes: any[] = [];
@@ -482,6 +508,18 @@ export class AddEditCustomField implements OnInit, OnDestroy {
 
       if (b.isExisting) {
         const originalDT = (this.originalData.fieldDataTypes || []).find((dt: any) => dt.customFieldLinkId === b.customFieldLinkId);
+        const originalActive = originalDT?.active ?? true;
+
+        if (b.active === false) {
+           if (originalActive !== false) {
+             updateCustomFieldDataTypes.push({
+               customFieldLinkId: b.customFieldLinkId,
+               valueDataType: b.valueDataType || '0',
+               active: false
+             });
+           }
+           return; // skip validations & options
+        }
 
         const addValidations: any[] = [];
         const updateValidations: any[] = [];
@@ -522,21 +560,36 @@ export class AddEditCustomField implements OnInit, OnDestroy {
         } else {
           // Deactivate options if datatype changed to non-option type
           (originalDT?.options || []).forEach((oo: any) => {
-            updateOptions.push({ customFieldOptionsId: oo.customFieldOptionsId, active: false });
+            if (oo.active !== false) {
+              updateOptions.push({ customFieldOptionsId: oo.customFieldOptionsId, active: false });
+            }
           });
         }
 
-        const block: any = {
-          customFieldLinkId: b.customFieldLinkId,
-          valueDataType: b.valueDataType || 'Varchar',
-          active: b.active
-        };
-        if (addValidations.length) block.addValidations = addValidations;
-        if (updateValidations.length) block.updateValidations = updateValidations;
-        if (addOptions.length) block.addOptions = addOptions;
-        if (updateOptions.length) block.updateOptions = updateOptions;
+        const originalValueDataType = originalDT?.valueDataType || 'Varchar';
+        const currentValueDataType = b.valueDataType || 'Varchar';
 
-        updateCustomFieldDataTypes.push(block);
+        const hasChanges = 
+          originalActive !== b.active || 
+          originalValueDataType !== currentValueDataType || 
+          addValidations.length > 0 || 
+          updateValidations.length > 0 || 
+          addOptions.length > 0 || 
+          updateOptions.length > 0;
+
+        if (hasChanges) {
+          const block: any = {
+            customFieldLinkId: b.customFieldLinkId,
+            valueDataType: b.valueDataType || 'Varchar',
+            active: b.active
+          };
+          if (addValidations.length) block.addValidations = addValidations;
+          if (updateValidations.length) block.updateValidations = updateValidations;
+          if (addOptions.length) block.addOptions = addOptions;
+          if (updateOptions.length) block.updateOptions = updateOptions;
+
+          updateCustomFieldDataTypes.push(block);
+        }
 
       } else if (b.active !== false) {
         
@@ -560,6 +613,12 @@ export class AddEditCustomField implements OnInit, OnDestroy {
 
     if (updateCustomFieldDataTypes.length) payload.updateCustomFieldDataTypes = updateCustomFieldDataTypes;
     if (addCustomFieldDataTypes.length) payload.addCustomFieldDataTypes = addCustomFieldDataTypes;
+
+    if (Object.keys(payload).length === 0) {
+      this.toastService.info('No changes were detected', 'Info');
+      this.submitting = false;
+      return;
+    }
 
     console.log('Update Custom Field Payload:', JSON.stringify(payload, null, 2));
 

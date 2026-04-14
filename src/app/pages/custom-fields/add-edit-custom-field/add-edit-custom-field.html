@@ -63,13 +63,21 @@
                                     <label class="form-label fs-7">
                                         Data Type <span class="text-danger">*</span>
                                     </label>
-                                    <select class="form-select form-select-sm" formControlName="fieldDataTypeId" (change)="onDataTypeChange(bi)">
-                                        <option value="" disabled>Select Data Type</option>
-                                        @for (type of dataTypes; track type.fieldDataTypeId) {
-                                        <option [value]="type.fieldDataTypeId">{{ type.fieldDataType }}</option>
-                                        }
-                                    </select>
-                                    @if (block.get('fieldDataTypeId')?.touched && block.get('fieldDataTypeId')?.invalid) {
+                                    @if(block.get('isExisting')?.value) {
+                                        <input type="text" class="form-control form-control-sm" [value]="getBlockLabel(bi)" readonly disabled>
+                                    } @else {
+                                        <select class="form-select form-select-sm" formControlName="fieldDataTypeId"
+                                            (change)="onDataTypeChange(bi)">
+                                            <option value="" disabled>Select Data Type</option>
+                                            @for (type of dataTypes; track type.fieldDataTypeId) {
+                                            <option [value]="type.fieldDataTypeId" [disabled]="isDataTypeSelected(type.fieldDataTypeId, bi)">
+                                                {{ type.fieldDataType }}
+                                            </option>
+                                            }
+                                        </select>
+                                    }
+                                    @if (block.get('fieldDataTypeId')?.touched && block.get('fieldDataTypeId')?.invalid)
+                                    {
                                     <div class="text-danger small">Data Type is required.</div>
                                     }
                                 </div>
@@ -93,9 +101,10 @@
                                     @for (val of getValidations(bi).controls; track val; let vi = $index) {
                                     @if (val.get('active')?.value !== false) {
                                     <div class="inner-card p-3 position-relative" [formGroupName]="vi">
-                                        
+
                                         <!-- Remove Validation Button -->
-                                        <button type="button" class="btn-clear position-absolute top-0 end-0 m-2 text-danger"
+                                        <button type="button"
+                                            class="btn-clear position-absolute top-0 end-0 m-2 text-danger"
                                             (click)="removeValidation(bi, vi)">
                                             <mat-icon>close</mat-icon>
                                         </button>
@@ -110,7 +119,7 @@
                                                         (click)="openRuleDropdown(bi)">
                                                         {{ val.get('ruleName')?.value || 'Select Rule' }}
                                                     </button>
-                                                    
+
                                                     <ul class="dropdown-menu p-0 shadow-sm custom-dropdown-menu w-100">
                                                         <!-- Search Input -->
                                                         <li class="p-2 border-bottom sticky-top custom-dropdown-header-footer"
@@ -119,7 +128,7 @@
                                                                 placeholder="Search rule..."
                                                                 (input)="onRuleSearch(bi, $event)" autofocus>
                                                         </li>
-                                                        
+
                                                         <!-- Pagination Prev -->
                                                         @if ((rulePages[bi] || 1) > 1) {
                                                         <li class="border-bottom sticky-top custom-dropdown-header-footer"
@@ -131,7 +140,7 @@
                                                             </button>
                                                         </li>
                                                         }
-                                                        
+
                                                         <!-- Dynamic Lookups for this Block -->
                                                         @for (rule of getBlockRules(bi); track rule.ruleId) {
                                                         <li>
@@ -144,20 +153,21 @@
                                                         }
 
                                                         @if (!getBlockRules(bi).length) {
-                                                        <li class="text-center text-muted p-2 small">No rules found.</li>
+                                                        <li class="text-center text-muted p-2 small">No rules found.
+                                                        </li>
                                                         }
-                                                        
+
                                                         <!-- Pagination Next -->
-                                                        @if ((rulePages[bi] || 1) < (ruleTotalPages[bi] || 1)) {
-                                                        <li class="border-top sticky-bottom custom-dropdown-header-footer"
+                                                        @if ((rulePages[bi] || 1) < (ruleTotalPages[bi] || 1)) { <li
+                                                            class="border-top sticky-bottom custom-dropdown-header-footer"
                                                             style="z-index: 2;">
                                                             <button type="button"
                                                                 class="dropdown-item custom-pagination-btn fw-bold py-2"
                                                                 (click)="onNextRulePage(bi, $event)">
                                                                 Next Page &raquo;
                                                             </button>
-                                                        </li>
-                                                        }
+                                                            </li>
+                                                            }
                                                     </ul>
                                                 </div>
                                             </div>
@@ -178,9 +188,9 @@
                                     }
 
                                     <!-- Empty validatons state -->
-                                    @if (getValidations(bi).controls.length === 0 || !hasActiveItems(getValidations(bi))) {
+                                    @if (getValidations(bi).controls.length === 0 ||
+                                    !hasActiveItems(getValidations(bi))) {
                                     <div class="empty-state-sm">
-                                        <mat-icon>rule</mat-icon>
                                         <p>No validation rules added.</p>
                                     </div>
                                     }
@@ -206,7 +216,7 @@
                                     @for (opt of getOptions(bi).controls; track opt; let oi = $index) {
                                     @if (opt.get('active')?.value !== false) {
                                     <div class="inner-card p-3 position-relative" [formGroupName]="oi">
-                                        
+
                                         <!-- Remove Option Button -->
                                         <button type="button"
                                             class="btn-clear position-absolute top-0 end-0 m-2 text-danger"
@@ -233,7 +243,6 @@
                                     <!-- Empty options state -->
                                     @if (getOptions(bi).controls.length === 0 || !hasActiveItems(getOptions(bi))) {
                                     <div class="empty-state-sm">
-                                        <mat-icon>list</mat-icon>
                                         <p>No options added for this type.</p>
                                     </div>
                                     }

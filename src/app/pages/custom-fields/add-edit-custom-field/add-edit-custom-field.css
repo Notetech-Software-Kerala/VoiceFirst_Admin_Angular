@@ -81,6 +81,20 @@ h6 {
     font-size: 0.85rem;
 }
 
+.empty-state-sm {
+    padding: 12px;
+    text-align: center;
+    color: var(--color-text-placeholder);
+    background-color: color-mix(in srgb, var(--color-bg-primary) 50%, transparent);
+    border-radius: 6px;
+    border: 1px dashed var(--color-border-hr);
+}
+
+.empty-state-sm p {
+    margin: 0;
+    font-size: 0.8rem;
+}
+
 .card-body {
     padding: 0;
 }

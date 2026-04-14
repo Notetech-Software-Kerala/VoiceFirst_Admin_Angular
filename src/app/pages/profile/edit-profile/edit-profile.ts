@@ -163,7 +163,7 @@ export class EditProfile implements OnInit {
     }
     
     if (Number(formValue.birthYear) !== Number(this.data.birthYear)) {
-      payload.birthYear = Number(formValue.birthYear);
+      payload.birthYear = String(formValue.birthYear);
     }
     
     if (formValue.dialCodeId !== this.data.dialCodeId && !payload.dialCodeId) {
