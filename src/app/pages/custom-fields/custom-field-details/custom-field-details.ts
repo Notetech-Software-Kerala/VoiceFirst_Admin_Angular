@@ -145,6 +145,37 @@ export class CustomFieldDetails implements OnInit, OnDestroy {
       });
   }
 
+  onRecoverDataType(dataType: any) {
+    this.confirmationService.confirmRestore(dataType.fieldDataType || 'Data Type', 'Are you sure you want to recover this Data Type?')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(confirmed => {
+        if (confirmed) {
+          const payload = {
+            updateCustomFieldDataTypes: [
+              {
+                customFieldLinkId: dataType.customFieldLinkId,
+                active: true
+              }
+            ]
+          };
+
+          this.customFieldService.update(this.customFieldId, payload).subscribe({
+            next: (res: any) => {
+              if (res.statusCode === 200) {
+                this.toastService.success('Data Type recovered successfully', 'Success');
+                this.loadCustomFieldDetails(this.customFieldId); // Reload field info
+              } else {
+                this.toastService.error(res.message || 'Failed to recover Data Type', 'Error');
+              }
+            },
+            error: (error) => {
+              console.error(error);
+            }
+          });
+        }
+      });
+  }
+
   onRestore() {
     if (!this.field) return;
 

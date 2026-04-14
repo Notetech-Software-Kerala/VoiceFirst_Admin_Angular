@@ -46,7 +46,7 @@ export class CustomFieldService {
     )
   }
 
-  update(id: number, data: Partial<CustomFieldModel>): Observable<ApiResponse<CustomFieldModel>> {
+  update(id: number, data: any): Observable<ApiResponse<CustomFieldModel>> {
     return this.http.patch<ApiResponse<CustomFieldModel>>(
       `${this.base}${apiConfig.customField}/${id}`,
       data
